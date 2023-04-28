@@ -146,3 +146,5 @@ if os.path.isfile(os.path.join(vmec_results_path, f"wout_final_freeb.nc")):
     curves_to_vtk(curves, os.path.join(coils_results_path, "curves_freeb"))
     pointData = {"B_N": BdotN_surf[:, :, None]}
     s_final.to_vtk(os.path.join(coils_results_path, "surf_freeb"), extra_data=pointData)
+
+os.remove(os.path.join(parent_path,'threed1.final'))
