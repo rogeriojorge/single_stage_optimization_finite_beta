@@ -10,11 +10,14 @@ from scipy.optimize import minimize
 from simsopt import make_optimizable
 from simsopt._core.util import ObjectiveFailure
 from simsopt.solve import least_squares_mpi_solve
-from simsopt.mhd import Vmec, QuasisymmetryRatioResidual, VirtualCasing
+from simsopt.util.constants import ELEMENTARY_CHARGE
 from simsopt.util import MpiPartition, proc0_print, comm_world
 from simsopt._core.finite_difference import MPIFiniteDifference
 from simsopt.field import BiotSavart, Current, coils_via_symmetries
+from simsopt.mhd.bootstrap import RedlGeomBoozer, VmecRedlBootstrapMismatch
+from simsopt.mhd import Vmec, QuasisymmetryRatioResidual, VirtualCasing, Boozer
 from simsopt.objectives import SquaredFlux, QuadraticPenalty, LeastSquaresProblem
+from simsopt.mhd.profiles import ProfilePolynomial, ProfilePressure, ProfileScaled, ProfileSpline
 from simsopt.geo import (CurveLength, CurveCurveDistance, MeanSquaredCurvature, SurfaceRZFourier, LinkingNumber,
                          LpCurveCurvature, ArclengthVariation, curves_to_vtk, create_equally_spaced_curves)
 mpi = MpiPartition()
@@ -39,7 +42,7 @@ MAXITER_single_stage = 15
 MAXFEV_single_stage  = 20
 LENGTH_THRESHOLD = 4.5 if 'QA' in QA_or_QH  else 3.5
 max_mode_array = [1]*1 + [2]*0 + [3]*0 + [4]*0 + [5]*0 + [6]*0
-nmodes_coils = 5
+nmodes_coils = 8
 aspect_ratio_target = 6 if 'QA' in QA_or_QH  else 7
 JACOBIAN_THRESHOLD = 100
 aspect_ratio_weight = 1e+1
@@ -47,7 +50,12 @@ aspect_ratio_weight = 1e+1
 quasisymmetry_weight_mpol_mapping = {1: 2e+1, 2: 7e+1, 3: 1e+2, 4: 2e+2}
 coils_objective_weight = 1e+4
 weight_iota = 1e3
+volavgB_weight = 1e2
+well_Weight = 1e1
+DMerc_Weight = 1e1
+DMerc_fraction = 0.5
 min_iota = 0.41
+volavgB_target = 1
 maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
 CC_THRESHOLD = 0.1
 CURVATURE_THRESHOLD = 10
@@ -68,8 +76,23 @@ CC_WEIGHT = 3.6e+2
 CURVATURE_WEIGHT = 1e-2
 MSC_WEIGHT = 2.8e-5
 ARCLENGTH_WEIGHT = 1e-9
+## Self-consistent bootstrap current
+beta = 3.5 #%
+ne0 = 3e20 * (beta/100/0.05)**(1/3)
+Te0 = 15e3 * (beta/100/0.05)**(2/3)
+# ne0 = 4.13e20
+# Te0 = 12.0e3
+ne = ProfilePolynomial(ne0 * np.array([1, 0, 0, 0, 0, -1.0]))
+Te = ProfilePolynomial(Te0 * np.array([1, -1.0]))
+Zeff = 1.0
+ni = ne
+Ti = Te
+pressure = ProfilePressure(ne, Te, ni, Ti)
+pressure_Pa = ProfileScaled(pressure, ELEMENTARY_CHARGE)
+######
 vmec_input_filename = os.path.join(parent_path, 'vmec_inputs', 'input.'+ QA_or_QH)
 directory = f'optimization_finitebeta_{QA_or_QH}_ncoils{ncoils}'
+helicity_n=-1 if 'QH' in QA_or_QH  else 0
 ##########################################################################################
 ##########################################################################################
 vmec_verbose = False
@@ -94,12 +117,18 @@ ntheta_big = ntheta_VMEC + 1
 quadpoints_theta = np.linspace(0, 1, ntheta_big)
 quadpoints_phi   = np.linspace(0, 1, nphi_big)
 surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=surf.ntor, quadpoints_phi=quadpoints_phi, quadpoints_theta=quadpoints_theta, stellsym=surf.stellsym)
-# Finite Beta Virtual Casing Principle
+## Set pressure and current for self-consistent bootstrap current
+vmec.unfix('phiedge')
+vmec.pressure_profile = pressure_Pa
+vmec.n_pressure = 7
+vmec.indata.pcurr_type = 'cubic_spline_ip'
+vmec.n_current = 50
+## Finite Beta Virtual Casing Principle
 vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
 total_current_vmec = vmec.external_current() / (2 * surf.nfp)
 ##########################################################################################
 ##########################################################################################
-#Stage 2
+# Stage 2
 base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
 base_currents = [Current(total_current_vmec / ncoils * 1e-5) * 1e5 for _ in range(ncoils-1)]
 total_current = Current(total_current_vmec)
@@ -227,17 +256,57 @@ for iteration, max_mode in enumerate(max_mode_array):
     surf.fix_all()
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
     surf.fix("rc(0,0)")
+    
+    n_spline = np.min((iteration * 2 + 5, 15))
+    s_spline = np.linspace(0, 1, n_spline)
+    if iteration == 0: current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
+    else: current = current.resample(s_spline)
+    current.unfix_all()
+    vmec.current_profile = ProfileScaled(current, -1e6)
+    
     number_vmec_dofs = int(len(surf.x))
-    # Aspect ratio objective
+    
+    # Define bootstrap objective:
+    booz = Boozer(vmec, mpol=12, ntor=12)
+    ns = 50
+    s_full = np.linspace(0, 1, ns)
+    ds = s_full[1] - s_full[0]
+    s_half = s_full[1:] - 0.5 * ds
+    s_redl = []
+    for s in s_spline:
+        index = np.argmin(np.abs(s_half - s))
+        s_redl.append(s_half[index])
+    assert len(s_redl) == len(set(s_redl))
+    assert len(s_redl) == len(s_spline)
+    s_redl = np.array(s_redl)
+    redl_geom = RedlGeomBoozer(booz, s_redl, helicity_n)
+    logfile = None
+    if mpi.proc0_world: logfile = f'jdotB_log_max_mode{max_mode}'
+    bootstrap_mismatch = VmecRedlBootstrapMismatch(redl_geom, ne, Te, Ti, Zeff, helicity_n, logfile=logfile)
+    
+    # Define remaining objective functions
     def aspect_ratio_max_objective(vmec): return np.max((vmec.aspect()-aspect_ratio_target,0))
-    aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
-    objective_tuple = [(aspect_ratio_max_optimizable.J, 0, aspect_ratio_weight)]
-    # Iota objective
     def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-min_iota,0))
-    iota_min_optimizable = make_optimizable(iota_min_objective, vmec)
+    # def minor_radius_objective(vmec): return vmec.wout.Aminor_p
+    def volavgB_objective(vmec): return vmec.wout.volavgB
+    def DMerc_min_objective(vmec): return np.min((np.min(vmec.wout.DMerc[int(len(vmec.wout.DMerc) * DMerc_fraction):]),0))
+    def magnetic_well_objective(vmec): return np.min((vmec.vacuum_well(),0))
+    
+    # minor_radius_optimizable =  make_optimizable(minor_radius_objective, vmec)
+    volavgB_optimizable      =  make_optimizable(volavgB_objective, vmec)
+    DMerc_optimizable        =  make_optimizable(DMerc_min_objective, vmec)
+    magnetic_well_optimizable = make_optimizable(magnetic_well_objective, vmec)
+    iota_min_optimizable    =   make_optimizable(iota_min_objective, vmec)
+    aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
+    
+    objective_tuple = [(aspect_ratio_max_optimizable.J, 0, aspect_ratio_weight)]
     objective_tuple.append((iota_min_optimizable.J, 0, weight_iota))
+    objective_tuple.append((volavgB_optimizable.J, volavgB_target, volavgB_weight))
+    objective_tuple.append((bootstrap_mismatch.residuals, 0, 1))
+    objective_tuple.append((magnetic_well_optimizable.J, 0.0, well_Weight))
+    objective_tuple.append((DMerc_optimizable.J, 0.0, DMerc_Weight))
     # Quasisymmetry objective
-    qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1 if 'QH' in QA_or_QH  else 0)
+    qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=helicity_n)
     # objective_tuple.append((qs.residuals, 0, quasisymmetry_weight))
     objective_tuple.append((qs.residuals, 0, quasisymmetry_weight_mpol_mapping[max_mode]))
     # Put all together
@@ -247,11 +316,18 @@ for iteration, max_mode in enumerate(max_mode_array):
     bs.set_points(surf.gamma().reshape((-1, 3)))
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
-    proc0_print(f"Aspect ratio before optimization: {vmec.aspect()}")
-    proc0_print(f"Mean iota before optimization: {vmec.mean_iota()}")
-    proc0_print(f"Quasisymmetry objective before optimization: {qs.total()}")
-    proc0_print(f"Magnetic well before optimization: {vmec.vacuum_well()}")
-    proc0_print(f"Squared flux before optimization: {Jf.J()}")
+    
+    proc0_print("Initial aspect ratio:", vmec.aspect())
+    proc0_print("Initial min iota:", np.min(np.abs(vmec.wout.iotaf)))
+    proc0_print("Initial mean iota:", vmec.mean_iota())
+    proc0_print("Initial mean shear:", vmec.mean_shear())
+    proc0_print("Initial magnetic well:", vmec.vacuum_well())
+    proc0_print("Initial quasisymmetry:", qs.total())
+    proc0_print("Initial volavgB:", vmec.wout.volavgB)
+    proc0_print("Initial min DMerc from mid radius:", DMerc_optimizable.J())
+    proc0_print("Initial Aminor:", vmec.wout.Aminor_p)
+    proc0_print("Initial betatotal:", vmec.wout.betatotal)
+    proc0_print("Initial squared flux:", Jf.J())
     ### Stage 2 optimization
     proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
     if comm_world.rank == 0:
@@ -328,11 +404,19 @@ for iteration, max_mode in enumerate(max_mode_array):
 ##########################################################################################
 bs.save(os.path.join(coils_results_path, "biot_savart_opt.json"))
 vmec.write_input(os.path.join(this_path, 'input.final'))
-proc0_print(f"Aspect ratio after optimization: {vmec.aspect()}")
-proc0_print(f"Mean iota after optimization: {vmec.mean_iota()}")
-proc0_print(f"Quasisymmetry objective after optimization: {qs.total()}")
-proc0_print(f"Magnetic well after optimization: {vmec.vacuum_well()}")
-proc0_print(f"Squared flux after optimization: {Jf.J()}")
+
+proc0_print("Final aspect ratio:", vmec.aspect())
+proc0_print("Final min iota:", np.min(np.abs(vmec.wout.iotaf)))
+proc0_print("Final mean iota:", vmec.mean_iota())
+proc0_print("Final mean shear:", vmec.mean_shear())
+proc0_print("Final magnetic well:", vmec.vacuum_well())
+proc0_print("Final quasisymmetry:", qs.total())
+proc0_print("Final volavgB:", vmec.wout.volavgB)
+proc0_print("Final min DMerc from mid radius:", DMerc_optimizable.J())
+proc0_print("Final Aminor:", vmec.wout.Aminor_p)
+proc0_print("Final betatotal:", vmec.wout.betatotal)
+proc0_print("Final squared flux:", Jf.J())
+
 BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
 BdotN = np.mean(np.abs(BdotN_surf))
 BdotNmax = np.max(np.abs(BdotN_surf))
