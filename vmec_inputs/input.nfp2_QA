@@ -14,20 +14,18 @@ NITER_ARRAY =     600 1500!  2500
 FTOL_ARRAY  = 1.0E-9 1e-12! 1e-13
 
 ! ---- Boundary toroidal flux ----
-PHIEDGE = 0.03
+PHIEDGE = 0.083854
 
 ! ---- Pressure profile specification ----
 PMASS_TYPE = "power_series"
-AM = 7e5 -7e5
+AM = 2.728e4 -2.728e4
 PRES_SCALE = 1.0
 
 ! ---- Profile specification of iota or current ----
+CURTOR =  0
 NCURR = 1
-CURTOR = -666689.559102069
-PCURR_TYPE = "cubic_spline_ip"
-AC =0.0
-AC_AUX_S = 0.0
-AC_AUX_F = 0.0
+PIOTA_TYPE = 'power_series'
+PCURR_TYPE = 'power_series'
 
 ! ---- Other numerical parameters ----
 DELT = 0.9

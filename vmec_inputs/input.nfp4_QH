@@ -14,20 +14,18 @@ NITER_ARRAY =     600 1500!  2500
 FTOL_ARRAY  = 1.0E-9 1e-12! 1e-13
 
 ! ---- Boundary toroidal flux ----
-PHIEDGE = 0.03
+PHIEDGE = 0.05773
 
 ! ---- Pressure profile specification ----
 PMASS_TYPE = "power_series"
-AM = 7e5 -7e5
+AM = 2.824e4 -2.824e4
 PRES_SCALE = 1.0
 
 ! ---- Profile specification of iota or current ----
+CURTOR =  0
 NCURR = 1
-CURTOR = -666689.559102069
-PCURR_TYPE = "cubic_spline_ip"
-AC =0.0
-AC_AUX_S = 0.0
-AC_AUX_F = 0.0
+PIOTA_TYPE = 'power_series'
+PCURR_TYPE = 'power_series'
 
 ! ---- Other numerical parameters ----
 DELT = 0.9
@@ -35,8 +33,8 @@ NSTEP = 200
 
 ! ---- Boundary shape. Array index order is (n, m) ----
 RBC(   0,   0) =  1.000000000000000e+00,    ZBS(   0,   0) = -0.000000000000000e+00
-RBC(   1,   0) =  1.113377943687741e-01,    ZBS(   1,   0) =  1.082988187028168e-01
-RBC(  -1,   1) = -6.723461162346533e-02,    ZBS(  -1,   1) =  7.594610197024793e-02
-RBC(   0,   1) =  1.374990289622220e-01,    ZBS(   0,   1) =  1.501451012436404e-01
-RBC(   1,   1) = -2.305673542175739e-03,    ZBS(   1,   1) = -2.782350597483152e-03
+RBC(   1,   0) =  1.150835722350640e-01,    ZBS(   1,   0) =  1.119457014742555e-01
+RBC(  -1,   1) = -7.707252588633698e-02,    ZBS(  -1,   1) =  8.058415344780281e-02
+RBC(   0,   1) =  1.558595919904384e-01,    ZBS(   0,   1) =  1.710936089623399e-01
+RBC(   1,   1) =  6.961393320036313e-04,    ZBS(   1,   1) =  4.547988694825885e-04
 /

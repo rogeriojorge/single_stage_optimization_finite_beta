@@ -24,9 +24,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
 parser.add_argument("--ncoils", type=int, default=4)
 args = parser.parse_args()
-if   args.type == 1: QA_or_QH = 'QA'
-elif args.type == 2: QA_or_QH = 'QH'
-elif args.type == 3: QA_or_QH = 'QI'
+if   args.type == 1: QA_or_QH = 'nfp2_QA'
+elif args.type == 2: QA_or_QH = 'nfp4_QH'
+elif args.type == 3: QA_or_QH = 'nfp3_QI'
 else: raise ValueError('Invalid type')
 ncoils = args.ncoils
 ##########################################################################################
@@ -37,15 +37,15 @@ MAXITER_stage_1 = 10
 MAXITER_stage_2 = 200
 MAXITER_single_stage = 15
 MAXFEV_single_stage  = 20
-LENGTH_THRESHOLD = 4.5
-max_mode_array = [1]*2 + [2]*0 + [3]*0 + [4]*0 + [5]*0 + [6]*0
+LENGTH_THRESHOLD = 4.5 if 'QA' in QA_or_QH  else 3.5
+max_mode_array = [1]*1 + [2]*0 + [3]*0 + [4]*0 + [5]*0 + [6]*0
 nmodes_coils = 5
-aspect_ratio_target = 6
+aspect_ratio_target = 6 if 'QA' in QA_or_QH  else 7
 JACOBIAN_THRESHOLD = 100
-aspect_ratio_weight = 3e-2
-mirror_weight = 1e+3
-quasisymmetry_weight = 1e+1
-coils_objective_weight = 1e+3
+aspect_ratio_weight = 1e+1
+# quasisymmetry_weight = 1e+1
+quasisymmetry_weight_mpol_mapping = {1: 2e+1, 2: 7e+1, 3: 1e+2, 4: 2e+2}
+coils_objective_weight = 1e+4
 weight_iota = 1e3
 min_iota = 0.41
 maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
@@ -57,7 +57,7 @@ ntheta_VMEC = 32
 vc_src_nphi = ntheta_VMEC
 ftol = 1e-3
 R0 = 1.0
-R1 = 0.6
+R1 = 0.6 if 'QA' in QA_or_QH  else 0.42
 nquadpoints = 120
 diff_method = "forward"
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
@@ -202,17 +202,14 @@ def fun(dofss, prob_jacobian=None, info={'Nfeval': 0}):
         grad_with_respect_to_coils = coils_objective_weight * coils_dJ
         JF.fix_all()  # Must re-fix the coil dofs before beginning the finite differencing.
         grad_with_respect_to_surface = prob_jacobian.jac(prob.x)[0]
-
     JF.fix_all()
     grad = np.concatenate((grad_with_respect_to_coils, grad_with_respect_to_surface))
-
     # Remove spurious files
     for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
     os.chdir(parent_path)
     for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
     os.chdir(this_path)
     for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-
     return J, grad
 ##########################################################################################
 #############################################################
@@ -240,8 +237,9 @@ for iteration, max_mode in enumerate(max_mode_array):
     iota_min_optimizable = make_optimizable(iota_min_objective, vmec)
     objective_tuple.append((iota_min_optimizable.J, 0, weight_iota))
     # Quasisymmetry objective
-    qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1 if QA_or_QH == 'QH' else 0)
-    objective_tuple.append((qs.residuals, 0, quasisymmetry_weight))
+    qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1 if 'QH' in QA_or_QH  else 0)
+    # objective_tuple.append((qs.residuals, 0, quasisymmetry_weight))
+    objective_tuple.append((qs.residuals, 0, quasisymmetry_weight_mpol_mapping[max_mode]))
     # Put all together
     prob = LeastSquaresProblem.from_tuples(objective_tuple)
     previous_surf_dofs = prob.x
@@ -280,7 +278,6 @@ for iteration, max_mode in enumerate(max_mode_array):
         least_squares_mpi_solve(prob_with_coils, mpi, grad=True, rel_step=1e-5, abs_step=1e-7, max_nfev=MAXITER_stage_1, ftol=1e-04, xtol=1e-04, gtol=1e-04)
         JF.full_unfix(free_coil_dofs_all)
     ## Broadcast dofs and save surfs/coils
-    dofs[:-number_vmec_dofs] = res.x
     mpi.comm_world.Bcast(dofs, root=0)
     JF.x = dofs[:-number_vmec_dofs]
     bs.set_points(surf.gamma().reshape((-1, 3)))
@@ -336,26 +333,26 @@ proc0_print(f"Mean iota after optimization: {vmec.mean_iota()}")
 proc0_print(f"Quasisymmetry objective after optimization: {qs.total()}")
 proc0_print(f"Magnetic well after optimization: {vmec.vacuum_well()}")
 proc0_print(f"Squared flux after optimization: {Jf.J()}")
-BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal)
+BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
 BdotN = np.mean(np.abs(BdotN_surf))
 BdotNmax = np.max(np.abs(BdotN_surf))
-outstr = f"Coil parameters: ⟨B·n⟩={BdotN:.1e}, B·n max={BdotNmax:.1e}"
-outstr += f", ║∇J coils║={np.linalg.norm(JF.dJ()):.1e}, C-C-Sep={Jccdist.shortest_distance():.2f}"
+outstr = f"Coil parameters: ⟨B·n/B⟩={BdotN:.1e}, B·n/B max={BdotNmax:.1e}"
+outstr += f", C-C-Sep={Jccdist.shortest_distance():.2f}"
 cl_string = ", ".join([f"{j.J():.1f}" for j in Jls])
 kap_string = ", ".join(f"{np.max(c.kappa()):.1f}" for c in base_curves)
 msc_string = ", ".join(f"{j.J():.1f}" for j in Jmscs)
 outstr += f" lengths=sum([{cl_string}])={sum(j.J() for j in Jls):.1f}, curv=[{kap_string}], msc=[{msc_string}]"
 proc0_print(outstr)
-try:
-    vmec_final = Vmec(os.path.join(this_path, f'input.final'), mpi=mpi)
-    vmec_final.indata.ns_array[:3]    = [  16,    51,    101]
-    vmec_final.indata.niter_array[:3] = [ 2000,  3000, 20000]
-    vmec_final.indata.ftol_array[:3]  = [1e-14, 1e-14, 1e-14]
-    vmec_final.write_input(os.path.join(this_path, 'input.final'))
-    vmec_final.run()
-    if mpi.proc0_world:
-        shutil.move(os.path.join(this_path, f"wout_final_000_000000.nc"), os.path.join(this_path, f"wout_final.nc"))
-        os.remove(os.path.join(this_path, f'input.final_000_000000'))
-except Exception as e:
-    proc0_print('Exception when creating final vmec file:')
-    proc0_print(e)
+if mpi.proc0_world:
+    try:
+        vmec_final = Vmec(os.path.join(this_path, f'input.final'), mpi=mpi)
+        vmec_final.indata.ns_array[:3]    = [  16,    51,    101]
+        vmec_final.indata.niter_array[:3] = [ 2000,  3000, 20000]
+        vmec_final.indata.ftol_array[:3]  = [1e-14, 1e-14, 1e-14]
+        vmec_final.write_input(os.path.join(this_path, 'input.final'))
+        # vmec_final.run()
+        # shutil.move(os.path.join(this_path, f"wout_final_000_000000.nc"), os.path.join(this_path, f"wout_final.nc"))
+        # os.remove(os.path.join(this_path, f'input.final_000_000000'))
+    except Exception as e:
+        proc0_print('Exception when creating final vmec file:')
+        proc0_print(e)

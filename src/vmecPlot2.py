@@ -352,7 +352,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     ax.axis('off')
     
     from matplotlib.colors import Normalize
-    cax = fig.add_axes([0.21, 0.8, 0.6, 0.03])  # Adjust position and size as needed
+    cax = fig.add_axes([0.21, 0.85, 0.6, 0.03])  # Adjust position and size as needed
     norm = Normalize(vmin=B.min(), vmax=B.max())
     sm = cm.ScalarMappable(cmap=cm.jet, norm=norm)
     sm.set_array([])
