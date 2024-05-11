@@ -10,7 +10,7 @@ NTOR = 5
 NTHETA = 16
 NZETA = 14
 NS_ARRAY    =       5   16    51
-NITER_ARRAY =     400  500  3000
+NITER_ARRAY =     200  400  3000
 FTOL_ARRAY  = 1.0E-9 1e-11 1e-13
 
 ! ---- Boundary toroidal flux ----

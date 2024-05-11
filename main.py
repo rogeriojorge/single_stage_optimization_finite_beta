@@ -47,27 +47,26 @@ MAXITER_stage_2 = 150
 MAXITER_single_stage = 10
 MAXFEV_single_stage  = 50
 LENGTH_THRESHOLD = 4.5*11 if 'QA' in QA_or_QH  else 3.5*11
-max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*0 + [6]*0
+max_mode_array                    = [1]*2 + [2]*2 + [3]*2 + [4]*2 + [5]*0 + [6]*0
 quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2}
-DMerc_weight_mpol_mapping         = {1: 1e+9, 2: 3e+10, 3: 1e+11, 4: 3e+11}
-DMerc_fraction_mpol_mapping       = {1: 0.1,  2: 0.5,   3: 0.8,   4: 0.95}
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
+DMerc_weight_mpol_mapping         = {1: 1e+8, 2: 1e+10, 3: 1e+11, 4: 3e+11}
+DMerc_fraction_mpol_mapping       = {1: 0.9, 2: 0.3, 3: 0.1, 4: 0.05}
+maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
 nmodes_coils = 7
-aspect_ratio_target = 6.5 if 'QA' in QA_or_QH  else 7
+aspect_ratio_target = 6.5 if 'QA' in QA_or_QH  else 6.8
 JACOBIAN_THRESHOLD = 300
 aspect_ratio_weight = 1e+2
 aminor_weight = 5e-2
 # quasisymmetry_weight = 1e+1
 coils_objective_weight = 1e+3
-weight_iota = 1e4
-volavgB_weight = 1e+0
+weight_iota = 1e5
+volavgB_weight = 5e+0
 well_Weight = 1e1
 # DMerc_Weight = 1e+10
 betatotal_weight = 1e1
 bootstrap_mismatch_weight = 1e1
-# DMerc_fraction = 0.6
-min_iota = 0.1
-min_average_iota = 0.41
+min_iota         = 0.15 if 'QA' in QA_or_QH  else 1.01
+min_average_iota = 0.41 if 'QA' in QA_or_QH  else 1.05
 aminor_target = 1.70442622782386
 volavgB_target = 5.86461221551616
 CC_THRESHOLD = 0.1*11
@@ -81,12 +80,13 @@ R0 = 1.0*11
 R1 = 0.6*11
 nquadpoints = 120
 diff_method = "forward"
+opt_method = 'trf'#'lm'
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 0
 ftol_stage_1 = 3e-5
-rel_step_stage1 = 1e-4
-abs_step_stage1 = 1e-7
+rel_step_stage1 = 2e-3
+abs_step_stage1 = 2e-5
 LENGTH_CON_WEIGHT = 0.1
 CC_WEIGHT = 1e0
 CURVATURE_WEIGHT = 1e-3
@@ -283,7 +283,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     vmec.current_profile = ProfileScaled(current, -1e6)
     
     # Define bootstrap objective:
-    booz = Boozer(vmec, mpol=14, ntor=14)
+    booz = Boozer(vmec, mpol=12, ntor=12)
     ns = 50
     s_full = np.linspace(0, 1, ns)
     ds = s_full[1] - s_full[0]
@@ -302,13 +302,14 @@ for iteration, max_mode in enumerate(max_mode_array):
     
     # Define remaining objective functions
     def aspect_ratio_max_objective(vmec): return np.max((vmec.aspect()-aspect_ratio_target,0))
-    def minor_radius_objective(vmec): return vmec.wout.Aminor_p
-    def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-min_iota,0))
-    def iota_average_min_objective(vmec): return np.min((vmec.mean_iota()-min_average_iota,0))
-    def volavgB_objective(vmec): return vmec.wout.volavgB
-    def DMerc_min_objective(vmec): return np.min((np.min(vmec.wout.DMerc[int(len(vmec.wout.DMerc) * DMerc_fraction_mpol_mapping[max_mode]):]),0))
-    def magnetic_well_objective(vmec): return np.min((vmec.vacuum_well(),0))
-    def betatotal_objective(vmec): return np.abs(vmec.wout.betatotal)
+    def minor_radius_objective(vmec):     return vmec.wout.Aminor_p
+    def iota_min_objective(vmec):         return np.min((np.min(np.abs(vmec.wout.iotaf))-min_iota,0))
+    def iota_average_min_objective(vmec): return np.min((np.abs(vmec.mean_iota())-min_average_iota,0))
+    def volavgB_objective(vmec):          return vmec.wout.volavgB
+    # def DMerc_min_objective(vmec):        return np.abs(np.min((np.min(vmec.wout.DMerc),0)))
+    def DMerc_min_objective(vmec):        return np.abs(np.min((np.min(vmec.wout.DMerc[int(len(vmec.wout.DMerc) * DMerc_fraction_mpol_mapping[max_mode]):]),0)))
+    def magnetic_well_objective(vmec):    return np.abs(np.min((vmec.vacuum_well(),0)))
+    def betatotal_objective(vmec):        return np.abs(vmec.wout.betatotal)
     aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
     minor_radius_optimizable     = make_optimizable(minor_radius_objective, vmec)
     iota_min_optimizable         = make_optimizable(iota_min_objective, vmec)
@@ -350,17 +351,22 @@ for iteration, max_mode in enumerate(max_mode_array):
     proc0_print("Initial magnetic well:", vmec.vacuum_well())
     proc0_print("Initial quasisymmetry:", qs.total())
     proc0_print("Initial volavgB:", vmec.wout.volavgB)
-    proc0_print("Initial min DMerc from mid radius:", DMerc_optimizable.J())
+    proc0_print("Initial min DMerc:", np.min(vmec.wout.DMerc))
     proc0_print("Initial Aminor:", vmec.wout.Aminor_p)
     proc0_print("Initial betatotal:", vmec.wout.betatotal)
     proc0_print("Initial bootstrap_mismatch:", bootstrap_mismatch.J())
     proc0_print("Initial squared flux:", Jf.J())
     ### Stage 1 optimization
     if optimize_stage1:
-        proc0_print(f'  Performing stage 1 optimization with ~{MAXITER_stage_1} iterations')
-        least_squares_mpi_solve(prob, mpi, grad=True, rel_step=rel_step_stage1, abs_step=abs_step_stage1, max_nfev=MAXITER_stage_1, ftol=ftol_stage_1, xtol=ftol_stage_1, gtol=ftol_stage_1)
-        dofs = np.concatenate((JF.x, prob.x))
-        bs.set_points(surf.gamma().reshape((-1, 3)))
+        if optimize_stage3 and max_mode_previous != 0: proc0_print('Not performing stage 1 optimization since stage 3 is enabled')
+        else:
+            proc0_print(f'  Performing stage 1 optimization with ~{MAXITER_stage_1} iterations')
+            abs_step = np.max((abs_step_stage1/(10**max_mode_previous), 1e-5))
+            rel_step = np.max((rel_step_stage1/(10**max_mode_previous), 1e-7))
+            least_squares_mpi_solve(prob, mpi, grad=True, rel_step=rel_step_stage1, abs_step=abs_step_stage1, max_nfev=MAXITER_stage_1,
+                                    ftol=ftol_stage_1, xtol=ftol_stage_1, gtol=ftol_stage_1, method=opt_method)
+            dofs = np.concatenate((JF.x, prob.x))
+            bs.set_points(surf.gamma().reshape((-1, 3)))
     ### Stage 2 optimization
     if optimize_stage2:
         proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
@@ -437,6 +443,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
     bs.save(os.path.join(coils_results_path, f"biot_savart_maxmode{max_mode}.json"))
     vmec.write_input(os.path.join(this_path, f'input.maxmode{max_mode}'))
+    max_mode_previous+=1
 ##########################################################################################
 ############## Save final results
 ##########################################################################################
@@ -450,7 +457,7 @@ proc0_print("Final mean shear:", vmec.mean_shear())
 proc0_print("Final magnetic well:", vmec.vacuum_well())
 proc0_print("Final quasisymmetry:", qs.total())
 proc0_print("Final volavgB:", vmec.wout.volavgB)
-proc0_print("Final min DMerc from mid radius:", DMerc_optimizable.J())
+proc0_print("Final min DMerc:", np.min(vmec.wout.DMerc))
 proc0_print("Final Aminor:", vmec.wout.Aminor_p)
 proc0_print("Final betatotal:", vmec.wout.betatotal)
 proc0_print("Final squared flux:", Jf.J())
