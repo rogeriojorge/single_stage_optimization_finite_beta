@@ -35,18 +35,23 @@ ncoils = args.ncoils
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
-optimize_DMerc = False
+optimize_DMerc = True
 optimize_Well = False
 optimize_aminor = False
-optimize_stage_1_with_coils = False
-MAXITER_stage_1 = 30
+optimize_stage1 = True
+optimize_stage1_with_coils = False
+optimize_stage2 = False
+optimize_stage3 = False
+MAXITER_stage_1 = 35
 MAXITER_stage_2 = 150
 MAXITER_single_stage = 10
 MAXFEV_single_stage  = 50
 LENGTH_THRESHOLD = 4.5*11 if 'QA' in QA_or_QH  else 3.5*11
-max_mode_array = [1]*3 + [2]*3 + [3]*3 + [4]*0 + [5]*0 + [6]*0
-quasisymmetry_weight_mpol_mapping = {1: 1e+2, 2: 5e+2, 3: 1e+3, 4: 3e+3}
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
+max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*0 + [6]*0
+quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2}
+DMerc_weight_mpol_mapping         = {1: 1e+9, 2: 3e+10, 3: 1e+11, 4: 3e+11}
+DMerc_fraction_mpol_mapping       = {1: 0.1,  2: 0.5,   3: 0.8,   4: 0.95}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
 nmodes_coils = 7
 aspect_ratio_target = 6.5 if 'QA' in QA_or_QH  else 7
 JACOBIAN_THRESHOLD = 300
@@ -57,11 +62,12 @@ coils_objective_weight = 1e+3
 weight_iota = 1e4
 volavgB_weight = 1e+0
 well_Weight = 1e1
-DMerc_Weight = 1e+9
+# DMerc_Weight = 1e+10
 betatotal_weight = 1e1
-bootstrap_mismatch_weight = 3e0
-DMerc_fraction = 0.5
-min_iota = 0.41
+bootstrap_mismatch_weight = 1e1
+# DMerc_fraction = 0.6
+min_iota = 0.1
+min_average_iota = 0.41
 aminor_target = 1.70442622782386
 volavgB_target = 5.86461221551616
 CC_THRESHOLD = 0.1*11
@@ -78,6 +84,9 @@ diff_method = "forward"
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 0
+ftol_stage_1 = 3e-5
+rel_step_stage1 = 1e-4
+abs_step_stage1 = 1e-7
 LENGTH_CON_WEIGHT = 0.1
 CC_WEIGHT = 1e0
 CURVATURE_WEIGHT = 1e-3
@@ -96,7 +105,11 @@ pressure = ProfilePressure(ne, Te, ni, Ti)
 pressure_Pa = ProfileScaled(pressure, ELEMENTARY_CHARGE)
 ######
 vmec_input_filename = os.path.join(parent_path, 'vmec_inputs', 'input.'+ QA_or_QH)
-directory = f'optimization_finitebeta_{QA_or_QH}_ncoils{ncoils}'
+directory = f'optimization_finitebeta_{QA_or_QH}_ncoils{ncoils}_stage'
+if optimize_stage1: directory += '1'
+if optimize_stage1_with_coils: directory += '1'
+if optimize_stage2: directory += '2'
+if optimize_stage3: directory += '3'
 helicity_n=-1 if 'QH' in QA_or_QH  else 0
 ##########################################################################################
 ##########################################################################################
@@ -270,8 +283,8 @@ for iteration, max_mode in enumerate(max_mode_array):
     vmec.current_profile = ProfileScaled(current, -1e6)
     
     # Define bootstrap objective:
-    booz = Boozer(vmec, mpol=12, ntor=12)
-    ns = 30
+    booz = Boozer(vmec, mpol=14, ntor=14)
+    ns = 50
     s_full = np.linspace(0, 1, ns)
     ds = s_full[1] - s_full[0]
     s_half = s_full[1:] - 0.5 * ds
@@ -291,23 +304,26 @@ for iteration, max_mode in enumerate(max_mode_array):
     def aspect_ratio_max_objective(vmec): return np.max((vmec.aspect()-aspect_ratio_target,0))
     def minor_radius_objective(vmec): return vmec.wout.Aminor_p
     def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-min_iota,0))
+    def iota_average_min_objective(vmec): return np.min((vmec.mean_iota()-min_average_iota,0))
     def volavgB_objective(vmec): return vmec.wout.volavgB
-    def DMerc_min_objective(vmec): return np.min((np.min(vmec.wout.DMerc[int(len(vmec.wout.DMerc) * DMerc_fraction):]),0))
+    def DMerc_min_objective(vmec): return np.min((np.min(vmec.wout.DMerc[int(len(vmec.wout.DMerc) * DMerc_fraction_mpol_mapping[max_mode]):]),0))
     def magnetic_well_objective(vmec): return np.min((vmec.vacuum_well(),0))
     def betatotal_objective(vmec): return np.abs(vmec.wout.betatotal)
     aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
     minor_radius_optimizable     = make_optimizable(minor_radius_objective, vmec)
     iota_min_optimizable         = make_optimizable(iota_min_objective, vmec)
+    iota_average_min_optimizable = make_optimizable(iota_average_min_objective, vmec)
     volavgB_optimizable          = make_optimizable(volavgB_objective, vmec)
     DMerc_optimizable            = make_optimizable(DMerc_min_objective, vmec)
     magnetic_well_optimizable    = make_optimizable(magnetic_well_objective, vmec)
     betatotal_optimizable        = make_optimizable(betatotal_objective, vmec)
     objective_tuple = [(aspect_ratio_max_optimizable.J, 0, aspect_ratio_weight)]
     objective_tuple.append((iota_min_optimizable.J, 0, weight_iota))
+    objective_tuple.append((iota_average_min_optimizable.J, 0, weight_iota))
     objective_tuple.append((volavgB_optimizable.J, volavgB_target, volavgB_weight))
     objective_tuple.append((betatotal_optimizable.J, beta/100, betatotal_weight))
     if optimize_aminor: objective_tuple = [((minor_radius_optimizable.J, aminor_target, aminor_weight))]
-    if optimize_DMerc: objective_tuple.append((DMerc_optimizable.J, 0.0, DMerc_Weight))
+    if optimize_DMerc: objective_tuple.append((DMerc_optimizable.J, 0.0, DMerc_weight_mpol_mapping[max_mode]))
     if optimize_Well: objective_tuple.append((magnetic_well_optimizable.J, 0.0, well_Weight))
     ## Self-consistent bootstrap current objective
     objective_tuple.append((bootstrap_mismatch.residuals, 0, bootstrap_mismatch_weight))
@@ -337,21 +353,29 @@ for iteration, max_mode in enumerate(max_mode_array):
     proc0_print("Initial min DMerc from mid radius:", DMerc_optimizable.J())
     proc0_print("Initial Aminor:", vmec.wout.Aminor_p)
     proc0_print("Initial betatotal:", vmec.wout.betatotal)
+    proc0_print("Initial bootstrap_mismatch:", bootstrap_mismatch.J())
     proc0_print("Initial squared flux:", Jf.J())
+    ### Stage 1 optimization
+    if optimize_stage1:
+        proc0_print(f'  Performing stage 1 optimization with ~{MAXITER_stage_1} iterations')
+        least_squares_mpi_solve(prob, mpi, grad=True, rel_step=rel_step_stage1, abs_step=abs_step_stage1, max_nfev=MAXITER_stage_1, ftol=ftol_stage_1, xtol=ftol_stage_1, gtol=ftol_stage_1)
+        dofs = np.concatenate((JF.x, prob.x))
+        bs.set_points(surf.gamma().reshape((-1, 3)))
     ### Stage 2 optimization
-    proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
-    coils_dofs = dofs[:-number_vmec_dofs]
-    if comm_world.rank == 0:
-        res = minimize(fun_coils, coils_dofs, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
-        dofs[:-number_vmec_dofs] = res.x
-        coils_dofs = res.x
-    mpi.comm_world.Barrier()
-    mpi.comm_world.Bcast(coils_dofs, root=0)
-    dofs[:-number_vmec_dofs] = coils_dofs
-    JF.x = coils_dofs
-    bs.set_points(surf.gamma().reshape((-1, 3)))
+    if optimize_stage2:
+        proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
+        coils_dofs = dofs[:-number_vmec_dofs]
+        if comm_world.rank == 0:
+            res = minimize(fun_coils, coils_dofs, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
+            dofs[:-number_vmec_dofs] = res.x
+            coils_dofs = res.x
+        mpi.comm_world.Barrier()
+        mpi.comm_world.Bcast(coils_dofs, root=0)
+        dofs[:-number_vmec_dofs] = coils_dofs
+        JF.x = coils_dofs
+        bs.set_points(surf.gamma().reshape((-1, 3)))
     ## Stage 1 optimization with coils
-    if optimize_stage_1_with_coils:
+    if optimize_stage1_with_coils:
         def JF_objective(vmec):
             bs.set_points(vmec.boundary.gamma().reshape((-1, 3)))
             return JF.J()
@@ -363,7 +387,7 @@ for iteration, max_mode in enumerate(max_mode_array):
         prob_with_coils = LeastSquaresProblem.from_tuples(objective_tuples_with_coils)
         proc0_print(f'  Performing stage 1 optimization with coils with ~{MAXITER_stage_1} iterations')
         JF.fix_all()
-        least_squares_mpi_solve(prob_with_coils, mpi, grad=True, rel_step=1e-5, abs_step=1e-7, max_nfev=MAXITER_stage_1, ftol=1e-04, xtol=1e-04, gtol=1e-04)
+        least_squares_mpi_solve(prob_with_coils, mpi, grad=True, rel_step=rel_step_stage1, abs_step=abs_step_stage1, max_nfev=MAXITER_stage_1, ftol=ftol_stage_1, xtol=ftol_stage_1, gtol=ftol_stage_1)
         JF.full_unfix(free_coil_dofs_all)
     ## Broadcast dofs and save surfs/coils
     # mpi.comm_world.Bcast(dofs, root=0)
@@ -372,28 +396,29 @@ for iteration, max_mode in enumerate(max_mode_array):
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
     BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
     if comm_world.rank == 0:
-        curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_after_stage2_maxmode{max_mode}"))
-        curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_after_stage2_maxmode{max_mode}"))
+        curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_after_stage12_maxmode{max_mode}"))
+        curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_after_stage12_maxmode{max_mode}"))
         pointData = {"B.n/B": BdotN_surf[:, :, None]}
-        surf.to_vtk(os.path.join(coils_results_path, f"surf_after_stage2_maxmode{max_mode}"), extra_data=pointData)
+        surf.to_vtk(os.path.join(coils_results_path, f"surf_after_stage12_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf_big.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
     BdotN_surf = np.sum(Bbs * surf_big.unitnormal(), axis=2) / np.linalg.norm(Bbs, axis=2)
     if comm_world.rank == 0:
         pointData = {"Bcoils.n/B": BdotN_surf[:, :, None]}
-        surf_big.to_vtk(os.path.join(coils_results_path, f"surf_big_after_stage2_maxmode{max_mode}"), extra_data=pointData)
+        surf_big.to_vtk(os.path.join(coils_results_path, f"surf_big_after_stage12_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf.gamma().reshape((-1, 3)))
     ## Single stage optimization
-    proc0_print(f'  Performing single stage optimization with ~{MAXFEV_single_stage} iterations')
-    dofs = np.concatenate((JF.x, prob.x))
-    mpi.comm_world.Bcast(dofs, root=0)
-    opt = make_optimizable(fun_J, prob, JF)
-    free_coil_dofs = JF.dofs_free_status
-    JF.fix_all()
-    with MPIFiniteDifference(opt.J, mpi, diff_method=diff_method, abs_step=finite_difference_abs_step, rel_step=finite_difference_rel_step) as prob_jacobian:
-        if mpi.proc0_world:
-            res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage, 'gtol': ftol}, tol=ftol)
-    JF.full_unfix(free_coil_dofs_all)
+    if optimize_stage3:
+        proc0_print(f'  Performing single stage optimization with ~{MAXFEV_single_stage} iterations')
+        dofs = np.concatenate((JF.x, prob.x))
+        mpi.comm_world.Bcast(dofs, root=0)
+        opt = make_optimizable(fun_J, prob, JF)
+        free_coil_dofs = JF.dofs_free_status
+        JF.fix_all()
+        with MPIFiniteDifference(opt.J, mpi, diff_method=diff_method, abs_step=finite_difference_abs_step, rel_step=finite_difference_rel_step) as prob_jacobian:
+            if mpi.proc0_world:
+                res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage, 'gtol': ftol}, tol=ftol)
+        JF.full_unfix(free_coil_dofs_all)
     ## Broadcast dofs and save surfs/coils
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
     BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)

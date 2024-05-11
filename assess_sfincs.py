@@ -5,7 +5,8 @@ import subprocess
 home_directory = os.path.expanduser("~")
 
 QA_or_QH = "nfp2_QA_ncoils3"
-number_of_cores = 14
+mpi_command = "mpiexec"
+number_of_cores = 1
 Nradius = 5
 beta = 2.5
 ne0 = 3  * (beta/100/0.05)**(1/3)
@@ -51,7 +52,7 @@ copy_files(finite_beta_folder, OUT_DIR, files_to_copy)
 # Change equilibrium file and profiles file content
 equilibrium_nr_replace_dict = {'wout_final.nc': os.path.join(OUT_DIR, "..", "wout_final.nc"), "!ss Nradius = 5": f"!ss Nradius = {Nradius}"}
 profiles_replace_dict = {2.38: ne0, -2.38: -ne0, 9.45: Te0, -9.45: -Te0}
-job_replace_dict = {'mpiexec -n 6': f'mpiexec -n {number_of_cores}'}
+job_replace_dict = {'mpiexec -n 6': f'{mpi_command} -n {number_of_cores}'}
 
 change_file_content(os.path.join(OUT_DIR, "input.namelist"), equilibrium_nr_replace_dict)
 change_file_content(os.path.join(OUT_DIR, "profiles"), profiles_replace_dict)
