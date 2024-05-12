@@ -25,7 +25,7 @@ parent_path = str(Path(__file__).parent.resolve())
 os.chdir(parent_path)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
-parser.add_argument("--ncoils", type=int, default=3)
+parser.add_argument("--ncoils", type=int, default=4)
 args = parser.parse_args()
 if   args.type == 1: QA_or_QH = 'nfp2_QA'
 elif args.type == 2: QA_or_QH = 'nfp4_QH'
@@ -35,24 +35,24 @@ ncoils = args.ncoils
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
-optimize_DMerc = True
-optimize_Well = False
 optimize_aminor = False
 optimize_stage1 = True
 optimize_stage1_with_coils = False
-optimize_stage2 = False
-optimize_stage3 = False
+optimize_stage2 = True
+optimize_stage3 = True
 MAXITER_stage_1 = 35
-MAXITER_stage_2 = 150
-MAXITER_single_stage = 10
+MAXITER_stage_2 = 250
+MAXITER_single_stage = 30
 MAXFEV_single_stage  = 50
-LENGTH_THRESHOLD = 4.5*11 if 'QA' in QA_or_QH  else 3.5*11
-max_mode_array                    = [1]*2 + [2]*2 + [3]*2 + [4]*2 + [5]*0 + [6]*0
+LENGTH_THRESHOLD = 4.6*11 if 'QA' in QA_or_QH  else 3.5*11
+max_mode_array                    = [1]*4 + [2]*4 + [3]*4 + [4]*0 + [5]*0 + [6]*0
 quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2}
-DMerc_weight_mpol_mapping         = {1: 1e+8, 2: 1e+10, 3: 1e+11, 4: 3e+11}
+DMerc_weight_mpol_mapping         = {1: 5e+8, 2: 1e+10, 3: 1e+11, 4: 3e+11}
 DMerc_fraction_mpol_mapping       = {1: 0.9, 2: 0.3, 3: 0.1, 4: 0.05}
 maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
-nmodes_coils = 7
+optimize_DMerc = True
+optimize_Well = False
+nmodes_coils = 10
 aspect_ratio_target = 6.5 if 'QA' in QA_or_QH  else 6.8
 JACOBIAN_THRESHOLD = 300
 aspect_ratio_weight = 1e+2
@@ -306,8 +306,11 @@ for iteration, max_mode in enumerate(max_mode_array):
     def iota_min_objective(vmec):         return np.min((np.min(np.abs(vmec.wout.iotaf))-min_iota,0))
     def iota_average_min_objective(vmec): return np.min((np.abs(vmec.mean_iota())-min_average_iota,0))
     def volavgB_objective(vmec):          return vmec.wout.volavgB
+    len_DMerc = len(vmec.wout.DMerc)
+    index_DMerc = int(len_DMerc * DMerc_fraction_mpol_mapping[max_mode])
+    middle_index_DMerc = int(len_DMerc * 0.5)
     # def DMerc_min_objective(vmec):        return np.abs(np.min((np.min(vmec.wout.DMerc),0)))
-    def DMerc_min_objective(vmec):        return np.abs(np.min((np.min(vmec.wout.DMerc[int(len(vmec.wout.DMerc) * DMerc_fraction_mpol_mapping[max_mode]):]),0)))
+    def DMerc_min_objective(vmec):        return np.abs(np.min((np.min(vmec.wout.DMerc[index_DMerc:]),0,vmec.wout.DMerc[middle_index_DMerc])))
     def magnetic_well_objective(vmec):    return np.abs(np.min((vmec.vacuum_well(),0)))
     def betatotal_objective(vmec):        return np.abs(vmec.wout.betatotal)
     aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
@@ -365,8 +368,16 @@ for iteration, max_mode in enumerate(max_mode_array):
             rel_step = np.max((rel_step_stage1/(10**max_mode_previous), 1e-7))
             least_squares_mpi_solve(prob, mpi, grad=True, rel_step=rel_step_stage1, abs_step=abs_step_stage1, max_nfev=MAXITER_stage_1,
                                     ftol=ftol_stage_1, xtol=ftol_stage_1, gtol=ftol_stage_1, method=opt_method)
+            if optimize_stage3 and max_mode_previous == 0:
+                proc0_print('Performing stage 1 optimization again since stage 3 is enabled')
+                least_squares_mpi_solve(prob, mpi, grad=True, rel_step=rel_step_stage1, abs_step=abs_step_stage1, max_nfev=MAXITER_stage_1,
+                                        ftol=ftol_stage_1, xtol=ftol_stage_1, gtol=ftol_stage_1, method=opt_method)
             dofs = np.concatenate((JF.x, prob.x))
             bs.set_points(surf.gamma().reshape((-1, 3)))
+    vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
+    # Jf.target = vc.B_external_normal
+    Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum
     ### Stage 2 optimization
     if optimize_stage2:
         proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
@@ -380,6 +391,10 @@ for iteration, max_mode in enumerate(max_mode_array):
         dofs[:-number_vmec_dofs] = coils_dofs
         JF.x = coils_dofs
         bs.set_points(surf.gamma().reshape((-1, 3)))
+    vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
+    # Jf.target = vc.B_external_normal
+    Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum
     ## Stage 1 optimization with coils
     if optimize_stage1_with_coils:
         def JF_objective(vmec):
@@ -397,7 +412,13 @@ for iteration, max_mode in enumerate(max_mode_array):
         JF.full_unfix(free_coil_dofs_all)
     ## Broadcast dofs and save surfs/coils
     # mpi.comm_world.Bcast(dofs, root=0)
-    JF.x = dofs[:-number_vmec_dofs]
+    # JF.x = dofs[:-number_vmec_dofs]
+    #
+    vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
+    # Jf.target = vc.B_external_normal
+    Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum
+    #
     bs.set_points(surf.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
     BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
