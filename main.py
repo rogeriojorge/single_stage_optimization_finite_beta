@@ -26,6 +26,10 @@ os.chdir(parent_path)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
 parser.add_argument("--ncoils", type=int, default=4)
+parser.add_argument("--stage1_coils", dest="stage1_coils", default=False, action="store_true")
+parser.add_argument("--stage1", dest="stage1", default=False, action="store_true")
+parser.add_argument("--stage2", dest="stage2", default=False, action="store_true")
+parser.add_argument("--stage3", dest="stage3", default=False, action="store_true")
 args = parser.parse_args()
 if   args.type == 1: QA_or_QH = 'nfp2_QA'
 elif args.type == 2: QA_or_QH = 'nfp4_QH'
@@ -36,25 +40,25 @@ ncoils = args.ncoils
 ############## Input parameters
 ##########################################################################################
 optimize_aminor = False
-optimize_stage1 = True
-optimize_stage1_with_coils = False
-optimize_stage2 = True
-optimize_stage3 = True
+optimize_stage1 = args.stage1
+optimize_stage1_with_coils = args.stage1_coils
+optimize_stage2 = args.stage2
+optimize_stage3 = args.stage3
 MAXITER_stage_1 = 35
 MAXITER_stage_2 = 250
-MAXITER_single_stage = 30
-MAXFEV_single_stage  = 50
+MAXITER_single_stage = 25
+MAXFEV_single_stage  = 35
 LENGTH_THRESHOLD = 4.6*11 if 'QA' in QA_or_QH  else 3.5*11
-max_mode_array                    = [1]*4 + [2]*4 + [3]*4 + [4]*0 + [5]*0 + [6]*0
+max_mode_array                    = [1]*1 + [2]*4 + [3]*4 + [4]*0 + [5]*0 + [6]*0
 quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2}
-DMerc_weight_mpol_mapping         = {1: 5e+8, 2: 1e+10, 3: 1e+11, 4: 3e+11}
+DMerc_weight_mpol_mapping         = {1: 1e+8, 2: 1e+10, 3: 1e+11, 4: 3e+11}
 DMerc_fraction_mpol_mapping       = {1: 0.9, 2: 0.3, 3: 0.1, 4: 0.05}
 maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
 optimize_DMerc = True
 optimize_Well = False
 nmodes_coils = 10
 aspect_ratio_target = 6.5 if 'QA' in QA_or_QH  else 6.8
-JACOBIAN_THRESHOLD = 300
+JACOBIAN_THRESHOLD = 350
 aspect_ratio_weight = 1e+2
 aminor_weight = 5e-2
 # quasisymmetry_weight = 1e+1
@@ -69,11 +73,11 @@ min_iota         = 0.15 if 'QA' in QA_or_QH  else 1.01
 min_average_iota = 0.41 if 'QA' in QA_or_QH  else 1.05
 aminor_target = 1.70442622782386
 volavgB_target = 5.86461221551616
-CC_THRESHOLD = 0.1*11
-CURVATURE_THRESHOLD = 7/11
+CC_THRESHOLD = 0.1*11 if 'QA' in QA_or_QH  else 0.08*11
+CURVATURE_THRESHOLD = 7/11 if 'QA' in QA_or_QH  else 12/11
 MSC_THRESHOLD = 10/11/11
-nphi_VMEC = 26
-ntheta_VMEC = 26
+nphi_VMEC = 32
+ntheta_VMEC = 32
 vc_src_nphi = ntheta_VMEC
 ftol = 1e-3
 R0 = 1.0*11
@@ -403,7 +407,7 @@ for iteration, max_mode in enumerate(max_mode_array):
         JF_objective_optimizable = make_optimizable(JF_objective, vmec)
         Jf_residual = JF_objective_optimizable.J()
         prob_residual = prob.objective()
-        new_Jf_weight = (prob_residual/Jf_residual)**2
+        new_Jf_weight = coils_objective_weight#(prob_residual/Jf_residual)**2
         objective_tuples_with_coils = tuple(objective_tuple)+tuple([(JF_objective_optimizable.J, 0, new_Jf_weight)])
         prob_with_coils = LeastSquaresProblem.from_tuples(objective_tuples_with_coils)
         proc0_print(f'  Performing stage 1 optimization with coils with ~{MAXITER_stage_1} iterations')
