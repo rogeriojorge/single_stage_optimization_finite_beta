@@ -26,7 +26,7 @@ parent_path = str(Path(__file__).parent.resolve())
 os.chdir(parent_path)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
-parser.add_argument("--ncoils", type=int, default=3)
+parser.add_argument("--ncoils", type=int, default=4)
 parser.add_argument("--stage1_coils", dest="stage1_coils", default=False, action="store_true")
 parser.add_argument("--stage1", dest="stage1", default=False, action="store_true")
 parser.add_argument("--stage2", dest="stage2", default=False, action="store_true")
@@ -50,15 +50,15 @@ MAXITER_stage_1 = 35
 MAXITER_stage_2 = 250
 MAXITER_single_stage = 25
 MAXFEV_single_stage  = 35
-LENGTH_THRESHOLD = 4.8*11 if 'QA' in QA_or_QH  else 3.5*11
-max_mode_array                    = [1]*0 + [2]*3 + [3]*3 + [4]*2 + [5]*0 + [6]*0
+LENGTH_THRESHOLD = 4.6*11 if 'QA' in QA_or_QH  else 3.5*11
+max_mode_array                    = [1]*0 + [2]*4 + [3]*4 + [4]*5 + [5]*3 + [6]*0
 quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2}  if 'QA' in QA_or_QH  else {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2}
 DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+12, 3: 5e+12, 4: 1e+13} if 'QA' in QA_or_QH  else {1: 1e+8, 2: 1e+10, 3: 5e+10, 4: 1e+11}
 DMerc_fraction_mpol_mapping       = {1: 0.7, 2: 0.2, 3: 0.1, 4: 0.05}       if 'QA' in QA_or_QH  else {1: 0.9, 2: 0.6, 3: 0.3, 4: 0.1}
 maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 6, 5: 7, 6: 7}
 optimize_DMerc = True
 optimize_Well = False
-nmodes_coils = 5 #10
+nmodes_coils = 6 #10
 aspect_ratio_target = 6.5 if 'QA' in QA_or_QH  else 6.8
 JACOBIAN_THRESHOLD = 30
 aspect_ratio_weight = 1e+2
@@ -76,7 +76,7 @@ min_iota         = 0.15 if 'QA' in QA_or_QH  else 1.01
 min_average_iota = 0.41 if 'QA' in QA_or_QH  else 1.05
 aminor_target = 1.70442622782386
 volavgB_target = 5.86461221551616
-CS_THRESHOLD        = 0.30*11
+CS_THRESHOLD        = 0.27*11
 CC_THRESHOLD        = 0.20*11 if 'QA' in QA_or_QH  else 0.08*11
 CURVATURE_THRESHOLD = 5/11    if 'QA' in QA_or_QH  else 12/11
 MSC_THRESHOLD       = 5/11/11 if 'QA' in QA_or_QH  else 8/11/11
@@ -160,7 +160,7 @@ total_current_vmec = vmec.external_current() / (2 * surf.nfp)
 base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
 base_currents = [Current(total_current_vmec / ncoils * 1e-5) * 1e5 for _ in range(ncoils-1)]
 total_current = Current(total_current_vmec)
-total_current.fix_all()
+# total_current.fix_all()
 base_currents += [total_current - sum(base_currents)]
 coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, stellsym=True)
 curves = [c.curve for c in coils]
@@ -252,7 +252,8 @@ def fun(dofss, prob_jacobian=None, info={'Nfeval': 0}):
     JF.full_unfix(free_coil_dofs)
     JF.x = coil_dofs
     J = fun_J(prob, JF)
-    if (info['Nfeval'] > MAXFEV_single_stage or np.abs(J-previous_J)/previous_J < ftol) and J < JACOBIAN_THRESHOLD:
+    # if (info['Nfeval'] > MAXFEV_single_stage or np.abs(J-previous_J)/previous_J < ftol) and J < JACOBIAN_THRESHOLD:
+    if info['Nfeval'] > MAXFEV_single_stage and J < JACOBIAN_THRESHOLD:
         return J, [0] * len(dofs)
     if J > JACOBIAN_THRESHOLD or isnan(J):
         proc0_print(f"fun#{info['Nfeval']}: Exception caught during function evaluation with J={J}. Returning J={JACOBIAN_THRESHOLD}")
