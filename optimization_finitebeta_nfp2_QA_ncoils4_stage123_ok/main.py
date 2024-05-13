@@ -20,13 +20,13 @@ from simsopt.mhd import Vmec, QuasisymmetryRatioResidual, VirtualCasing, Boozer
 from simsopt.objectives import SquaredFlux, QuadraticPenalty, LeastSquaresProblem
 from simsopt.mhd.profiles import ProfilePolynomial, ProfilePressure, ProfileScaled, ProfileSpline
 from simsopt.geo import (CurveLength, CurveCurveDistance, MeanSquaredCurvature, SurfaceRZFourier, LinkingNumber,
-                         LpCurveCurvature, ArclengthVariation, curves_to_vtk, create_equally_spaced_curves, CurveSurfaceDistance)
+                         LpCurveCurvature, ArclengthVariation, curves_to_vtk, create_equally_spaced_curves)
 mpi = MpiPartition()
 parent_path = str(Path(__file__).parent.resolve())
 os.chdir(parent_path)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
-parser.add_argument("--ncoils", type=int, default=3)
+parser.add_argument("--ncoils", type=int, default=4)
 parser.add_argument("--stage1_coils", dest="stage1_coils", default=False, action="store_true")
 parser.add_argument("--stage1", dest="stage1", default=False, action="store_true")
 parser.add_argument("--stage2", dest="stage2", default=False, action="store_true")
@@ -40,7 +40,6 @@ ncoils = args.ncoils
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
-use_original_current_with_resampling = True # if true, use nfp2_QA_original or nfp4_QH_original
 optimize_aminor = False
 optimize_stage1 = args.stage1
 optimize_stage1_with_coils = args.stage1_coils
@@ -50,17 +49,17 @@ MAXITER_stage_1 = 35
 MAXITER_stage_2 = 250
 MAXITER_single_stage = 25
 MAXFEV_single_stage  = 35
-LENGTH_THRESHOLD = 4.8*11 if 'QA' in QA_or_QH  else 3.5*11
-max_mode_array                    = [1]*0 + [2]*3 + [3]*3 + [4]*2 + [5]*0 + [6]*0
+LENGTH_THRESHOLD = 4.6*11 if 'QA' in QA_or_QH  else 3.5*11
+max_mode_array                    = [1]*0 + [2]*4 + [3]*4 + [4]*4 + [5]*0 + [6]*0
 quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2}  if 'QA' in QA_or_QH  else {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2}
-DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+12, 3: 5e+12, 4: 1e+13} if 'QA' in QA_or_QH  else {1: 1e+8, 2: 1e+10, 3: 5e+10, 4: 1e+11}
-DMerc_fraction_mpol_mapping       = {1: 0.7, 2: 0.2, 3: 0.1, 4: 0.05}       if 'QA' in QA_or_QH  else {1: 0.9, 2: 0.6, 3: 0.3, 4: 0.1}
-maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 6, 5: 7, 6: 7}
+DMerc_weight_mpol_mapping         = {1: 5e+9, 2: 1e+11, 3: 2e+11, 4: 3e+11} if 'QA' in QA_or_QH  else {1: 1e+8, 2: 1e+10, 3: 5e+10, 4: 1e+11}
+DMerc_fraction_mpol_mapping       = {1: 0.7, 2: 0.5, 3: 0.3, 4: 0.2}        if 'QA' in QA_or_QH  else {1: 0.9, 2: 0.6, 3: 0.3, 4: 0.1}
+maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
 optimize_DMerc = True
 optimize_Well = False
-nmodes_coils = 5 #10
+nmodes_coils = 10
 aspect_ratio_target = 6.5 if 'QA' in QA_or_QH  else 6.8
-JACOBIAN_THRESHOLD = 30
+JACOBIAN_THRESHOLD = 100
 aspect_ratio_weight = 1e+2
 aminor_weight = 5e-2
 # quasisymmetry_weight = 1e+1
@@ -76,11 +75,10 @@ min_iota         = 0.15 if 'QA' in QA_or_QH  else 1.01
 min_average_iota = 0.41 if 'QA' in QA_or_QH  else 1.05
 aminor_target = 1.70442622782386
 volavgB_target = 5.86461221551616
-CS_THRESHOLD        = 0.30*11
-CC_THRESHOLD        = 0.20*11 if 'QA' in QA_or_QH  else 0.08*11
-CURVATURE_THRESHOLD = 5/11    if 'QA' in QA_or_QH  else 12/11
-MSC_THRESHOLD       = 5/11/11 if 'QA' in QA_or_QH  else 8/11/11
-nphi_VMEC   = 28
+CC_THRESHOLD = 0.1*11 if 'QA' in QA_or_QH  else 0.08*11
+CURVATURE_THRESHOLD = 7/11 if 'QA' in QA_or_QH  else 12/11
+MSC_THRESHOLD = 10/11/11
+nphi_VMEC = 28
 ntheta_VMEC = 28
 vc_src_nphi = ntheta_VMEC
 ftol = 1e-3
@@ -90,8 +88,8 @@ nquadpoints = 120
 diff_method = "forward"
 opt_method = 'trf'#'lm'
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-finite_difference_abs_step = 1e-6
-finite_difference_rel_step = 0#1e-4
+finite_difference_abs_step = 1e-5
+finite_difference_rel_step = 1e-4
 ftol_stage_1 = 3e-5
 rel_step_stage1 = 2e-3
 abs_step_stage1 = 2e-5
@@ -100,8 +98,6 @@ CC_WEIGHT = 1e0
 CURVATURE_WEIGHT = 1e-3
 MSC_WEIGHT = 1e-3
 ARCLENGTH_WEIGHT = 1e-9
-CS_PENALTY = 10
-initial_DMerc_index = 2
 ## Self-consistent bootstrap current
 beta = 2.5 #%
 ne0 = 3e20 * (beta/100/0.05)**(1/3)
@@ -114,7 +110,7 @@ Ti = Te
 pressure = ProfilePressure(ne, Te, ni, Ti)
 pressure_Pa = ProfileScaled(pressure, ELEMENTARY_CHARGE)
 ######
-vmec_input_filename = os.path.join(parent_path, 'vmec_inputs', 'input.'+ QA_or_QH + ('_original' if use_original_current_with_resampling else ''))
+vmec_input_filename = os.path.join(parent_path, 'vmec_inputs', 'input.'+ QA_or_QH)
 directory = f'optimization_finitebeta_{QA_or_QH}_ncoils{ncoils}_stage'
 if optimize_stage1: directory += '1'
 if optimize_stage1_with_coils: directory += '1c'
@@ -187,7 +183,6 @@ bs.set_points(surf.gamma().reshape((-1, 3)))
 Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
 Jls = [CurveLength(c) for c in base_curves]
 Jccdist = CurveCurveDistance(curves, CC_THRESHOLD, num_basecurves=len(curves))
-Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
 Jcs = [LpCurveCurvature(c, 2, CURVATURE_THRESHOLD) for i, c in enumerate(base_curves)]
 Jmscs = [MeanSquaredCurvature(c) for c in base_curves]
 Jals = [ArclengthVariation(c) for c in base_curves]
@@ -197,7 +192,7 @@ J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmsc
 J_ALS = ARCLENGTH_WEIGHT * sum(Jals)
 J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum(QuadraticPenalty(J, LENGTH_THRESHOLD, "max") for J in Jls)
 linkNum = LinkingNumber(curves)
-JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
+JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum
 ##########################################################################################
 proc0_print('  Starting optimization')
 global previous_J
@@ -219,8 +214,7 @@ def fun_coils(dofss, info):
         cl_string = ", ".join([f"{j.J():.1f}" for j in Jls])
         kap_string = ", ".join(f"{np.max(c.kappa()):.1f}" for c in base_curves)
         msc_string = ", ".join(f"{j.J():.2f}" for j in Jmscs)
-        outstr += f" lengths=sum([{cl_string}])={sum(j.J() for j in Jls):.1f}, curv=[{kap_string}], msc=[{msc_string}]"
-        outstr += f", C-S-Sep={Jcsdist.shortest_distance():.2f}"
+        outstr += f" lengths=sum([{cl_string}])={sum(j.J() for j in Jls):.1f}, curv=[{kap_string}],msc=[{msc_string}]"
         print(outstr)
         # print(f"Currents: {[c.current.get_value() for c in coils]}")
     return J, grad
@@ -269,13 +263,10 @@ def fun(dofss, prob_jacobian=None, info={'Nfeval': 0}):
     grad = np.concatenate((grad_with_respect_to_coils, grad_with_respect_to_surface))
     # Remove spurious files
     for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
     os.chdir(parent_path)
     for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
     os.chdir(this_path)
     for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
     previous_J = J
     # proc0_print(f"  Time taken = {time.time()-start_time:.2f}s")
     return J, grad
@@ -298,16 +289,10 @@ for iteration, max_mode in enumerate(max_mode_array):
     
     n_spline = np.max((np.min((iteration * 2 + 5, 15)), 25))
     s_spline = np.linspace(0, 1, n_spline)
-    if iteration == 0:
-        current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
-    else:
-        current = current.resample(s_spline)
+    if iteration == 0: current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
+    else: current = current.resample(s_spline)
     current.unfix_all()
-    if use_original_current_with_resampling:
-        vmec.current_profile = ProfileScaled(current, -1e6)
-    else:
-        # vmec.current_profile.unfix_all()
-        proc0_print('WARNING: Using original current profile without changing it, this will not result in a good optimization')
+    vmec.current_profile = ProfileScaled(current, -1e6)
     
     # Define bootstrap objective:
     booz = Boozer(vmec, mpol=12, ntor=12)
@@ -338,11 +323,11 @@ for iteration, max_mode in enumerate(max_mode_array):
     def iota_average_min_objective(vmec): return np.min((np.abs(vmec.mean_iota())-min_average_iota,0))
     def iota_max_objective(vmec):         return np.max((np.max(np.abs(vmec.wout.iotaf))-max_iota,0))
     def volavgB_objective(vmec):          return vmec.wout.volavgB
-    len_DMerc = len(vmec.wout.DMerc[initial_DMerc_index:])
+    len_DMerc = len(vmec.wout.DMerc)
     index_DMerc = int(len_DMerc * DMerc_fraction_mpol_mapping[max_mode])
     middle_index_DMerc = int(len_DMerc * 0.5)
     # def DMerc_min_objective(vmec):        return np.abs(np.min((np.min(vmec.wout.DMerc),0)))
-    def DMerc_min_objective(vmec):        return np.abs(np.min((np.min(vmec.wout.DMerc[initial_DMerc_index:][index_DMerc:]),0,vmec.wout.DMerc[initial_DMerc_index:][middle_index_DMerc])))
+    def DMerc_min_objective(vmec):        return np.abs(np.min((np.min(vmec.wout.DMerc[index_DMerc:]),0,vmec.wout.DMerc[middle_index_DMerc])))
     def magnetic_well_objective(vmec):    return np.abs(np.min((vmec.vacuum_well(),0)))
     def betatotal_objective(vmec):        return np.abs(vmec.wout.betatotal)
     aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
@@ -376,8 +361,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
-    Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum
     free_coil_dofs = JF.dofs_free_status
     dofs = np.concatenate((JF.x, prob.x))
     bs.set_points(surf.gamma().reshape((-1, 3)))
@@ -390,7 +374,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     proc0_print("Initial magnetic well:", vmec.vacuum_well())
     proc0_print("Initial quasisymmetry:", qs.total())
     proc0_print("Initial volavgB:", vmec.wout.volavgB)
-    proc0_print("Initial min DMerc:", np.min(vmec.wout.DMerc[initial_DMerc_index:]))
+    proc0_print("Initial min DMerc:", np.min(vmec.wout.DMerc))
     proc0_print("Initial Aminor:", vmec.wout.Aminor_p)
     proc0_print("Initial betatotal:", vmec.wout.betatotal)
     proc0_print("Initial bootstrap_mismatch:", bootstrap_mismatch.J())
@@ -413,8 +397,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
-    Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum
     ### Stage 2 optimization
     if optimize_stage2:
         proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
@@ -431,8 +414,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
-    Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum
     ## Stage 1 optimization with coils
     if optimize_stage1_with_coils:
         def JF_objective(vmec):
@@ -442,7 +424,7 @@ for iteration, max_mode in enumerate(max_mode_array):
         Jf_residual = JF_objective_optimizable.J()
         prob_residual = prob.objective()
         new_Jf_weight = coils_objective_weight#(prob_residual/Jf_residual)**2
-        objective_tuples_with_coils = tuple(objective_tuple)+tuple([(JF_objective_optimizable.J, 0, new_Jf_weight**2/3)])
+        objective_tuples_with_coils = tuple(objective_tuple)+tuple([(JF_objective_optimizable.J, 0, new_Jf_weight**2)])
         prob_with_coils = LeastSquaresProblem.from_tuples(objective_tuples_with_coils)
         proc0_print(f'  Performing stage 1 optimization with coils with ~{MAXITER_stage_1} iterations')
         JF.fix_all()
@@ -450,7 +432,6 @@ for iteration, max_mode in enumerate(max_mode_array):
         rel_step = np.max((rel_step_stage1/(10**max_mode_previous), 1e-7))
         least_squares_mpi_solve(prob_with_coils, mpi, grad=True, rel_step=rel_step, abs_step=abs_step, max_nfev=MAXITER_stage_1, ftol=ftol_stage_1, xtol=ftol_stage_1, gtol=ftol_stage_1)
         JF.full_unfix(free_coil_dofs_all)
-    vmec.write_input(os.path.join(this_path, f'input.after_stage12_maxmode{max_mode}'))
     ## Broadcast dofs and save surfs/coils
     # mpi.comm_world.Bcast(dofs, root=0)
     # JF.x = dofs[:-number_vmec_dofs]
@@ -458,8 +439,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
-    Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum
     #
     bs.set_points(surf.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
@@ -476,7 +456,6 @@ for iteration, max_mode in enumerate(max_mode_array):
         pointData = {"Bcoils.n/B": BdotN_surf[:, :, None]}
         surf_big.to_vtk(os.path.join(coils_results_path, f"surf_big_after_stage12_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf.gamma().reshape((-1, 3)))
-    bs.save(os.path.join(coils_results_path, f"biot_savart_after_stage12_maxmode{max_mode}.json"))
     ## Single stage optimization
     if optimize_stage3:
         proc0_print(f'  Performing single stage optimization with ~{MAXFEV_single_stage} iterations')
@@ -524,7 +503,7 @@ proc0_print("Final mean shear:", vmec.mean_shear())
 proc0_print("Final magnetic well:", vmec.vacuum_well())
 proc0_print("Final quasisymmetry:", qs.total())
 proc0_print("Final volavgB:", vmec.wout.volavgB)
-proc0_print("Final min DMerc:", np.min(vmec.wout.DMerc[initial_DMerc_index:]))
+proc0_print("Final min DMerc:", np.min(vmec.wout.DMerc))
 proc0_print("Final Aminor:", vmec.wout.Aminor_p)
 proc0_print("Final betatotal:", vmec.wout.betatotal)
 proc0_print("Final squared flux:", Jf.J())

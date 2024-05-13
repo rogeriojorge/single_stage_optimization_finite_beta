@@ -25,6 +25,7 @@ surf_big.vts
 surf_init.vts
 surf_opt.vts
 fieldlines_*
+jdotB_log*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
