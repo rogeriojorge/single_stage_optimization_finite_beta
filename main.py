@@ -519,11 +519,11 @@ if optimize_stage3:
     JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
     ### Stage 2 optimization
     if optimize_stage2:
-        proc0_print(f'  Performing final stage 2 optimization with ~{MAXITER_stage_2} iterations')
+        proc0_print(f'  Performing final stage 2 optimization with ~{MAXITER_stage_2*3} iterations')
         dofs = np.concatenate((JF.x, prob.x))
         coils_dofs = dofs[:-number_vmec_dofs]
         if comm_world.rank == 0:
-            res = minimize(fun_coils, coils_dofs, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
+            res = minimize(fun_coils, coils_dofs, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2*3, 'maxcor': 300}, tol=1e-12)
             dofs[:-number_vmec_dofs] = res.x
             coils_dofs = res.x
         mpi.comm_world.Barrier()
