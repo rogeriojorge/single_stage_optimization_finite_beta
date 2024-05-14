@@ -53,7 +53,7 @@ MAXFEV_single_stage  = 35
 LENGTH_THRESHOLD = 4.6*11 if 'QA' in QA_or_QH  else 3.5*11
 max_mode_array                    = [1]*0 + [2]*4 + [3]*4 + [4]*5 + [5]*3 + [6]*0
 quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2}  if 'QA' in QA_or_QH  else {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2}
-DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+12, 3: 5e+12, 4: 1e+13} if 'QA' in QA_or_QH  else {1: 1e+8, 2: 1e+10, 3: 5e+10, 4: 1e+11}
+DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 1e+13, 3: 1e+14, 4: 3e+14} if 'QA' in QA_or_QH  else {1: 1e+8, 2: 1e+10, 3: 5e+10, 4: 1e+11}
 DMerc_fraction_mpol_mapping       = {1: 0.7, 2: 0.2, 3: 0.1, 4: 0.05}       if 'QA' in QA_or_QH  else {1: 0.9, 2: 0.6, 3: 0.3, 4: 0.1}
 maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 6, 5: 7, 6: 7}
 optimize_DMerc = True
@@ -412,6 +412,7 @@ for iteration, max_mode in enumerate(max_mode_array):
             dofs = np.concatenate((JF.x, prob.x))
             bs.set_points(surf.gamma().reshape((-1, 3)))
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
+    proc0_print("Initial DMerc:", (vmec.wout.DMerc[initial_DMerc_index:]))
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
     Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
