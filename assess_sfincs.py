@@ -4,8 +4,9 @@ import shutil
 import subprocess
 home_directory = os.path.expanduser("~")
 
-QA_or_QH = "nfp2_QA_ncoils3"
-mpi_command = "mpiexec"
+QA_or_QH = "nfp2_QA_ncoils4_stage123"
+mpi_command = "~/miniforge3/bin/mpiexec.hydra"
+vmec_wout_file = "wout_maxmode4.nc"
 number_of_cores = 1
 Nradius = 5
 beta = 2.5
@@ -50,7 +51,7 @@ def change_file_content(file_path, replace_dict):
 copy_files(finite_beta_folder, OUT_DIR, files_to_copy)
 
 # Change equilibrium file and profiles file content
-equilibrium_nr_replace_dict = {'wout_final.nc': os.path.join(OUT_DIR, "..", "wout_final.nc"), "!ss Nradius = 5": f"!ss Nradius = {Nradius}"}
+equilibrium_nr_replace_dict = {'wout_final.nc': os.path.join(OUT_DIR, "..", vmec_wout_file), "!ss Nradius = 5": f"!ss Nradius = {Nradius}"}
 profiles_replace_dict = {2.38: ne0, -2.38: -ne0, 9.45: Te0, -9.45: -Te0}
 job_replace_dict = {'mpiexec -n 6': f'{mpi_command} -n {number_of_cores}'}
 

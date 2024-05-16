@@ -7,7 +7,7 @@
 !ss profilesScheme = 2
 !ss Nradius = 5
 !ss psiN_min = 0.025
-!ss psiN_max = 0.975
+!ss psiN_max = 0.90 ! originally 0.975 in LandremanBullerDrevlak RedlPaper
 
 ! Parameters specific to scanType = 2:
 

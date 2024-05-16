@@ -1,0 +1,938 @@
+ ****************************************************************************
+ SFINCS: Stellarator Fokker-Plank Iterative Neoclassical Conservative Solver
+ Version 3
+ Using double precision.
+ Serial job (1 process) detected.
+ Successfully read parameters from general namelist in input.namelist.
+ Successfully read parameters from geometryParameters namelist in input.namelist.
+ Successfully read parameters from speciesParameters namelist in input.namelist.
+ Successfully read parameters from physicsParameters namelist in input.namelist.
+ Successfully read parameters from resolutionParameters namelist in input.namelist.
+ Successfully read parameters from otherNumericalParameters namelist in input.namelist.
+ Successfully read parameters from preconditionerOptions namelist in input.namelist.
+ Successfully read parameters from export_f namelist in input.namelist.
+ mumps detected
+ superlu_dist detected
+ ---- Physics parameters: ----
+ Number of particle species =            2
+ Delta (rho* at reference parameters)          =    4.5694000000000004E-003
+ alpha (e Phi / T at reference parameters)     =    1.0000000000000000     
+ nu_n (collisionality at reference parameters) =    8.3156500000000008E-003
+ Linear run
+ ---- Numerical parameters: ----
+ Ntheta             =           25
+ Nzeta              =           39
+ Nxi                =           60
+ NL                 =            4
+ Nx                 =            7
+ solverTolerance    =    1.0000000000000001E-005
+ Theta derivative: centered finite differences, 5-point stencil
+ Zeta derivative: centered finite differences, 5-point stencil
+ For solving large linear systems, an iterative Krylov solver will be used.
+ Processor    0 owns theta indices   1 to  25 and zeta indices   1 to  39
+ Nxi_for_x_option:           1
+ x:   6.3716484606701013E-002  0.31819201888861848       0.72419898925837300        1.2380355992150891        1.8385282202709461        2.5314881513276766        3.3734564301245800     
+ Nxi for each x:           7          14          25          39          55          60          60
+ min_x_for_L:           1           1           1           1           1           1           1           2           2           2           2           2           2           2           3           3           3           3           3           3           3           3           3           3           3           4           4           4           4           4           4           4           4           4           4           4           4           4           4           5           5           5           5           5           5           5           5           5           5           5           5           5           5           5           5           6           6           6           6           6
+ The matrix is       507004 x      507004  elements.
+ Selecting the flux surface to use based on psiN_wish =   0.50000000000000000     
+ Reading VMEC geometry from file /Users/rogeriojorge/local/single_stage_optimization_finite_beta/optimization_finitebeta_nfp2_QA_ncoils4_stage123/sfincs/../wout_maxmode4.nc
+ Interpolating using radial indices  51 and  52 of 101 from vmec's half mesh.
+ Weights for half mesh =  0.50000000000000 and  0.50000000000000
+ Interpolating using radial indices  51 and  52 of 101 from vmec's full mesh.
+ Weights for full mesh =  1.00000000000000 and  0.00000000000000
+ Including   72 of   78 stellarator-symmetric modes from the VMEC file.
+ Equilibrium is stellarator-symmetric.
+ Successfully read VMEC geometry file /Users/rogeriojorge/local/single_stage_optimization_finite_beta/optimization_finitebeta_nfp2_QA_ncoils4_stage123/sfincs/../wout_maxmode4.nc
+ ---- Geometry parameters: ----
+ Geometry scheme =            5
+ psiAHat (Normalized toroidal flux at the last closed flux surface) =    8.6731649268576891     
+ aHat (Radius of the last closed flux surface in units of RHat) =    1.7461508514402222     
+ GHat (Boozer component multiplying grad zeta) =    69.839248981991332     
+ IHat (Boozer component multiplying grad theta) =   0.24937655611285511     
+ iota (Rotational transform) =   0.45898936896536474     
+ ---- Geometry parameters: ----
+ Geometry scheme =            5
+ psiAHat (Normalized toroidal flux at the last closed flux surface) =    8.6731649268576891     
+ aHat (Radius of the last closed flux surface in units of RHat) =    1.7461508514402222     
+ GHat (Boozer component multiplying grad zeta) =    69.839248981991332     
+ IHat (Boozer component multiplying grad theta) =   0.24937655611285511     
+ iota (Rotational transform) =   0.45898936896536474     
+ ------------------------------------------------------
+ Done creating grids.
+ Requested/actual flux surface for this calculation, in various radial coordinates:
+   psiHat =    4.3365824634288446      /   4.3365824634288455     
+   psiN   =   0.50000000000000000      /  0.50000000000000011     
+   rHat   =    1.2347151080280447      /   1.2347151080280450     
+   rN     =   0.70710678118654757      /  0.70710678118654757     
+ Selecting the input gradients of n & T from the specified ddrHat values.
+ Selecting the input gradient of Phi from the specified Er.
+ Entering main solver loop.
+ Initializing f0
+ Beginning preallocation for whichMatrix =            1
+ Beginning preallocation for whichMatrix =            0
+ Since this is a linear run, we will only take a single step, and not iterate Newton's method.
+ Solver package which will be used: mumps                                                                           
+ ------------------------------------------------------
+ Finished initialization.
+ Beginning the main solve.  This could take a while ...
+ evaluateResidual called.
+ State vector is 0 so I will skip building the first matrix when evaluating the residual.
+--------- Residual function norm:  7.4768767E-05 -----------------------------
+ evaluateJacobian called.
+ Running populateMatrix with whichMatrix =            0
+ Time to pre-assemble Jacobian preconditioner matrix:    3.8807320000000800       seconds.
+ Time to assemble Jacobian preconditioner matrix:    8.4236000000146305E-002  seconds.
+ # of nonzeros in Jacobian preconditioner matrix:    13483256 , allocated:    39573304 , mallocs:           0  (should be 0)
+ Running populateMatrix with whichMatrix =            1
+ Time to pre-assemble Jacobian matrix:    4.4761029999999664       seconds.
+ Time to assemble Jacobian matrix:    3.2568999999966763E-002  seconds.
+ # of nonzeros in Jacobian matrix:    21396703 , allocated:    39573304 , mallocs:           0  (should be 0)
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   1      507004       13483256
+      executing #MPI =      1, without OMP
+
+ =================================================
+  MUMPS compiled with option -DAVOID_MPI_IN_PLACE
+ MUMPS compiled with option -Dparmetis
+ MUMPS compiled with option -Dpord
+ MUMPS compiled with option -Dptscotch
+ =================================================
+L U Solver for unsymmetric matrices
+Type of parallelism: Working host
+
+ ****** ANALYSIS STEP ********
+
+ Processing a graph of size:    507004
+ ... Structural symmetry (in percent)=  100
+ Average density of rows/columns =   26
+ ... No column permutation
+ Ordering based on METIS
+ ELAPSED TIME SPENT IN METIS reordering  =     11.6608
+ SYMBOLIC based on column counts 
+ ELAPSED TIME IN symbolic factorization  =      0.3025
+
+Leaving analysis phase with  ...
+ INFOG(1)                                       =               0
+ INFOG(2)                                       =               0
+ -- (20) Number of entries in factors (estim.)  =       802786750
+ --  (3) Real space for factors    (estimated)  =       802786750
+ --  (4) Integer space for factors (estimated)  =         6684150
+ --  (5) Maximum frontal size      (estimated)  =            3152
+ --  (6) Number of nodes in the tree            =           12069
+ -- (32) Type of analysis effectively used      =               1
+ --  (7) Ordering option effectively used       =               5
+ ICNTL (6) Maximum transversal option           =               0
+ ICNTL (7) Pivot order option                   =               7
+ ICNTL(12) Ordering symmetric indef. matrices   =               1
+ ICNTL(13) Parallelism/splitting of root node   =               0
+ ICNTL(14) Percentage of memory relaxation      =              50
+ ICNTL(15) Analysis by block effectively used   =               0
+ ICNTL(18) Distributed input matrix (on if >0)  =               0
+ ICNTL(32) Forward elimination during facto.    =               0
+ ICNTL(35) BLR activation                       =               0
+ ICNTL(48) Tree based multithreading (effective)=               0
+ ICNTL(58) Symbolic factorization option        =               2
+ Number of level 2 nodes                        =               0
+ Number of split nodes                          =               0
+ RINFOG(1) Operations during elimination (estim)= 1.206D+12
+
+ MEMORY ESTIMATIONS ... 
+ Estimations with standard Full-Rank (FR) factorization:
+    Total space in MBytes, IC factorization      (INFOG(17)):            9935
+    Total space in MBytes,  OOC factorization    (INFOG(27)):             454
+
+ Elapsed time in analysis driver=      12.4173
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   2      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+****** FACTORIZATION STEP ********
+
+ GLOBAL STATISTICS PRIOR NUMERICAL FACTORIZATION ...
+ Number of working processes                =               1
+ ICNTL(22) Out-of-core option               =               0
+ ICNTL(35) BLR activation (eff. choice)     =               0
+ ICNTL(37) BLR CB compression (eff. choice) =               0
+ ICNTL(49) Compact workarray S (end facto.) =               0
+ ICNTL(14) Memory relaxation                =              50
+ INFOG(3) Real space for factors (estimated)=       802786750
+ INFOG(4) Integer space for factors (estim.)=         6684150
+ Maximum frontal size (estimated)           =            3152
+ Number of nodes in the tree                =           12069
+ ICNTL(23) Memory allowed (value on host)   =               0
+           Sum over all procs               =               0
+ Memory provided by user, sum of LWK_USER   =               0
+ Effective threshold for pivoting, CNTL(1)  =      0.1000D-05
+
+ Statistics on the scaling phase
+ Elapsed time for scaling                   =      1.5095
+ Max difference from 1 after scaling the entries for ONE-NORM (option 7/8)   = 0.72D+01
+
+ Effective size of S     (based on INFO(39))=           1212741678
+ Elapsed time to reformat/distribute matrix =      0.4431
+
+
+ Allocated buffers
+ ------------------
+ Size of reception buffer in bytes ...... =       200000
+ Size of async. emission buffer (bytes).. =       200012
+ Small emission buffer (bytes) .......... =           20
+
+ ** Memory allocated, total in Mbytes           (INFOG(19)):        9935
+ ** Memory effectively used, total in Mbytes    (INFOG(22)):        6701
+
+ Elapsed time for factorization                     =    126.2964
+
+Leaving factorization with ...
+ RINFOG (2) Operations in node assembly             = 1.541D+09
+ ------ (3) Operations in node elimination          = 1.206D+12
+ ICNTL  (8) Scaling effectively used                =               7
+ INFOG  (9) Real space for factors                  =       802786750
+ INFOG (10) Integer space for factors               =         6684150
+ INFOG (11) Maximum front size                      =            3152
+ INFOG (29) Number of entries in factors            =       802786750
+ INFOG (12) Number of off diagonal pivots           =               0
+ INFOG (13) Number of delayed pivots                =               0
+ RINFOG(19) Smallest pivot WITH perturbed pivots    = 1.035D-05
+ RINFOG(20) Smallest pivot WITHOUT perturbed pivots = 1.035D-05
+ RINFOG(21) Largest pivot in absolute value         = 1.850D+05
+ INFOG (24) Effective value of ICNTL(12)            =               1
+ INFOG (14) Number of memory compress               =               0
+
+ Elapsed time in factorization driver               =    128.2893
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001065
+ Time in solution step (fwd/bwd)  =       1.894595
+  .. Time in forward (fwd) step   =          0.951828
+  .. Time in backward (bwd) step  =          0.942764
+ Time to gather solution(cent.sol)=       0.000446
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       1.8982
+    0 KSP Residual norm 3.809773996784e-03
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001180
+ Time in solution step (fwd/bwd)  =       3.228409
+  .. Time in forward (fwd) step   =          0.929833
+  .. Time in backward (bwd) step  =          2.298575
+ Time to gather solution(cent.sol)=       0.000539
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       3.2320
+    1 KSP Residual norm 2.184266116703e-03
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001123
+ Time in solution step (fwd/bwd)  =       1.885498
+  .. Time in forward (fwd) step   =          0.975327
+  .. Time in backward (bwd) step  =          0.910170
+ Time to gather solution(cent.sol)=       0.000477
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       1.8891
+    2 KSP Residual norm 1.498588943398e-03
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.020586
+ Time in solution step (fwd/bwd)  =       2.276021
+  .. Time in forward (fwd) step   =          0.866545
+  .. Time in backward (bwd) step  =          1.409473
+ Time to gather solution(cent.sol)=       0.000678
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       2.2996
+    3 KSP Residual norm 9.750904925729e-04
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001011
+ Time in solution step (fwd/bwd)  =       1.835704
+  .. Time in forward (fwd) step   =          0.850358
+  .. Time in backward (bwd) step  =          0.985344
+ Time to gather solution(cent.sol)=       0.000477
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       1.8393
+    4 KSP Residual norm 8.042649925226e-04
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001122
+ Time in solution step (fwd/bwd)  =       1.805132
+  .. Time in forward (fwd) step   =          0.835376
+  .. Time in backward (bwd) step  =          0.969754
+ Time to gather solution(cent.sol)=       0.000793
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       1.8096
+    5 KSP Residual norm 7.964062745820e-04
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.000960
+ Time in solution step (fwd/bwd)  =       1.957875
+  .. Time in forward (fwd) step   =          0.967279
+  .. Time in backward (bwd) step  =          0.990593
+ Time to gather solution(cent.sol)=       0.001599
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       1.9625
+    6 KSP Residual norm 7.810300825419e-04
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.003249
+ Time in solution step (fwd/bwd)  =       2.002727
+  .. Time in forward (fwd) step   =          1.085186
+  .. Time in backward (bwd) step  =          0.917537
+ Time to gather solution(cent.sol)=       0.001316
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       2.0138
+    7 KSP Residual norm 6.277485329611e-04
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.002997
+ Time in solution step (fwd/bwd)  =       1.809437
+  .. Time in forward (fwd) step   =          0.891188
+  .. Time in backward (bwd) step  =          0.918246
+ Time to gather solution(cent.sol)=       0.000473
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       1.8176
+    8 KSP Residual norm 3.425738929021e-04
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.000955
+ Time in solution step (fwd/bwd)  =       1.692206
+  .. Time in forward (fwd) step   =          0.817271
+  .. Time in backward (bwd) step  =          0.874934
+ Time to gather solution(cent.sol)=       0.000535
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       1.6962
+    9 KSP Residual norm 1.883884292046e-04
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.002406
+ Time in solution step (fwd/bwd)  =       4.883700
+  .. Time in forward (fwd) step   =          0.939395
+  .. Time in backward (bwd) step  =          3.944303
+ Time to gather solution(cent.sol)=       0.000484
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       4.8914
+   10 KSP Residual norm 1.048920885843e-04
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001499
+ Time in solution step (fwd/bwd)  =       3.649790
+  .. Time in forward (fwd) step   =          1.092187
+  .. Time in backward (bwd) step  =          2.557600
+ Time to gather solution(cent.sol)=       0.000502
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       3.6626
+   11 KSP Residual norm 5.016201818609e-05
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001883
+ Time in solution step (fwd/bwd)  =       2.085081
+  .. Time in forward (fwd) step   =          1.041876
+  .. Time in backward (bwd) step  =          1.043204
+ Time to gather solution(cent.sol)=       0.000482
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       2.0895
+   12 KSP Residual norm 2.789611403072e-05
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001449
+ Time in solution step (fwd/bwd)  =       2.471714
+  .. Time in forward (fwd) step   =          1.051989
+  .. Time in backward (bwd) step  =          1.419722
+ Time to gather solution(cent.sol)=       0.000522
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       2.5155
+   13 KSP Residual norm 1.510580511489e-05
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.109095
+ Time in solution step (fwd/bwd)  =       3.173262
+  .. Time in forward (fwd) step   =          2.148943
+  .. Time in backward (bwd) step  =          1.024316
+ Time to gather solution(cent.sol)=       0.000879
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       3.3348
+   14 KSP Residual norm 5.542609336676e-06
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001126
+ Time in solution step (fwd/bwd)  =       2.261312
+  .. Time in forward (fwd) step   =          1.080757
+  .. Time in backward (bwd) step  =          1.180553
+ Time to gather solution(cent.sol)=       0.000497
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       2.2653
+   15 KSP Residual norm 2.330214625735e-06
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.002920
+ Time in solution step (fwd/bwd)  =       3.998106
+  .. Time in forward (fwd) step   =          0.929794
+  .. Time in backward (bwd) step  =          3.068309
+ Time to gather solution(cent.sol)=       0.000494
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       4.0066
+   16 KSP Residual norm 1.179604570262e-06
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001784
+ Time in solution step (fwd/bwd)  =       2.177882
+  .. Time in forward (fwd) step   =          1.070598
+  .. Time in backward (bwd) step  =          1.107280
+ Time to gather solution(cent.sol)=       0.001430
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       2.1926
+   17 KSP Residual norm 4.515372288199e-07
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.020302
+ Time in solution step (fwd/bwd)  =       2.156762
+  .. Time in forward (fwd) step   =          1.085346
+  .. Time in backward (bwd) step  =          1.071413
+ Time to gather solution(cent.sol)=       0.000493
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       2.1797
+   18 KSP Residual norm 2.044842824779e-07
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001503
+ Time in solution step (fwd/bwd)  =       4.095709
+  .. Time in forward (fwd) step   =          2.883499
+  .. Time in backward (bwd) step  =          1.212207
+ Time to gather solution(cent.sol)=       0.000512
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       4.1080
+   19 KSP Residual norm 9.478076369587e-08
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.001538
+ Time in solution step (fwd/bwd)  =       2.046727
+  .. Time in forward (fwd) step   =          0.911382
+  .. Time in backward (bwd) step  =          1.135342
+ Time to gather solution(cent.sol)=       0.000505
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       2.0522
+   20 KSP Residual norm 4.733819757086e-08
+
+Entering DMUMPS 5.7.1 from C interface with JOB, N, NNZ =   3      507004       13483256
+      executing #MPI =      1, without OMP
+
+
+
+ ****** SOLVE & CHECK STEP ********
+
+ GLOBAL STATISTICS PRIOR SOLVE PHASE ...........
+ Number of right-hand-sides                    =           1
+ Blocking factor for multiple rhs              =           1
+ ICNTL (9)                                     =           1
+  --- (10)                                     =           0
+  --- (11)                                     =           0
+  --- (20)                                     =           0
+  --- (21)                                     =           0
+  --- (30)                                     =           0
+  --- (35)                                     =           0
+  --- (48) (effective)                         =           0
+ ** Space in MBYTES used for solve                        :      9811
+
+ Leaving solve with ...
+ Time to build/scatter RHS        =       0.002879
+ Time in solution step (fwd/bwd)  =       4.347622
+  .. Time in forward (fwd) step   =          0.820895
+  .. Time in backward (bwd) step  =          3.526726
+ Time to gather solution(cent.sol)=       0.000450
+ Time for distributed solution    =       0.000000
+
+ Elapsed time in solve driver=       4.3556
+   21 KSP Residual norm 1.997057821104e-08
+ evaluateResidual called.
+ Beginning preallocation for whichMatrix =            3
+ Running populateMatrix with whichMatrix =            3
+ Time to pre-assemble residual f1 matrix:    4.4339920000002166       seconds.
+ Time to assemble residual f1 matrix:    5.9306999999989785E-002  seconds.
+ # of nonzeros in residual f1 matrix:    21396703 , allocated:    39573304 , mallocs:           0  (should be 0)
+--------- Completed iteration    1 of SNES -----------------------------------
+--------- Residual function norm:  8.9645365E-09 -----------------------------
+ Linear iteration (KSP) converged.  KSPConvergedReason =            2
+   KSP_CONVERGED_RTOL: Norm decreased by rtol.
+ Computing diagnostics.
+ Initializing f0
+ Results for species            1 :
+    FSADensityPerturbation:    -3.6966697971060105E-016
+    FSABFlow:                 -0.75385608176919772     
+    max and min Mach #:        -2.2797134589357497E-002  -2.8346724412967365E-002
+    FSAPressurePerturbation:   -1.0053722411268058E-014
+    NTV:                        0.0000000000000000     
+    particleFlux_vm0_psiHat     6.9086124760428871E-019
+    particleFlux_vm_psiHat      6.0052166226535216E-007
+    classicalParticleFlux       3.2682927011333368E-009
+    classicalHeatFlux           6.5818553444596416E-007
+    momentumFlux_vm0_psiHat     0.0000000000000000     
+    momentumFlux_vm_psiHat     -7.5206101218648996E-011
+    heatFlux_vm0_psiHat         3.5744790374131474E-018
+    heatFlux_vm_psiHat          1.5614976751734158E-005
+    particle source            -1.7025618686048533E-012
+    heat source                -3.3166790037180898E-012
+ Results for species            2 :
+    FSADensityPerturbation:     6.7598085384238349E-017
+    FSABFlow:                 -0.47483039015833090     
+    max and min Mach #:        -2.4170809567284872E-004  -4.7959319794702721E-004
+    FSAPressurePerturbation:    2.2090431515801715E-015
+    NTV:                        0.0000000000000000     
+    particleFlux_vm0_psiHat    -6.3098660614525036E-019
+    particleFlux_vm_psiHat      1.0803382566680350E-007
+    classicalParticleFlux       3.2682927011333356E-009
+    classicalHeatFlux           3.0426110021629402E-008
+    momentumFlux_vm0_psiHat     0.0000000000000000     
+    momentumFlux_vm_psiHat     -2.2291043865492564E-015
+    heatFlux_vm0_psiHat        -3.8844930961082214E-018
+    heatFlux_vm_psiHat          9.1735796376184258E-007
+    particle source             3.5261737088751036E-016
+    heat source                 3.3799496642536714E-015
+ FSABjHat (bootstrap current):  -0.27902569161086682     
+ Saving diagnostics to h5 file for iteration            1
+ Done with the main solve.  Time to solve:    213.14112000000023       seconds.
+
+Entering DMUMPS 5.7.1 from C interface with JOB =  -2
+      executing #MPI =      1, without OMP
+ Goodbye!

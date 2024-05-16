@@ -52,9 +52,9 @@ MAXITER_single_stage = 25
 MAXFEV_single_stage  = 35
 LENGTH_THRESHOLD = 4.6*11 if 'QA' in QA_or_QH  else 3.5*11
 max_mode_array                    = [1]*0 + [2]*4 + [3]*4 + [4]*5 + [5]*3 + [6]*0
-quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2}  if 'QA' in QA_or_QH  else {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2}
-DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 1e+13, 3: 1e+14, 4: 3e+14} if 'QA' in QA_or_QH  else {1: 1e+8, 2: 1e+10, 3: 5e+10, 4: 1e+11}
-DMerc_fraction_mpol_mapping       = {1: 0.7, 2: 0.2, 3: 0.1, 4: 0.05}       if 'QA' in QA_or_QH  else {1: 0.9, 2: 0.6, 3: 0.3, 4: 0.1}
+quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2, 5: 8e+2}  if 'QA' in QA_or_QH  else {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
+DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5:4e+14} if 'QA' in QA_or_QH  else {1: 1e+8, 2: 1e+10, 3: 5e+10, 4: 1e+11, 5: 2e+11}
+DMerc_fraction_mpol_mapping       = {1: 0.7, 2: 0.2, 3: 0.1, 4: 0.05, 5:0.05}        if 'QA' in QA_or_QH  else {1: 0.9, 2: 0.6, 3: 0.3, 4: 0.1, 5: 0.05}
 maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 6, 5: 7, 6: 7}
 optimize_DMerc = True
 optimize_Well = False
@@ -106,8 +106,11 @@ initial_DMerc_index = 2
 beta = 2.5 #%
 ne0 = 3e20 * (beta/100/0.05)**(1/3)
 Te0 = 15e3 * (beta/100/0.05)**(2/3)
-ne = ProfilePolynomial(ne0 * np.array([1, 0, 0, 0, 0, -1.0]))
-Te = ProfilePolynomial(Te0 * np.array([1, -1.0]))
+# ne = ProfilePolynomial(ne0 * np.array([1, 0, 0, 0, 0, -1.0]))
+# Te = ProfilePolynomial(Te0 * np.array([1, -1.0]))
+### Look at experimental profiles of ne and Te (W7-X?)
+ne = ProfilePolynomial(ne0 * np.array([1, 0, 0, 0, 0, -0.98]))
+Te = ProfilePolynomial(Te0 * np.array([1, -0.98]))
 Zeff = 1.0
 ni = ne
 Ti = Te
@@ -268,15 +271,6 @@ def fun(dofss, prob_jacobian=None, info={'Nfeval': 0}):
         grad_with_respect_to_surface = prob_jacobian.jac(prob.x)[0]
     JF.fix_all()
     grad = np.concatenate((grad_with_respect_to_coils, grad_with_respect_to_surface))
-    # Remove spurious files
-    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
-    os.chdir(parent_path)
-    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
-    os.chdir(this_path)
-    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
     previous_J = J
     # proc0_print(f"  Time taken = {time.time()-start_time:.2f}s")
     return J, grad
@@ -297,7 +291,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
     surf.fix("rc(0,0)")
     
-    n_spline = np.max((np.min((iteration * 2 + 5, 15)), 25))
+    n_spline = np.min((np.max((iteration * 2 + 5, 9)), 20))
     s_spline = np.linspace(0, 1, n_spline)
     if iteration == 0:
         current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
@@ -307,6 +301,8 @@ for iteration, max_mode in enumerate(max_mode_array):
     if use_original_current_with_resampling:
         vmec.current_profile = ProfileScaled(current, -1e6)
     else:
+        ## USE THE SCRIPT IN
+        ## 20220708-01-zenodo_for_QS_optimization_with_self_consistent_bootstrap_current/calculations/20220218-01-more_QS_finite_beta_optimization/20220218-01-020_QH_A6.5_n0_2.2_T0_10_refiningBestFrom019/simsopt_driver
         # vmec.current_profile.unfix_all()
         proc0_print('WARNING: Using original current profile without changing it, this will not result in a good optimization')
     
@@ -412,7 +408,7 @@ for iteration, max_mode in enumerate(max_mode_array):
             dofs = np.concatenate((JF.x, prob.x))
             bs.set_points(surf.gamma().reshape((-1, 3)))
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
-    proc0_print("Initial DMerc:", (vmec.wout.DMerc[initial_DMerc_index:]))
+    # proc0_print("Initial DMerc:", (vmec.wout.DMerc[initial_DMerc_index:]))
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
     Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
@@ -511,6 +507,18 @@ for iteration, max_mode in enumerate(max_mode_array):
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
     bs.save(os.path.join(coils_results_path, f"biot_savart_maxmode{max_mode}.json"))
     vmec.write_input(os.path.join(this_path, f'input.maxmode{max_mode}'))
+    
+    # Remove spurious files
+    os.chdir(vmec_results_path)
+    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
+    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
+    os.chdir(parent_path)
+    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
+    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
+    os.chdir(this_path)
+    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
+    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
+    
     max_mode_previous+=1
 if optimize_stage3:
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
