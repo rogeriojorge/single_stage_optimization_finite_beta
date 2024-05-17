@@ -34,14 +34,15 @@ parser.add_argument("--stage3", dest="stage3", default=False, action="store_true
 args = parser.parse_args()
 if   args.type == 1: QA_or_QH = 'nfp2_QA'
 elif args.type == 2: QA_or_QH = 'nfp4_QH'
-elif args.type == 3: QA_or_QH = 'nfp3_QI'
+elif args.type == 3: QA_or_QH = 'nfp3_QA'
+elif args.type == 4: QA_or_QH = 'nfp3_QH'
+elif args.type == 5: QA_or_QH = 'nfp3_QI'
 else: raise ValueError('Invalid type')
 ncoils = args.ncoils
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
-use_original_current_with_resampling = True # if true, use nfp2_QA_original or nfp4_QH_original
-optimize_aminor = False
+use_original_vmec_inut = False # if true, use nfp2_QA_original or nfp4_QH_original
 optimize_stage1 = args.stage1
 optimize_stage1_with_coils = args.stage1_coils
 optimize_stage2 = args.stage2
@@ -50,16 +51,72 @@ MAXITER_stage_1 = 35
 MAXITER_stage_2 = 250
 MAXITER_single_stage = 25
 MAXFEV_single_stage  = 35
-LENGTH_THRESHOLD = 4.6*11 if 'QA' in QA_or_QH  else 3.5*11
-max_mode_array                    = [1]*0 + [2]*4 + [3]*4 + [4]*5 + [5]*3 + [6]*0
-quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2, 5: 8e+2}  if 'QA' in QA_or_QH  else {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
-DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5:4e+14} if 'QA' in QA_or_QH  else {1: 1e+8, 2: 1e+10, 3: 5e+10, 4: 1e+11, 5: 2e+11}
-DMerc_fraction_mpol_mapping       = {1: 0.7, 2: 0.2, 3: 0.1, 4: 0.05, 5:0.05}        if 'QA' in QA_or_QH  else {1: 0.9, 2: 0.6, 3: 0.3, 4: 0.1, 5: 0.05}
-maxmodes_mpol_mapping             = {1: 3, 2: 5, 3: 5, 4: 6, 5: 7, 6: 7}
+
+if QA_or_QH == 'nfp2_QA':
+    LENGTH_THRESHOLD = 4.6*11
+    max_mode_array                    = [1] *0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
+    quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2,  5: 8e+2}
+    DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.7,  2: 0.15,  3: 0.1,   4: 0.05,  5: 0.05}
+    aspect_ratio_target = 6.5
+    max_iota            = 0.9
+    min_iota            = 0.15
+    min_average_iota    = 0.41
+    CC_THRESHOLD        = 0.20*11
+    CURVATURE_THRESHOLD = 5/11
+    MSC_THRESHOLD       = 5/11/11
+    bootstrap_mismatch_weight = 1e1
+elif QA_or_QH == 'nfp4_QH':
+    LENGTH_THRESHOLD = 3.5*11
+    max_mode_array                    = [1] * 0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
+    quasisymmetry_weight_mpol_mapping = {1: 3e+2,  2: 5e+2,  3: 7e+2,  4: 8e+2,  5: 9e+2}
+    DMerc_weight_mpol_mapping         = {1: 2e+13, 2: 5e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.1,   2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
+    aspect_ratio_target = 5.0
+    max_iota            = 1.9
+    min_iota            = 1.02
+    min_average_iota    = 1.05
+    CC_THRESHOLD        = 0.08*11
+    CURVATURE_THRESHOLD = 12/11
+    MSC_THRESHOLD       = 8/11/11
+    bootstrap_mismatch_weight = 1e2
+elif QA_or_QH == 'nfp3_QA':
+    LENGTH_THRESHOLD = 3.5*11
+    max_mode_array                    = [1] *0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
+    quasisymmetry_weight_mpol_mapping = {1: 1e+1,  2: 1e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
+    DMerc_weight_mpol_mapping         = {1: 1e+13, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.05,  2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
+    aspect_ratio_target = 6.5
+    max_iota            = 0.9
+    min_iota            = 0.25
+    min_average_iota    = 0.55
+    CC_THRESHOLD        = 0.08*11
+    CURVATURE_THRESHOLD = 12/11
+    MSC_THRESHOLD       = 8/11/11
+    bootstrap_mismatch_weight = 1e1
+elif QA_or_QH == 'nfp3_QH':
+    LENGTH_THRESHOLD = 3.5*11
+    max_mode_array                    = [1] *0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
+    quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
+    DMerc_weight_mpol_mapping         = {1: 1e+7, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.8,  2: 0.1,   3: 0.05,  4: 0.05,  5: 0.05}
+    aspect_ratio_target = 6.8
+    max_iota            = 0.97
+    min_iota            = 0.8
+    min_average_iota    = 0.85
+    CC_THRESHOLD        = 0.08*11
+    CURVATURE_THRESHOLD = 12/11
+    MSC_THRESHOLD       = 8/11/11
+    bootstrap_mismatch_weight = 1e1
+else:
+    raise ValueError('Invalid QA_or_QH (QI not implemented yet)')
+
+maxmodes_mpol_mapping = {1: 5,    2: 5,     3: 5,     4: 6,     5: 7, 6: 7}
 optimize_DMerc = True
-optimize_Well = False
+optimize_Well  = False
+optimize_aminor = False
+optimize_mean_iota = True
 nmodes_coils = 6 #10
-aspect_ratio_target = 6.5 if 'QA' in QA_or_QH  else 6.8
 JACOBIAN_THRESHOLD = 30
 aspect_ratio_weight = 1e+2
 aminor_weight = 5e-2
@@ -67,19 +124,12 @@ aminor_weight = 5e-2
 coils_objective_weight = 1e+3
 weight_iota = 1e5
 volavgB_weight = 5e+0
-well_Weight = 1e1
+well_Weight = 1e2
 # DMerc_Weight = 1e+10
 betatotal_weight = 1e1
-bootstrap_mismatch_weight = 1e1
-max_iota         = 0.9  if 'QA' in QA_or_QH  else 1.9
-min_iota         = 0.15 if 'QA' in QA_or_QH  else 1.01
-min_average_iota = 0.41 if 'QA' in QA_or_QH  else 1.05
 aminor_target = 1.70442622782386
 volavgB_target = 5.86461221551616
-CS_THRESHOLD        = 0.27*11
-CC_THRESHOLD        = 0.20*11 if 'QA' in QA_or_QH  else 0.08*11
-CURVATURE_THRESHOLD = 5/11    if 'QA' in QA_or_QH  else 12/11
-MSC_THRESHOLD       = 5/11/11 if 'QA' in QA_or_QH  else 8/11/11
+CS_THRESHOLD = 0.27*11
 nphi_VMEC   = 28
 ntheta_VMEC = 28
 vc_src_nphi = ntheta_VMEC
@@ -92,9 +142,9 @@ opt_method = 'trf'#'lm'
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-6
 finite_difference_rel_step = 0#1e-4
-ftol_stage_1 = 3e-5
-rel_step_stage1 = 2e-3
-abs_step_stage1 = 2e-5
+ftol_stage_1 = 1e-5
+rel_step_stage1 = 2e-5
+abs_step_stage1 = 2e-7
 LENGTH_CON_WEIGHT = 0.1
 CC_WEIGHT = 1e0
 CURVATURE_WEIGHT = 1e-3
@@ -117,7 +167,7 @@ Ti = Te
 pressure = ProfilePressure(ne, Te, ni, Ti)
 pressure_Pa = ProfileScaled(pressure, ELEMENTARY_CHARGE)
 ######
-vmec_input_filename = os.path.join(parent_path, 'vmec_inputs', 'input.'+ QA_or_QH + ('_original' if use_original_current_with_resampling else ''))
+vmec_input_filename = os.path.join(parent_path, 'vmec_inputs', 'input.'+ QA_or_QH + ('_original' if use_original_vmec_inut else ''))
 directory = f'optimization_finitebeta_{QA_or_QH}_ncoils{ncoils}_stage'
 if optimize_stage1: directory += '1'
 if optimize_stage1_with_coils: directory += '1c'
@@ -291,21 +341,27 @@ for iteration, max_mode in enumerate(max_mode_array):
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
     surf.fix("rc(0,0)")
     
-    n_spline = np.min((np.max((iteration * 2 + 5, 9)), 20))
+    n_spline = np.min((np.max((iteration * 2 + 7, 9)), 15))
     s_spline = np.linspace(0, 1, n_spline)
     if iteration == 0:
-        current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
+        if use_original_vmec_inut:
+            current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
+            factor = -1e6
+        else:
+            s_spline = vmec.indata.ac_aux_s
+            f_spline = vmec.indata.ac_aux_f
+            index = np.where(s_spline[1:] <= 0)[0][0] + 1
+            s_spline = s_spline[:index]
+            f_spline = f_spline[:index]
+            factor = -2e6
+            current0 = ProfileSpline(s_spline, f_spline / factor)
+            s_spline = np.linspace(0, 1, n_spline)
+            current = current0.resample(s_spline)
     else:
         current = current.resample(s_spline)
     current.unfix_all()
-    if use_original_current_with_resampling:
-        vmec.current_profile = ProfileScaled(current, -1e6)
-    else:
-        ## USE THE SCRIPT IN
-        ## 20220708-01-zenodo_for_QS_optimization_with_self_consistent_bootstrap_current/calculations/20220218-01-more_QS_finite_beta_optimization/20220218-01-020_QH_A6.5_n0_2.2_T0_10_refiningBestFrom019/simsopt_driver
-        # vmec.current_profile.unfix_all()
-        proc0_print('WARNING: Using original current profile without changing it, this will not result in a good optimization')
-    
+    vmec.current_profile = ProfileScaled(current, factor)
+        
     # Define bootstrap objective:
     booz = Boozer(vmec, mpol=12, ntor=12)
     ns = 50
@@ -330,9 +386,9 @@ for iteration, max_mode in enumerate(max_mode_array):
     
     # Define remaining objective functions
     def aspect_ratio_max_objective(vmec): return np.max((vmec.aspect()-aspect_ratio_target,0))
-    def minor_radius_objective(vmec):     return vmec.wout.Aminor_p
+    def minor_radius_objective(vmec):     return np.min((np.abs(vmec.wout.Aminor_p-aminor_target),0))
     def iota_min_objective(vmec):         return np.min((np.min(np.abs(vmec.wout.iotaf))-min_iota,0))
-    def iota_average_min_objective(vmec): return np.min((np.abs(vmec.mean_iota())-min_average_iota,0))
+    def iota_mean_min_objective(vmec):    return np.min((np.abs(vmec.mean_iota())-min_average_iota,0))
     def iota_max_objective(vmec):         return np.max((np.max(np.abs(vmec.wout.iotaf))-max_iota,0))
     def volavgB_objective(vmec):          return vmec.wout.volavgB
     len_DMerc = len(vmec.wout.DMerc[initial_DMerc_index:])
@@ -345,7 +401,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
     minor_radius_optimizable     = make_optimizable(minor_radius_objective, vmec)
     iota_min_optimizable         = make_optimizable(iota_min_objective, vmec)
-    iota_average_min_optimizable = make_optimizable(iota_average_min_objective, vmec)
+    iota_mean_min_optimizable = make_optimizable(iota_mean_min_objective, vmec)
     iota_max_optimizable         = make_optimizable(iota_max_objective, vmec)
     volavgB_optimizable          = make_optimizable(volavgB_objective, vmec)
     DMerc_optimizable            = make_optimizable(DMerc_min_objective, vmec)
@@ -353,11 +409,11 @@ for iteration, max_mode in enumerate(max_mode_array):
     betatotal_optimizable        = make_optimizable(betatotal_objective, vmec)
     objective_tuple = [(aspect_ratio_max_optimizable.J, 0, aspect_ratio_weight)]
     objective_tuple.append((iota_min_optimizable.J, 0, weight_iota))
-    objective_tuple.append((iota_average_min_optimizable.J, 0, weight_iota))
+    if optimize_mean_iota: objective_tuple.append((iota_mean_min_optimizable.J, 0, weight_iota))
     objective_tuple.append((iota_max_optimizable.J, 0, weight_iota*1e5)) # This prevents axisymmetry with high iota on-axis for lower resolutions
     objective_tuple.append((volavgB_optimizable.J, volavgB_target, volavgB_weight))
     objective_tuple.append((betatotal_optimizable.J, beta/100, betatotal_weight))
-    if optimize_aminor: objective_tuple = [((minor_radius_optimizable.J, aminor_target, aminor_weight))]
+    if optimize_aminor: objective_tuple = [((minor_radius_optimizable.J, 0.0, aminor_weight))]
     if optimize_DMerc: objective_tuple.append((DMerc_optimizable.J, 0.0, DMerc_weight_mpol_mapping[max_mode]))
     if optimize_Well: objective_tuple.append((magnetic_well_optimizable.J, 0.0, well_Weight))
     ## Self-consistent bootstrap current objective
@@ -388,6 +444,8 @@ for iteration, max_mode in enumerate(max_mode_array):
     proc0_print("Initial quasisymmetry:", qs.total())
     proc0_print("Initial volavgB:", vmec.wout.volavgB)
     proc0_print("Initial min DMerc:", np.min(vmec.wout.DMerc[initial_DMerc_index:]))
+    # proc0_print("Initial DMerc:", (vmec.wout.DMerc[initial_DMerc_index:]))
+    # proc0_print("Initial DMerc objective:", DMerc_optimizable.J())
     proc0_print("Initial Aminor:", vmec.wout.Aminor_p)
     proc0_print("Initial betatotal:", vmec.wout.betatotal)
     proc0_print("Initial bootstrap_mismatch:", bootstrap_mismatch.J())
@@ -509,15 +567,21 @@ for iteration, max_mode in enumerate(max_mode_array):
     vmec.write_input(os.path.join(this_path, f'input.maxmode{max_mode}'))
     
     # Remove spurious files
-    os.chdir(vmec_results_path)
-    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
-    os.chdir(parent_path)
-    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
-    os.chdir(this_path)
-    for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
-    for obj_file in glob.glob("objective_*"): os.remove(obj_file)
+    try:
+        os.chdir(vmec_results_path)
+        for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
+        for obj_file in glob.glob("objective_*"): os.remove(obj_file)
+    except Exception as e: proc0_print(f'Exception when removing spurious files in {vmec_results_path}: {e}')
+    try:
+        os.chdir(parent_path)
+        for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
+        for obj_file in glob.glob("objective_*"): os.remove(obj_file)
+    except Exception as e: proc0_print(f'Exception when removing spurious files in {parent_path}: {e}')
+    try:
+        os.chdir(this_path)
+        for jac_file in glob.glob("jac_log_*"): os.remove(jac_file)
+        for obj_file in glob.glob("objective_*"): os.remove(obj_file)
+    except Exception as e: proc0_print(f'Exception when removing spurious files in {this_path}: {e}')
     
     max_mode_previous+=1
 if optimize_stage3:
@@ -557,6 +621,7 @@ proc0_print("Final volavgB:", vmec.wout.volavgB)
 proc0_print("Final min DMerc:", np.min(vmec.wout.DMerc[initial_DMerc_index:]))
 proc0_print("Final Aminor:", vmec.wout.Aminor_p)
 proc0_print("Final betatotal:", vmec.wout.betatotal)
+proc0_print("Final bootstrap_mismatch:", bootstrap_mismatch.J())
 proc0_print("Final squared flux:", Jf.J())
 
 BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
@@ -571,10 +636,10 @@ outstr += f" lengths=sum([{cl_string}])={sum(j.J() for j in Jls):.1f}, curv=[{ka
 proc0_print(outstr)
 if mpi.proc0_world:
     try:
-        vmec_final = Vmec(os.path.join(this_path, f'input.final'), mpi=mpi)
+        vmec_final = Vmec(os.path.join(this_path, f'input.final'), mpi=mpi, verbose=False)
         vmec_final.indata.ns_array[:3]    = [  16,    51,    101]
-        vmec_final.indata.niter_array[:3] = [ 2000,  3000, 20000]
-        vmec_final.indata.ftol_array[:3]  = [1e-14, 1e-14, 1e-14]
+        vmec_final.indata.niter_array[:3] = [ 300,   500,  20000]
+        vmec_final.indata.ftol_array[:3]  = [ 1e-9, 1e-10, 1e-14]
         vmec_final.write_input(os.path.join(this_path, 'input.final'))
         # vmec_final.run()
         # shutil.move(os.path.join(this_path, f"wout_final_000_000000.nc"), os.path.join(this_path, f"wout_final.nc"))
