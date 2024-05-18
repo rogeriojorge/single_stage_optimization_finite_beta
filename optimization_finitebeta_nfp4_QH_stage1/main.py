@@ -6,7 +6,6 @@ import shutil
 import argparse
 import numpy as np
 from math import isnan
-from simsopt import load
 from pathlib import Path
 from scipy.optimize import minimize
 from simsopt import make_optimizable
@@ -27,7 +26,7 @@ parent_path = str(Path(__file__).parent.resolve())
 os.chdir(parent_path)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
-# parser.add_argument("--ncoils", type=int, default=4)
+parser.add_argument("--ncoils", type=int, default=4)
 parser.add_argument("--stage1_coils", dest="stage1_coils", default=False, action="store_true")
 parser.add_argument("--stage1", dest="stage1", default=False, action="store_true")
 parser.add_argument("--stage2", dest="stage2", default=False, action="store_true")
@@ -39,7 +38,7 @@ elif args.type == 3: QA_or_QH = 'nfp3_QA'
 elif args.type == 4: QA_or_QH = 'nfp3_QH'
 elif args.type == 5: QA_or_QH = 'nfp3_QI'
 else: raise ValueError('Invalid type')
-# ncoils = args.ncoils
+ncoils = args.ncoils
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
@@ -49,138 +48,80 @@ optimize_stage1_with_coils = args.stage1_coils
 optimize_stage2 = args.stage2
 optimize_stage3 = args.stage3
 MAXITER_stage_1 = 35
-MAXITER_stage_2 = 200
+MAXITER_stage_2 = 250
 MAXITER_single_stage = 25
 MAXFEV_single_stage  = 35
 
-#### GET COILS PROPERTIES FROM OPTIMAL_COILS_FINAL FOLDER INSTEAD OF MANUALLY ADDING THEM HERE
 if QA_or_QH == 'nfp2_QA':
+    LENGTH_THRESHOLD = 4.6*11
     max_mode_array                    = [1] *0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
     quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2,  5: 8e+2}
     DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
     DMerc_fraction_mpol_mapping       = {1: 0.7,  2: 0.15,  3: 0.1,   4: 0.05,  5: 0.05}
-    coils_objective_array = [1e3, 3e3, 5e3]
     aspect_ratio_target = 6.5
     max_iota            = 0.9
     min_iota            = 0.15
     min_average_iota    = 0.41
-    ncoils              = 4
-    nmodes_coils        = 5
-    R0                  = 11.14
-    R1                  = 0.59*R0
-    LENGTH_THRESHOLD    = 4.2*R0
-    LENGTH_CON_WEIGHT   = 0.69
-    CURVATURE_THRESHOLD = 3.8/R0
-    CURVATURE_WEIGHT    = 7.8e-5
-    MSC_THRESHOLD       = 15.6/R0
-    MSC_WEIGHT          = 9.4e-5
-    CC_THRESHOLD        = 0.17*R0
-    CC_WEIGHT           = 5.2e-1
-    CS_THRESHOLD        = 0.17*R0
-    CS_WEIGHT           = 8.2e1
-    ARCLENGTH_WEIGHT    = 3.5e-5
+    CC_THRESHOLD        = 0.20*11
+    CURVATURE_THRESHOLD = 5/11
+    MSC_THRESHOLD       = 5/11/11
     bootstrap_mismatch_weight = 1e1
 elif QA_or_QH == 'nfp4_QH':
+    LENGTH_THRESHOLD = 3.5*11
     max_mode_array                    = [1] * 0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
     quasisymmetry_weight_mpol_mapping = {1: 3e+2,  2: 5e+2,  3: 7e+2,  4: 8e+2,  5: 9e+2}
     DMerc_weight_mpol_mapping         = {1: 2e+13, 2: 5e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
     DMerc_fraction_mpol_mapping       = {1: 0.1,   2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
-    coils_objective_array = [2e2, 5e2, 1e3]
     aspect_ratio_target = 5.0
     max_iota            = 1.9
     min_iota            = 1.02
     min_average_iota    = 1.05
-    ncoils              = 4
-    nmodes_coils        = 8
-    R0                  = 11.5
-    R1                  = 0.45*R0
-    LENGTH_THRESHOLD    = 3.4*R0
-    LENGTH_CON_WEIGHT   = 0.012
-    CURVATURE_THRESHOLD = 2.5/R0
-    CURVATURE_WEIGHT    = 1.5e-5
-    MSC_THRESHOLD       = 1.7/R0
-    MSC_WEIGHT          = 2.0e-6
-    CC_THRESHOLD        = 0.075*R0
-    CC_WEIGHT           = 1.4e+2
-    CS_THRESHOLD        = 0.07*R0
-    CS_WEIGHT           = 6.0e-2
-    ARCLENGTH_WEIGHT    = 5.1e-6
+    CC_THRESHOLD        = 0.08*11
+    CURVATURE_THRESHOLD = 12/11
+    MSC_THRESHOLD       = 8/11/11
     bootstrap_mismatch_weight = 1e2
 elif QA_or_QH == 'nfp3_QA':
+    LENGTH_THRESHOLD = 3.5*11
     max_mode_array                    = [1] *0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
     quasisymmetry_weight_mpol_mapping = {1: 1e+1,  2: 1e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
     DMerc_weight_mpol_mapping         = {1: 1e+13, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
     DMerc_fraction_mpol_mapping       = {1: 0.05,  2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
-    coils_objective_array = [2e2, 5e2, 1e3]
     aspect_ratio_target = 6.5
     max_iota            = 0.9
     min_iota            = 0.25
     min_average_iota    = 0.55
-    ncoils              = 3
-    nmodes_coils        = 5
-    R0                  = 11.14
-    R1                  = 0.44*R0
-    LENGTH_THRESHOLD    = 4.1*R0
-    LENGTH_CON_WEIGHT   = 0.13
-    CURVATURE_THRESHOLD = 2.7/R0
-    CURVATURE_WEIGHT    = 6.0e-4
-    MSC_THRESHOLD       = 17.8/R0
-    MSC_WEIGHT          = 7.3e-4
-    CC_THRESHOLD        = 0.14*R0
-    CC_WEIGHT           = 4.9e-1
-    CS_THRESHOLD        = 0.215*R0
-    CS_WEIGHT           = 2.0e-2
-    ARCLENGTH_WEIGHT    = 3.7e-4
+    CC_THRESHOLD        = 0.08*11
+    CURVATURE_THRESHOLD = 12/11
+    MSC_THRESHOLD       = 8/11/11
     bootstrap_mismatch_weight = 1e1
 elif QA_or_QH == 'nfp3_QH':
+    LENGTH_THRESHOLD = 3.5*11
     max_mode_array                    = [1] *0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
-    quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 4e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
-    DMerc_weight_mpol_mapping         = {1: 1e+7, 2: 7e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
-    DMerc_fraction_mpol_mapping       = {1: 0.8,  2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
-    coils_objective_array = [2e2, 5e2, 1e3]
+    quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
+    DMerc_weight_mpol_mapping         = {1: 1e+7, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.8,  2: 0.1,   3: 0.05,  4: 0.05,  5: 0.05}
     aspect_ratio_target = 6.8
     max_iota            = 0.97
     min_iota            = 0.8
     min_average_iota    = 0.85
-    nmodes_coils        = 15
-    ncoils              = 4
-    R0                  = 11.14
-    R1                  = 0.5*R0
-    LENGTH_THRESHOLD    = 3.95*R0
-    LENGTH_CON_WEIGHT   = 0.014
-    CURVATURE_THRESHOLD = 2.34/R0
-    CURVATURE_WEIGHT    = 2.0e-3
-    MSC_THRESHOLD       = 15.6/R0
-    MSC_WEIGHT          = 1.0e-6
-    CC_THRESHOLD        = 0.14*R0
-    CC_WEIGHT           = 1.2e-1
-    CS_THRESHOLD        = 0.19*R0
-    CS_WEIGHT           = 1.7e-2
-    ARCLENGTH_WEIGHT    = 4.3e-9
+    CC_THRESHOLD        = 0.08*11
+    CURVATURE_THRESHOLD = 12/11
+    MSC_THRESHOLD       = 8/11/11
     bootstrap_mismatch_weight = 1e1
 else:
     raise ValueError('Invalid QA_or_QH (QI not implemented yet)')
-
-print('Compare the following directory with the one in the optimal_coils folder')
-coils_directory = (
-    f"ncoils_{ncoils}_order_{nmodes_coils}_R1_{R1:.2}_length_target_{LENGTH_THRESHOLD:.2}_weight_{LENGTH_CON_WEIGHT:.2}"
-    + f"_max_curvature_{CURVATURE_THRESHOLD:.2}_weight_{CURVATURE_WEIGHT:.2}"
-    + f"_msc_{MSC_THRESHOLD:.2}_weight_{MSC_WEIGHT:.2}"
-    + f"_cc_{CC_THRESHOLD:.2}_weight_{CC_WEIGHT:.2}"
-    + f"_cs_{CS_THRESHOLD:.2}_weight_{CS_WEIGHT:.2}"
-    + f"_arclweight_{ARCLENGTH_WEIGHT:.2}"
-)
-print('   '+coils_directory)
 
 maxmodes_mpol_mapping = {1: 5,    2: 5,     3: 5,     4: 6,     5: 7, 6: 7}
 optimize_DMerc = True
 optimize_Well  = False
 optimize_aminor = False
 optimize_mean_iota = True
+nmodes_coils = 6 #10
 JACOBIAN_THRESHOLD = 30
 aspect_ratio_weight = 1e+2
 aminor_weight = 5e-2
 # quasisymmetry_weight = 1e+1
+coils_objective_weight = 1e+3
 weight_iota = 1e5
 volavgB_weight = 5e+0
 well_Weight = 1e2
@@ -188,10 +129,13 @@ well_Weight = 1e2
 betatotal_weight = 1e1
 aminor_target = 1.70442622782386
 volavgB_target = 5.86461221551616
+CS_THRESHOLD = 0.27*11
 nphi_VMEC   = 28
 ntheta_VMEC = 28
 vc_src_nphi = ntheta_VMEC
 ftol = 1e-3
+R0 = 1.0*11
+R1 = 0.6*11
 nquadpoints = 120
 diff_method = "forward"
 opt_method = 'trf'#'lm'
@@ -201,6 +145,12 @@ finite_difference_rel_step = 0#1e-4
 ftol_stage_1 = 1e-5
 rel_step_stage1 = 2e-5
 abs_step_stage1 = 2e-7
+LENGTH_CON_WEIGHT = 0.1
+CC_WEIGHT = 1e0
+CURVATURE_WEIGHT = 1e-3
+MSC_WEIGHT = 1e-3
+ARCLENGTH_WEIGHT = 1e-9
+CS_PENALTY = 10
 initial_DMerc_index = 2
 ## Self-consistent bootstrap current
 beta = 2.5 #%
@@ -262,27 +212,14 @@ total_current_vmec = vmec.external_current() / (2 * surf.nfp)
 ##########################################################################################
 ##########################################################################################
 # Stage 2
-optimal_coils_path = os.path.join(parent_path, f'optimization_finitebeta_{QA_or_QH}_stage1','coils','optimal_coils_final',coils_directory)
-try:
-    bs_json_files = [file for file in os.listdir(optimal_coils_path) if '.json' in file]
-    bs = load(os.path.join(optimal_coils_path, bs_json_files[1]))
-    print(' Optimal coils found.')
-    curves   = [c.curve    for c in bs.coils]
-    currents = [c._current for c in bs.coils]
-    base_curves = curves[:ncoils]
-    base_currents = currents[:ncoils]
-except Exception as e:
-    print(e)
-    print(' No optimal coils found. Creating coils from scratch')
-    base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
-    base_currents = [Current(total_current_vmec / ncoils * 1e-7) * 1e7 for _ in range(ncoils-1)]
-    total_current = Current(total_current_vmec)
-    # total_current.fix_all()
-    base_currents += [total_current - sum(base_currents)]
+base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
+base_currents = [Current(total_current_vmec / ncoils * 1e-5) * 1e5 for _ in range(ncoils-1)]
+total_current = Current(total_current_vmec)
+# total_current.fix_all()
+base_currents += [total_current - sum(base_currents)]
 coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, stellsym=True)
 curves = [c.curve for c in coils]
 bs = BiotSavart(coils)
-
 ##########################################################################################
 ##########################################################################################
 # Save initial surface and coil data
@@ -312,16 +249,14 @@ Jals = [ArclengthVariation(c) for c in base_curves]
 J_CC = CC_WEIGHT * Jccdist
 J_CURVATURE = CURVATURE_WEIGHT * sum(Jcs)
 J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs)
-J_CS = CS_WEIGHT * Jcsdist
 J_ALS = ARCLENGTH_WEIGHT * sum(Jals)
-J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * QuadraticPenalty(sum(Jls), LENGTH_THRESHOLD*ncoils)
-linkNum = LinkingNumber(curves, 2)
-JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + J_CS
+J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum(QuadraticPenalty(J, LENGTH_THRESHOLD, "max") for J in Jls)
+linkNum = LinkingNumber(curves)
+JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
 ##########################################################################################
 proc0_print('  Starting optimization')
-global previous_J, coils_objective_weight
+global previous_J
 previous_J = 1e19
-coils_objective_weight = coils_objective_array[0]
 ##########################################################################################
 # Initial stage 2 optimization
 ##########################################################################################
@@ -348,7 +283,7 @@ def fun_coils(dofss, info):
 # Single stage optimization
 ##########################################################################################
 def fun_J(prob, coils_prob):
-    global previous_surf_dofs, coils_objective_weight
+    global previous_surf_dofs
     J_stage_1 = prob.objective()
     if np.any(previous_surf_dofs != prob.x):  # Only run virtual casing if surface dofs have changed
         previous_surf_dofs = prob.x
@@ -362,7 +297,7 @@ def fun_J(prob, coils_prob):
     J = J_stage_1 + J_stage_2
     return J
 def fun(dofss, prob_jacobian=None, info={'Nfeval': 0}):
-    global previous_J, coils_objective_weight
+    global previous_J
     start_time = time.time()
     info['Nfeval'] += 1
     os.chdir(vmec_results_path)
@@ -379,7 +314,7 @@ def fun(dofss, prob_jacobian=None, info={'Nfeval': 0}):
         proc0_print(f"fun#{info['Nfeval']}: Exception caught during function evaluation with J={J}. Returning J={JACOBIAN_THRESHOLD}")
         J = JACOBIAN_THRESHOLD
         grad_with_respect_to_surface = [0] * number_vmec_dofs
-        grad_with_respect_to_coils   = [0] * len(coil_dofs)
+        grad_with_respect_to_coils = [0] * len(coil_dofs)
     else:
         proc0_print(f"fun#{info['Nfeval']}: Objective function = {J:.4f}")
         coils_dJ = JF.dJ()
@@ -407,8 +342,6 @@ for iteration, max_mode in enumerate(max_mode_array):
     surf.fix_all()
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
     surf.fix("rc(0,0)")
-    
-    coils_objective_weight = coils_objective_array[np.min((iteration, len(coils_objective_array)-1))]
     
     n_spline = np.min((np.max((iteration * 2 + 7, 9)), 15))
     s_spline = np.linspace(0, 1, n_spline)
@@ -499,7 +432,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
     Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + J_CS
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
     free_coil_dofs = JF.dofs_free_status
     dofs = np.concatenate((JF.x, prob.x))
     bs.set_points(surf.gamma().reshape((-1, 3)))
@@ -539,7 +472,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
     Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + J_CS
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
     ### Stage 2 optimization
     if optimize_stage2:
         proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
@@ -557,7 +490,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
     Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + J_CS
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
     ## Stage 1 optimization with coils
     if optimize_stage1_with_coils:
         def JF_objective(vmec):
@@ -584,7 +517,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
     Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + J_CS
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
     #
     bs.set_points(surf.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
@@ -658,7 +591,7 @@ if optimize_stage3:
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
     Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
-    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + J_CS
+    JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + J_ALS + linkNum + Jcsdist
     ### Stage 2 optimization
     if optimize_stage2:
         proc0_print(f'  Performing final stage 2 optimization with ~{MAXITER_stage_2*3} iterations')

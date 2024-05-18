@@ -29,22 +29,22 @@ ncoils = args.ncoils
 create_surface_coils = False
 R0_factor = 11
 filename = 'wout_final.nc'
-MAXITER = 200 if 'QA' in QA_or_QH else 300
-R1_mean = 0.44*R0_factor
-R1_std = 0.4*R0_factor
+MAXITER = 200
+R1_mean = 0.4*R0_factor
+R1_std = 0.3*R0_factor
 min_length_per_coil = 3.5*R0_factor
-max_length_per_coil = 4.7*R0_factor
+max_length_per_coil = 4.6*R0_factor
 min_curvature = 4/R0_factor
-max_curvature = 25/R0_factor/R0_factor
-CC_min = 0.05*R0_factor
+max_curvature = 20/R0_factor/R0_factor
+CC_min = 0.07*R0_factor
 CC_max = 0.20*R0_factor
 order_min = 5
-order_max = 16
+order_max = 15
 nphi = 32
 ntheta = 32
 vc_src_nphi = 80
-CS_min = 0.05*R0_factor
-CS_max = 0.30*R0_factor
+CS_min = 0.1*R0_factor
+CS_max = 0.3*R0_factor
 ###########################################
 # Directories
 directory = f'optimization_finitebeta_{QA_or_QH}_stage1'
@@ -76,8 +76,8 @@ os.chdir(out_dir)
 # Load the target plasma surface:
 nfp = surf.nfp
 R0 = surf.get_rc(0, 0)
-print(f'R0 = {R0}')
-# exit()
+print(R0)
+exit()
 total_current = vmec.external_current() / (2*nfp)
 ## Create a copy of the surface that is closed in theta and phi, and covers the full torus toroidally. This is nice for visualization.
 # nphi_big = nphi * 2 * nfp + 1
@@ -289,14 +289,14 @@ for index in range(10000):
 
     # Threshold and weight for the coil-to-coil distance penalty in the objective function:
     cc_threshold = rand(CC_min, CC_max)
-    cc_weight = 10.0 ** rand(-2, 3)
+    cc_weight = 10.0 ** rand(-3, 2)
     
     # Threshold and weight for the coil-to-surface penalty in the objective function:
     cs_threshold = rand(CS_min, CS_max)
     cs_weight = 10.0 ** rand(-3, 2)
     
     # Weight for the arclength variation penalty in the objective function:
-    arclength_weight = 10.0 ** rand(-9, -2)
+    arclength_weight = 10.0 ** rand(-8, -2)
 
     run_optimization(
         R1, order,

@@ -27,6 +27,7 @@ surf_opt.vts
 fieldlines_*
 jdotB_log*
 sfincsOutput.h5
+scan
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
