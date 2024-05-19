@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import re
 import time
 import glob
 import shutil
@@ -49,7 +50,8 @@ optimize_stage1_with_coils = args.stage1_coils
 optimize_stage2 = args.stage2
 optimize_stage3 = args.stage3
 MAXITER_stage_1 = 35
-MAXITER_stage_2 = 200
+MAXITER_stage_2 = 400
+tol_coils       = 1e-7
 MAXITER_single_stage = 25
 MAXFEV_single_stage  = 35
 
@@ -68,15 +70,15 @@ if QA_or_QH == 'nfp2_QA':
     nmodes_coils        = 5
     R0                  = 11.14
     R1                  = 0.59*R0
-    LENGTH_THRESHOLD    = 4.2*R0
+    LENGTH_THRESHOLD    = (4.2-0.1)*R0
     LENGTH_CON_WEIGHT   = 0.69
-    CURVATURE_THRESHOLD = 3.8/R0
+    CURVATURE_THRESHOLD = (3.8-0.3)/R0
     CURVATURE_WEIGHT    = 7.8e-5
-    MSC_THRESHOLD       = 15.6/R0
+    MSC_THRESHOLD       = (15.6-2)/R0
     MSC_WEIGHT          = 9.4e-5
-    CC_THRESHOLD        = 0.17*R0
+    CC_THRESHOLD        = (0.17+0.03)*R0
     CC_WEIGHT           = 5.2e-1
-    CS_THRESHOLD        = 0.17*R0
+    CS_THRESHOLD        = (0.17+0.03)*R0
     CS_WEIGHT           = 8.2e1
     ARCLENGTH_WEIGHT    = 3.5e-5
     bootstrap_mismatch_weight = 1e1
@@ -94,17 +96,17 @@ elif QA_or_QH == 'nfp4_QH':
     nmodes_coils        = 8
     R0                  = 11.5
     R1                  = 0.45*R0
-    LENGTH_THRESHOLD    = 3.4*R0
+    LENGTH_THRESHOLD    = (3.4-0.0)*R0
     LENGTH_CON_WEIGHT   = 0.012
-    CURVATURE_THRESHOLD = 2.5/R0
+    CURVATURE_THRESHOLD = (2.5-0.0)/R0
     CURVATURE_WEIGHT    = 1.5e-5
-    MSC_THRESHOLD       = 1.7/R0
+    MSC_THRESHOLD       = (1.7-0.0)/R0
     MSC_WEIGHT          = 2.0e-6
-    CC_THRESHOLD        = 0.075*R0
+    CC_THRESHOLD        = (0.075-0.0)*R0
     CC_WEIGHT           = 1.4e+2
-    CS_THRESHOLD        = 0.07*R0
+    CS_THRESHOLD        = (0.07-0.0)*R0
     CS_WEIGHT           = 6.0e-2
-    ARCLENGTH_WEIGHT    = 5.1e-6
+    ARCLENGTH_WEIGHT    = (5.1e-6-3.0e-6)
     bootstrap_mismatch_weight = 1e2
 elif QA_or_QH == 'nfp3_QA':
     max_mode_array                    = [1] *0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
@@ -120,17 +122,17 @@ elif QA_or_QH == 'nfp3_QA':
     nmodes_coils        = 5
     R0                  = 11.14
     R1                  = 0.44*R0
-    LENGTH_THRESHOLD    = 4.1*R0
+    LENGTH_THRESHOLD    = (4.1-0.0)*R0
     LENGTH_CON_WEIGHT   = 0.13
-    CURVATURE_THRESHOLD = 2.7/R0
+    CURVATURE_THRESHOLD = (2.7-0.1)/R0
     CURVATURE_WEIGHT    = 6.0e-4
-    MSC_THRESHOLD       = 17.8/R0
-    MSC_WEIGHT          = 7.3e-4
-    CC_THRESHOLD        = 0.14*R0
+    MSC_THRESHOLD       = (17.8-17.5)/R0
+    MSC_WEIGHT          = (7.3e-4+1e-2)
+    CC_THRESHOLD        = (0.14+0.00)*R0
     CC_WEIGHT           = 4.9e-1
-    CS_THRESHOLD        = 0.215*R0
+    CS_THRESHOLD        = (0.215+0.005)*R0
     CS_WEIGHT           = 2.0e-2
-    ARCLENGTH_WEIGHT    = 3.7e-4
+    ARCLENGTH_WEIGHT    = (3.7e-4-3.0e-4)
     bootstrap_mismatch_weight = 1e1
 elif QA_or_QH == 'nfp3_QH':
     max_mode_array                    = [1] *0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
@@ -146,31 +148,30 @@ elif QA_or_QH == 'nfp3_QH':
     ncoils              = 4
     R0                  = 11.14
     R1                  = 0.5*R0
-    LENGTH_THRESHOLD    = 3.95*R0
+    LENGTH_THRESHOLD    = (3.95+0.05)*R0
     LENGTH_CON_WEIGHT   = 0.014
-    CURVATURE_THRESHOLD = 2.34/R0
-    CURVATURE_WEIGHT    = 2.0e-3
-    MSC_THRESHOLD       = 15.6/R0
+    CURVATURE_THRESHOLD = (2.34+0.06)/R0
+    CURVATURE_WEIGHT    = (2.0e-3-1.0e-3)
+    MSC_THRESHOLD       = (15.6-0.0)/R0
     MSC_WEIGHT          = 1.0e-6
-    CC_THRESHOLD        = 0.14*R0
+    CC_THRESHOLD        = (0.14-0.0)*R0
     CC_WEIGHT           = 1.2e-1
-    CS_THRESHOLD        = 0.19*R0
+    CS_THRESHOLD        = (0.19-0.0)*R0
     CS_WEIGHT           = 1.7e-2
     ARCLENGTH_WEIGHT    = 4.3e-9
     bootstrap_mismatch_weight = 1e1
 else:
     raise ValueError('Invalid QA_or_QH (QI not implemented yet)')
-
-print('Compare the following directory with the one in the optimal_coils folder')
-coils_directory = (
-    f"ncoils_{ncoils}_order_{nmodes_coils}_R1_{R1:.2}_length_target_{LENGTH_THRESHOLD:.2}_weight_{LENGTH_CON_WEIGHT:.2}"
-    + f"_max_curvature_{CURVATURE_THRESHOLD:.2}_weight_{CURVATURE_WEIGHT:.2}"
-    + f"_msc_{MSC_THRESHOLD:.2}_weight_{MSC_WEIGHT:.2}"
-    + f"_cc_{CC_THRESHOLD:.2}_weight_{CC_WEIGHT:.2}"
-    + f"_cs_{CS_THRESHOLD:.2}_weight_{CS_WEIGHT:.2}"
-    + f"_arclweight_{ARCLENGTH_WEIGHT:.2}"
-)
-print('   '+coils_directory)
+# print('Compare the following directory with the one in the optimal_coils folder')
+# coils_directory = (
+#     f"ncoils_{ncoils}_order_{nmodes_coils}_R1_{R1:.2}_length_target_{LENGTH_THRESHOLD:.2}_weight_{LENGTH_CON_WEIGHT:.2}"
+#     + f"_max_curvature_{CURVATURE_THRESHOLD:.2}_weight_{CURVATURE_WEIGHT:.2}"
+#     + f"_msc_{MSC_THRESHOLD:.2}_weight_{MSC_WEIGHT:.2}"
+#     + f"_cc_{CC_THRESHOLD:.2}_weight_{CC_WEIGHT:.2}"
+#     + f"_cs_{CS_THRESHOLD:.2}_weight_{CS_WEIGHT:.2}"
+#     + f"_arclweight_{ARCLENGTH_WEIGHT:.2}"
+# )
+# print('   '+coils_directory)
 
 maxmodes_mpol_mapping = {1: 5,    2: 5,     3: 5,     4: 6,     5: 7, 6: 7}
 optimize_DMerc = True
@@ -245,6 +246,7 @@ if comm_world.rank == 0:
 proc0_print(f' Using vmec input file {vmec_input_filename}')
 vmec = Vmec(vmec_input_filename, mpi=mpi, verbose=vmec_verbose, nphi=nphi_VMEC, ntheta=ntheta_VMEC, range_surface='half period')
 surf = vmec.boundary
+R0 = surf.get_rc(0, 0)
 nphi_big   = nphi_VMEC * 2 * surf.nfp + 1
 ntheta_big = ntheta_VMEC + 1
 quadpoints_theta = np.linspace(0, 1, ntheta_big)
@@ -262,23 +264,77 @@ total_current_vmec = vmec.external_current() / (2 * surf.nfp)
 ##########################################################################################
 ##########################################################################################
 # Stage 2
-optimal_coils_path = os.path.join(parent_path, f'optimization_finitebeta_{QA_or_QH}_stage1','coils','optimal_coils_final',coils_directory)
-try:
-    bs_json_files = [file for file in os.listdir(optimal_coils_path) if '.json' in file]
-    bs = load(os.path.join(optimal_coils_path, bs_json_files[1]))
-    print(' Optimal coils found.')
-    curves   = [c.curve    for c in bs.coils]
-    currents = [c._current for c in bs.coils]
-    base_curves = curves[:ncoils]
-    base_currents = currents[:ncoils]
-except Exception as e:
-    print(e)
-    print(' No optimal coils found. Creating coils from scratch')
+def parse_directory_name(directory_name):
+    pattern = r"ncoils_(\d+)_order_(\d+)_R1_([^_]+)_length_target_([^_]+)_weight_([^_]+)_max_curvature_([^_]+)_weight_([^_]+)_msc_([^_]+)_weight_([^_]+)_cc_([^_]+)_weight_([^_]+)_cs_([^_]+)_weight_([^_]+)_arclweight_([^_]+)"
+    match = re.match(pattern, directory_name)
+    if match:
+        return {
+            'ncoils': int(match.group(1)), 'nmodes_coils': int(match.group(2)), 'R1': float(match.group(3)),
+            'LENGTH_THRESHOLD': float(match.group(4)), 'LENGTH_CON_WEIGHT': float(match.group(5)),
+            'CURVATURE_THRESHOLD': float(match.group(6)), 'CURVATURE_WEIGHT': float(match.group(7)),
+            'MSC_THRESHOLD': float(match.group(8)), 'MSC_WEIGHT': float(match.group(9)),
+            'CC_THRESHOLD': float(match.group(10)), 'CC_WEIGHT': float(match.group(11)),
+            'CS_THRESHOLD': float(match.group(12)), 'CS_WEIGHT': float(match.group(13)),
+            'ARCLENGTH_WEIGHT': float(match.group(14))
+        }
+    return None
+# Select directory with optimal coils
+def select_directory(directories, ncoils, nmodes):
+    for dir_name in directories:
+        params = parse_directory_name(dir_name)
+        if params and params['ncoils'] == ncoils and params['nmodes_coils'] == nmodes:
+            return dir_name, params  # Return both the directory name and parameters
+    return None, None  # Return None if no matching directory is found
+optimal_coils_directory = os.path.join(parent_path, f'optimization_finitebeta_{QA_or_QH}_stage1','coils','optimal_coils_final')
+directories = os.listdir(optimal_coils_directory)
+selected_directory, coils_params = select_directory(directories, ncoils=ncoils, nmodes=nmodes_coils)
+proc0_print(f"Selected directory: {selected_directory}")
+proc0_print(f"Coils parameters: {coils_params}")
+# Define function for creating coils from scratch
+def create_coils_from_scratch(ncoils, R0, R1, nmodes_coils):
     base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
-    base_currents = [Current(total_current_vmec / ncoils * 1e-7) * 1e7 for _ in range(ncoils-1)]
+    base_currents = [Current(total_current_vmec / ncoils * 1e-7) * 1e7 for _ in range(ncoils - 1)]
     total_current = Current(total_current_vmec)
-    # total_current.fix_all()
     base_currents += [total_current - sum(base_currents)]
+    return base_curves, base_currents
+# Create base_curve and base_currents
+if selected_directory:
+    optimal_coils_path = os.path.join(optimal_coils_directory, selected_directory)
+    try:
+        bs_json_files = [file for file in os.listdir(optimal_coils_path) if 'biot_savart.json' in file]
+        bs = load(os.path.join(optimal_coils_path, bs_json_files[0]))  # Assuming you want the first .json file
+        print('Optimal coils found.')
+        curves = [c.curve for c in bs.coils]
+        currents = [c._current for c in bs.coils]
+        base_curves = curves[:ncoils]
+        base_currents = currents[:ncoils]
+    except Exception as e:
+        print(e)
+        print('Error reading coil files, falling back to creating coils from scratch.')
+        base_curves, base_curves = create_coils_from_scratch(ncoils, selected_directory['R0'], selected_directory['R1'], selected_directory['nmodes_coils'])
+else:
+    print("No matching directory found. Creating coils from scratch.")
+    if 'R1' not in globals(): R1 = 0.59 * R0
+    coils_params={'R0': R0, 'R1': R1}
+    base_curves, base_currents = create_coils_from_scratch(ncoils, R0, R1, nmodes_coils)
+## Create coils
+# optimal_coils_path = os.path.join(parent_path, f'optimization_finitebeta_{QA_or_QH}_stage1','coils','optimal_coils_final',coils_directory)
+# try:
+#     bs_json_files = [file for file in os.listdir(optimal_coils_path) if '.json' in file]
+#     bs = load(os.path.join(optimal_coils_path, bs_json_files[1]))
+#     print(' Optimal coils found.')
+#     curves   = [c.curve    for c in bs.coils]
+#     currents = [c._current for c in bs.coils]
+#     base_curves = curves[:ncoils]
+#     base_currents = currents[:ncoils]
+# except Exception as e:
+#     print(e)
+#     print(' No optimal coils found. Creating coils from scratch')
+#     base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
+#     base_currents = [Current(total_current_vmec / ncoils * 1e-7) * 1e7 for _ in range(ncoils-1)]
+#     total_current = Current(total_current_vmec)
+#     # total_current.fix_all()
+#     base_currents += [total_current - sum(base_currents)]
 coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, stellsym=True)
 curves = [c.curve for c in coils]
 bs = BiotSavart(coils)
@@ -335,12 +391,24 @@ def fun_coils(dofss, info):
         Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
         BdotN = np.max(np.abs(((np.sum(Bbs * surf.unitnormal(), axis=2) - Jf.target)) / np.linalg.norm(Bbs, axis=2)))
         outstr = f"fun_coils#{info['Nfeval']} - J={J:.1e}, Jf={jf:.1e}, max⟨B·n⟩/B={BdotN:.1e}"
-        outstr += f", ║∇J coils║={np.linalg.norm(JF.dJ()):.1e}, C-C-Sep={Jccdist.shortest_distance():.2f}"
+        # outstr += f", ║∇J coils║={np.linalg.norm(JF.dJ()):.1e}"
+        outstr += f", C-C-Sep={Jccdist.shortest_distance():.2f}"
         cl_string = ", ".join([f"{j.J():.1f}" for j in Jls])
         kap_string = ", ".join(f"{np.max(c.kappa()):.1f}" for c in base_curves)
         msc_string = ", ".join(f"{j.J():.2f}" for j in Jmscs)
-        outstr += f" lengths=sum([{cl_string}])={sum(j.J() for j in Jls):.1f}, curv=[{kap_string}], msc=[{msc_string}]"
+        outstr += f" L=sum([{cl_string}])={sum(j.J() for j in Jls):.1f}, curv=[{kap_string}], msc=[{msc_string}]"
         outstr += f", C-S-Sep={Jcsdist.shortest_distance():.2f}"
+        print(outstr)
+        outstr  = f"fun_coils#{info['Nfeval']} "
+        outstr += f"- JF: {J:.3e}"
+        outstr += f", Jf: {jf:.3e}"
+        outstr += f", J_CC: {J_CC.J():.2e}"
+        outstr += f", J_CURVATURE: {J_CURVATURE.J():.2e}"
+        outstr += f", J_MSC: {J_MSC.J():.2e}"
+        outstr += f", J_CS: {J_CS.J():.2e}"
+        outstr += f", J_ALS: {J_ALS.J():.2e}"
+        outstr += f", J_LENGTH_PENALTY: {J_LENGTH_PENALTY.J():.2e}"
+        # outstr += f", LinkingNumber: {linkNum.J():.2e}"
         print(outstr)
         # print(f"Currents: {[c.current.get_value() for c in coils]}")
     return J, grad
@@ -545,7 +613,8 @@ for iteration, max_mode in enumerate(max_mode_array):
         proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
         coils_dofs = dofs[:-number_vmec_dofs]
         if comm_world.rank == 0:
-            res = minimize(fun_coils, coils_dofs, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
+            res = minimize(fun_coils, coils_dofs, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=tol_coils)
+            print(res.message)
             dofs[:-number_vmec_dofs] = res.x
             coils_dofs = res.x
         mpi.comm_world.Barrier()
@@ -615,6 +684,7 @@ for iteration, max_mode in enumerate(max_mode_array):
         with MPIFiniteDifference(opt.J, mpi, diff_method=diff_method, abs_step=abs_step, rel_step=rel_step) as prob_jacobian:
             if mpi.proc0_world:
                 res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage, 'gtol': ftol}, tol=ftol)
+                print(res.message)
         JF.full_unfix(free_coil_dofs_all)
     ## Broadcast dofs and save surfs/coils
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
@@ -653,7 +723,8 @@ for iteration, max_mode in enumerate(max_mode_array):
     except Exception as e: proc0_print(f'Exception when removing spurious files in {this_path}: {e}')
     
     max_mode_previous+=1
-if optimize_stage3:
+##########################################################################################
+if optimize_stage3 or optimize_stage1:
     vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
     # Jf.target = vc.B_external_normal
     Jf = SquaredFlux(surf, bs, definition="local", target=vc.B_external_normal)
@@ -665,7 +736,8 @@ if optimize_stage3:
         dofs = np.concatenate((JF.x, prob.x))
         coils_dofs = dofs[:-number_vmec_dofs]
         if comm_world.rank == 0:
-            res = minimize(fun_coils, coils_dofs, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2*3, 'maxcor': 300}, tol=1e-12)
+            res = minimize(fun_coils, coils_dofs, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2*3, 'maxcor': 300}, tol=tol_coils)
+            print(res.message)
             dofs[:-number_vmec_dofs] = res.x
             coils_dofs = res.x
         mpi.comm_world.Barrier()
