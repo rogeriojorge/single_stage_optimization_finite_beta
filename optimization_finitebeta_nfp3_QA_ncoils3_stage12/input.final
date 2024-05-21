@@ -1,5 +1,5 @@
 &INDATA
-! This file created by simsopt on May 13 2024, 15:53:27
+! This file created by simsopt on May 20 2024, 18:07:21
 
 ! ---- Geometric parameters ----
 NFP = 3
@@ -10,9 +10,9 @@ MPOL = 5
 NTOR = 5
 NTHETA = 16
 NZETA = 14
-NS_ARRAY    =     45
-NITER_ARRAY =   3000
-FTOL_ARRAY  =  5e-13
+NS_ARRAY    =     16     51    101
+NITER_ARRAY =    300    500  20000
+FTOL_ARRAY  =  1e-09  1e-10  1e-14
 
 ! ---- Boundary toroidal flux ----
 PHIEDGE = 52.03559072839071

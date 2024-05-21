@@ -3,23 +3,32 @@ import re
 import os
 import shutil
 import numpy as np
+import matplotlib.pyplot as plt
 from simsopt import load
 from simsopt.mhd import Vmec, VirtualCasing
 from simsopt.util import MpiPartition
-from simsopt.geo import SurfaceRZFourier, curves_to_vtk
+from simsopt.geo import SurfaceRZFourier
 from simsopt.util import MpiPartition, proc0_print, comm_world
 this_path = os.path.dirname(os.path.abspath(__file__))
 mpi = MpiPartition()
 
+# cd optimization_finitebeta_nfp3_QA_ncoils3_stage23
+# ../src/vmecPlot2.py wout_final.nc;../src/vmecPlot2.py wout_final_freeb.nc;../src/booz_plot.py wout_final.nc;../src/booz_plot.py wout_final_freeb.nc
+
 filename_input  = f'input.final'
 filename_output = f"wout_final.nc"
-results_folder = f'optimization_finitebeta_nfp2_QA_ncoils4_stage12'
+results_folder = f'optimization_finitebeta_nfp3_QA_ncoils3_stage23'
 coils_file = f'biot_savart_opt.json'
 ncoils = int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
-run_original_input = False
-run_freeb_input = False
-create_freeb_surf = True
+run_original_input = True
+run_freeb_input    = True
+create_freeb_surf  = True
+
+nphi_plot = 32
+ntheta_plot = 80
+s_array = [0.05, 0.25, 0.55, 1.0]
+phi_plot=0#np.pi/3
 
 out_dir = os.path.join(this_path,results_folder)
 os.makedirs(out_dir, exist_ok=True)
@@ -55,6 +64,11 @@ if run_freeb_input:
     vmec.indata.mgrid_file = mgrid_file
     vmec.indata.nzeta = nphi_mgrid
     vmec.indata.extcur[0] = 1.0
+    
+    vmec.indata.ns_array   [:5] = [ 5,       16,   21,     51,   101]
+    vmec.indata.niter_array[:5] = [ 100,    300,  400,    500, 20000]
+    vmec.indata.ftol_array [:5] = [ 1e-9, 1e-10, 1e-11, 1e-11, 1e-14]
+    
     vmec.write_input(input_freeb_file)
     vmec.run()
     if comm_world.rank == 0:
@@ -93,152 +107,76 @@ if os.path.isfile(wout_freeb_file):
         surf_freeb_big.to_vtk(os.path.join(OUT_DIR, "surf_freeb_big"), extra_data=pointData)
     bs.set_points(surf.gamma().reshape((-1, 3)))
 
-# import os
-# import numpy as np
-# from pathlib import Path
-# from subprocess import run
-# import matplotlib.pyplot as plt
-# import booz_xform as bx
-# from simsopt import load
-# from simsopt.geo import curves_to_vtk
-# from simsopt.util import MpiPartition
-# from simsopt.field.coil import coils_to_makegrid
-# from simsopt.mhd import Vmec, QuasisymmetryRatioResidual, Boozer, VirtualCasing
-# ###################################################################################
-# mpi = MpiPartition()
-# parent_path = str(Path(__file__).parent.resolve())
-# os.chdir(parent_path)
-# directory = f'optimization_QH_finitebeta'
-# this_path = os.path.join(parent_path, directory)
-# vmec_results_path = os.path.join(this_path, "vmec")
-# coils_results_path = os.path.join(this_path, "coils")
-# vmec_input_filename = os.path.join(this_path, 'input.final')
-# coils_filename = os.path.join(coils_results_path, 'biot_savart_opt.json')
-# OUT_DIR = os.path.join(this_path, "figures")
-# os.makedirs(OUT_DIR, exist_ok=True)
+if os.path.exists(wout_freeb_file) and os.path.exists(os.path.join(out_dir, filename_output)):
+    plt.figure()
+    for i, s in enumerate(s_array):
+        # vmec_freeb = Vmec(wout_freeb_file, mpi=mpi, verbose=False, nphi=nphi_vmec_freeb, ntheta=ntheta_plot, range_surface='half period')
+        # surf_freeb = vmec_freeb.boundary
+        surf_freeb = SurfaceRZFourier.from_wout(wout_freeb_file, quadpoints_phi=np.linspace(0, 1, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
+        cross_section_freeb = surf_freeb.cross_section(phi=0)
+        r_interp_freeb = np.sqrt(cross_section_freeb[:, 0] ** 2 + cross_section_freeb[:, 1] ** 2)
+        z_interp_freeb = cross_section_freeb[:, 2]
+        
+        # vmec_final = Vmec(os.path.join(out_dir, filename_output), mpi=mpi, verbose=False, nphi=nphi_plot, ntheta=ntheta_plot, range_surface='half period')
+        # surf_final = vmec_final.boundary
+        surf_final = SurfaceRZFourier.from_wout(os.path.join(out_dir, filename_output), quadpoints_phi=np.linspace(0, 1, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
+        cross_section_final = surf_final.cross_section(phi=0)
+        r_interp_final = np.sqrt(cross_section_final[:, 0] ** 2 + cross_section_final[:, 1] ** 2)
+        z_interp_final = cross_section_final[:, 2]
+        plt.plot(r_interp_final, z_interp_final, linewidth=1, c='r', label=f'Fixed Boundary' if i==0 else None)
+        plt.plot(r_interp_freeb, z_interp_freeb, linewidth=1, c='k', label=f'Free Boundary' if i==0 else None)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir,'Fixed_vs_Free_boundary.png'), dpi=300)
+    # plt.show()
+    plt.close()
 
-# bs = load(coils_filename)
-
-# nphi_VMEC = 34
-# ntheta_VMEC = 34
-# vmec_final = Vmec(vmec_input_filename, mpi=mpi, verbose=False, nphi=nphi_VMEC, ntheta=ntheta_VMEC, range_surface='half period')
-# surf = vmec_final.boundary
-
-# ncoils = int(len(bs.coils)/surf.nfp/2)
-# base_curves   = [coil.curve for coil in bs.coils[0:ncoils]]
-# base_currents = [coil.current for coil in bs.coils[0:ncoils]]
-
-# coils_to_makegrid(os.path.join(coils_results_path,'coils.opt_coils'), base_curves, base_currents, nfp=surf.nfp, stellsym=True)
-
-# r0 = np.sqrt(surf.gamma()[:, :, 0] ** 2 + surf.gamma()[:, :, 1] ** 2)
-# z0 = surf.gamma()[:, :, 2]
-# nzeta = 45
-# nr = 47
-# nz = 49
-# rmin=0.9*np.min(r0)
-# rmax=1.1*np.max(r0)
-# zmin=1.1*np.min(z0)
-# zmax=1.1*np.max(z0)
-
-# with open(os.path.join(coils_results_path,'input_xgrid.dat'), 'w') as f:
-#     f.write('opt_coils\n')
-#     f.write('S\n')
-#     f.write('y\n')
-#     f.write(f'{rmin}\n')
-#     f.write(f'{rmax}\n')
-#     f.write(f'{zmin}\n')
-#     f.write(f'{zmax}\n')
-#     f.write(f'{nzeta}\n')
-#     f.write(f'{nr}\n')
-#     f.write(f'{nz}\n')
-
-# print("Running makegrid")
-# os.chdir(coils_results_path)
-# mgrid_executable = '/Users/rogeriojorge/bin/xgrid'
-# run_string = f"{mgrid_executable} < {os.path.join(coils_results_path,'input_xgrid.dat')} > {os.path.join(coils_results_path,'log_xgrid.opt_coils')}"
-# run(run_string, shell=True, check=True)
-# os.chdir(this_path)
-# print(" done")
-
-# os.chdir(coils_results_path)
-# mgrid_file = os.path.join(coils_results_path,'mgrid_opt_coils.nc')
-
-# vmec_final.indata.lfreeb = True
-# vmec_final.indata.mgrid_file = os.path.join(coils_results_path,'mgrid_opt_coils.nc')
-# vmec_final.indata.extcur[0:len(bs.coils)] = [-c.current.get_value()*1.515*1e-7 for c in bs.coils]
-# vmec_final.indata.nvacskip = 6
-# vmec_final.indata.nzeta = nzeta
-# vmec_final.indata.phiedge = vmec_final.indata.phiedge
-
-# vmec_final.indata.ns_array[:4]    = [   9,    29,    49,   101]
-# vmec_final.indata.niter_array[:4] = [4000,  6000,  6000,  8000]
-# vmec_final.indata.ftol_array[:4]  = [1e-5,  1e-6, 1e-12, 1e-15]
-
-# vmec_final.write_input(os.path.join(this_path,'input.final_freeb'))
-
-# # vmec_final.run()
-
-# print("Running VMEC")
-# os.chdir(vmec_results_path)
-# vmec_executable = '/Users/rogeriojorge/bin/xvmec2000'
-# run_string = f"{vmec_executable} {os.path.join(this_path,'input.final_freeb')}"
-# run(run_string, shell=True, check=True)
-# os.chdir(this_path)
-# print(" done")
-
-# print("Plotting VMEC result")
-# if os.path.isfile(os.path.join(vmec_results_path, f"wout_final_freeb.nc")):
-#     print('Found final vmec file')
-#     print("Plot VMEC result")
-#     import vmecPlot2
-#     vmecPlot2.main(file=os.path.join(vmec_results_path, f"wout_final_freeb.nc"), name='free_b', figures_folder=OUT_DIR)
-#     vmec_freeb = Vmec(os.path.join(vmec_results_path, f"wout_final_freeb.nc"), nphi=nphi_VMEC, ntheta=ntheta_VMEC)
-#     quasisymmetry_target_surfaces = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
-#     if 'QA' in directory:
-#         qs = QuasisymmetryRatioResidual(vmec_freeb, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=0)
-#     else:
-#         qs = QuasisymmetryRatioResidual(vmec_freeb, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1)
-
-#     print('####################################################')
-#     print('####################################################')
-#     print('Quasisymmetry objective free boundary =',qs.total())
-#     print('Mean iota free boundary =',vmec_freeb.mean_iota())
-#     print('####################################################')
-#     print('####################################################')
-
-#     print('Creating Boozer class for vmec_freeb')
-#     b1 = Boozer(vmec_freeb, mpol=64, ntor=64)
-#     print('Defining surfaces where to compute Boozer coordinates')
-#     boozxform_nsurfaces = 10
-#     booz_surfaces = np.linspace(0,1,boozxform_nsurfaces,endpoint=False)
-#     print(f' booz_surfaces={booz_surfaces}')
-#     b1.register(booz_surfaces)
-#     print('Running BOOZ_XFORM')
-#     try:
-#         b1.run()
-#         # b1.bx.write_boozmn(os.path.join(vmec_results_path,'vmec',"boozmn_free_b.nc"))
-#         print("Plot BOOZ_XFORM")
-#         fig = plt.figure(); bx.surfplot(b1.bx, js=1,  fill=False, ncontours=35)
-#         plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_1_free_b.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
-#         fig = plt.figure(); bx.surfplot(b1.bx, js=int(boozxform_nsurfaces/2), fill=False, ncontours=35)
-#         plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_2_free_b.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
-#         fig = plt.figure(); bx.surfplot(b1.bx, js=boozxform_nsurfaces-1, fill=False, ncontours=35)
-#         plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_3_free_b.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
-#         fig = plt.figure(); bx.symplot(b1.bx, helical_detail = True if 'QH' in directory else False, sqrts=True)
-#         plt.savefig(os.path.join(OUT_DIR, "Boozxform_symplot_free_b.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
-#         fig = plt.figure(); bx.modeplot(b1.bx, sqrts=True); plt.xlabel(r'$s=\psi/\psi_b$')
-#         plt.savefig(os.path.join(OUT_DIR, "Boozxform_modeplot_free_b.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
-#     except Exception as e: print(e)
-
-#     s_final = vmec_freeb.boundary
-#     B_on_surface_final = bs.set_points(s_final.gamma().reshape((-1, 3))).AbsB()
-#     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
-#     vc_src_nphi = nphi_VMEC
-#     vc_final = VirtualCasing.from_vmec(vmec_freeb, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC)
-#     BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2) - vc_final.B_external_normal
-#     curves = [c.curve for c in bs.coils]
-#     curves_to_vtk(curves, os.path.join(coils_results_path, "curves_freeb"))
-#     pointData = {"B_N": BdotN_surf[:, :, None]}
-#     s_final.to_vtk(os.path.join(coils_results_path, "surf_freeb"), extra_data=pointData)
-
-# os.remove(os.path.join(parent_path,'threed1.final'))
+if 'stage23' in results_folder:
+    path_with_stage12 = os.path.join(this_path,results_folder.replace('stage23','stage12'))
+    try:
+        fig = plt.figure()
+        fig.set_size_inches(6,6)
+        ax=fig.add_subplot(111, label="1")
+        for i, s in enumerate(s_array):
+            surf_freeb_stage3 = SurfaceRZFourier.from_wout(wout_freeb_file, quadpoints_phi=np.linspace(0, 1/2/surf.nfp, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
+            # surf_freeb_stage3.to_vtk(os.path.join(OUT_DIR,"surf_freeb_stage3"))
+            cross_section_freeb_stage3 = surf_freeb_stage3.cross_section(phi=phi_plot)
+            r_interp_freeb_stage3 = np.sqrt(cross_section_freeb_stage3[:, 0] ** 2 + cross_section_freeb_stage3[:, 1] ** 2)
+            z_interp_freeb_stage3 = cross_section_freeb_stage3[:, 2]
+            
+            surf_final_stage3 = SurfaceRZFourier.from_wout(os.path.join(out_dir, filename_output), quadpoints_phi=np.linspace(0, 1/2/surf.nfp, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
+            # surf_final_stage3.to_vtk(os.path.join(OUT_DIR,"surf_final_stage3"))
+            cross_section_final_stage3 = surf_final_stage3.cross_section(phi=phi_plot)
+            r_interp_final_stage3 = np.sqrt(cross_section_final_stage3[:, 0] ** 2 + cross_section_final_stage3[:, 1] ** 2)
+            z_interp_final_stage3 = cross_section_final_stage3[:, 2]
+            
+            
+            surf_freeb_stage1 = SurfaceRZFourier.from_wout(os.path.join(path_with_stage12, "wout_final_freeb.nc"), quadpoints_phi=np.linspace(0, 1/2/surf.nfp, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
+            # surf_freeb_stage1.to_vtk(os.path.join(OUT_DIR,"surf_freeb_stage1"))
+            cross_section_freeb_stage1 = surf_freeb_stage1.cross_section(phi=phi_plot)
+            r_interp_freeb_stage1 = np.sqrt(cross_section_freeb_stage1[:, 0] ** 2 + cross_section_freeb_stage1[:, 1] ** 2)
+            z_interp_freeb_stage1 = cross_section_freeb_stage1[:, 2]
+            
+            surf_final_stage1 = SurfaceRZFourier.from_wout(os.path.join(path_with_stage12, filename_output), quadpoints_phi=np.linspace(0, 1/2/surf.nfp, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
+            # surf_final_stage1.to_vtk(os.path.join(OUT_DIR,"surf_final_stage1"))
+            cross_section_final_stage1 = surf_final_stage1.cross_section(phi=phi_plot)
+            r_interp_final_stage1 = np.sqrt(cross_section_final_stage1[:, 0] ** 2 + cross_section_final_stage1[:, 1] ** 2)
+            z_interp_final_stage1 = cross_section_final_stage1[:, 2]
+            
+            plt.plot(r_interp_final_stage1, z_interp_final_stage1, 'b-', linewidth=2, label=f'Stage 1 (Fixed Boundary)' if i==0 else None)
+            plt.plot(r_interp_freeb_stage1, z_interp_freeb_stage1, 'g--', linewidth=2, label=f'Stage 2 (Free Boundary)' if i==0 else None)
+            plt.plot(r_interp_final_stage3, z_interp_final_stage3, 'r.-', linewidth=2, label=f'Single-Stage (Fixed Boundary)' if i==0 else None)
+            plt.plot(r_interp_freeb_stage3, z_interp_freeb_stage3, 'k-.', linewidth=2, label=f'Single-Stage (Free Boundary)' if i==0 else None)
+            
+        plt.gca().set_aspect('equal',adjustable='box')
+        plt.legend(fontsize=12)
+        plt.xlabel('R', fontsize=22)
+        plt.ylabel('Z', fontsize=22)
+        ax.tick_params(axis='x', labelsize=16)
+        ax.tick_params(axis='y', labelsize=16)
+        plt.tight_layout()
+        plt.savefig(os.path.join(out_dir,'stage123_comparison.png'), dpi=300)
+        plt.show()
+        plt.close()
+    except Exception as e:
+        print(e)

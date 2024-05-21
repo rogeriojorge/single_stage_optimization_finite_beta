@@ -242,7 +242,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     plt.tight_layout()
     plt.figtext(0.5,0.99,os.path.abspath(filename),ha='center',va='top',fontsize=6)
 
-    if savefig: plt.savefig(os.path.join(figures_folder, name+'_VMECparams.pdf'), bbox_inches = 'tight', pad_inches = 0)
+    if savefig: plt.savefig(os.path.join(figures_folder, f'VMECparams_{name}.pdf'), bbox_inches = 'tight', pad_inches = 0)
 
     ########################################################
     # Now make plot of flux surface shapes
@@ -267,7 +267,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     ax.tick_params(axis='x', labelsize=16)
     ax.tick_params(axis='y', labelsize=16)
     plt.tight_layout()
-    if savefig: plt.savefig(os.path.join(figures_folder, name+'_poloidal_plot.png'))
+    if savefig: plt.savefig(os.path.join(figures_folder, f'poloidal_plot_{name}.png'))
     R_boundary = R
     Z_boundary = Z
 
@@ -311,7 +311,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     plt.tight_layout()
     # plt.subplots_adjust(wspace=0, hspace=0)
     # plt.figtext(0.5,0.99,os.path.abspath(filename),ha='center',va='top',fontsize=6)
-    if savefig: plt.savefig(os.path.join(figures_folder, name+'_VMECsurfaces.pdf'), bbox_inches = 'tight', pad_inches = 0)
+    if savefig: plt.savefig(os.path.join(figures_folder, f'VMECsurfaces_{name}.pdf'), bbox_inches = 'tight', pad_inches = 0)
 
     ########################################################
     # Now make 3D surface plot
@@ -360,7 +360,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     cbar.set_label('|B| [T]')
 
     # plt.figtext(0.5,0.99,os.path.abspath(filename),ha='center',va='top',fontsize=6)
-    if savefig: plt.savefig(os.path.join(figures_folder, name+'_VMEC_3Dplot.png'), bbox_inches = 'tight', pad_inches = 0, dpi=400)
+    if savefig: plt.savefig(os.path.join(figures_folder, f'VMEC_3Dplot_{name}.png'), bbox_inches = 'tight', pad_inches = 0, dpi=400)
     else: plt.show()
 
     #### Mayavi plot ######

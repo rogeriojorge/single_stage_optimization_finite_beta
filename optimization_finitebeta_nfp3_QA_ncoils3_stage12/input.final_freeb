@@ -1,18 +1,24 @@
 &INDATA
-! This file created by simsopt on May 13 2024, 15:53:27
+! This file created by simsopt on May 20 2024, 18:08:11
 
 ! ---- Geometric parameters ----
 NFP = 3
 LASYM = F
 
+! ---- Free-boundary parameters ----
+LFREEB = T
+MGRID_FILE = '/Users/rogeriojorge/local/single_stage_optimization_finite_beta/optimization_finitebeta_nfp3_QA_ncoils3_stage12/coils/mgrid.nc'
+EXTCUR = 1.0 
+
+
 ! ---- Resolution parameters ----
 MPOL = 5
 NTOR = 5
 NTHETA = 16
-NZETA = 14
-NS_ARRAY    =     45
-NITER_ARRAY =   3000
-FTOL_ARRAY  =  5e-13
+NZETA = 24
+NS_ARRAY    =      5     16     21     51    101
+NITER_ARRAY =    100    300    400    500  20000
+FTOL_ARRAY  =  1e-09  1e-10  1e-11  1e-11  1e-14
 
 ! ---- Boundary toroidal flux ----
 PHIEDGE = 52.03559072839071
