@@ -49,11 +49,11 @@ optimize_stage1 = args.stage1
 optimize_stage1_with_coils = args.stage1_coils
 optimize_stage2 = args.stage2
 optimize_stage3 = args.stage3
-MAXITER_stage_1 = 35
+MAXITER_stage_1 = 40
 MAXITER_stage_2 = 600
 tol_coils       = 1e-7
-MAXITER_single_stage = 25
-MAXFEV_single_stage  = 35
+MAXITER_single_stage = 40
+MAXFEV_single_stage  = 50
 
 #### INITIAL COILS PROPERTIES BEING OBTAINED FROM OPTIMAL_COILS_FINAL FOLDER
 if QA_or_QH == 'nfp2_QA':
@@ -114,7 +114,7 @@ elif QA_or_QH == 'nfp4_QH':
     ARCLENGTH_WEIGHT    = (5.1e-6-3.0e-6)
     bootstrap_mismatch_weight = 1e2
 elif QA_or_QH == 'nfp3_QA':
-    max_mode_array                    = [1] *1 + [2] * 5 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
+    max_mode_array                    = [1] *1 + [2] * 7 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
     # quasisymmetry_weight_mpol_mapping = {1: 1e+1,  2: 1e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
     # DMerc_weight_mpol_mapping         = {1: 1e+13, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
     quasisymmetry_weight_mpol_mapping = {1: 5e+2,  2: 5e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
