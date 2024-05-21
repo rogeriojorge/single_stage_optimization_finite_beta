@@ -108,6 +108,7 @@ if os.path.isfile(wout_freeb_file):
     bs.set_points(surf.gamma().reshape((-1, 3)))
 
 if os.path.exists(wout_freeb_file) and os.path.exists(os.path.join(out_dir, filename_output)):
+    print('Do not use wout for plotting, use input')
     plt.figure()
     for i, s in enumerate(s_array):
         # vmec_freeb = Vmec(wout_freeb_file, mpi=mpi, verbose=False, nphi=nphi_vmec_freeb, ntheta=ntheta_plot, range_surface='half period')
@@ -138,6 +139,7 @@ if 'stage23' in results_folder:
         fig.set_size_inches(6,6)
         ax=fig.add_subplot(111, label="1")
         for i, s in enumerate(s_array):
+            print('Do not use wout for plotting, use input')
             surf_freeb_stage3 = SurfaceRZFourier.from_wout(wout_freeb_file, quadpoints_phi=np.linspace(0, 1/2/surf.nfp, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
             # surf_freeb_stage3.to_vtk(os.path.join(OUT_DIR,"surf_freeb_stage3"))
             cross_section_freeb_stage3 = surf_freeb_stage3.cross_section(phi=phi_plot)
