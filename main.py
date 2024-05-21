@@ -57,14 +57,14 @@ MAXFEV_single_stage  = 50
 
 #### INITIAL COILS PROPERTIES BEING OBTAINED FROM OPTIMAL_COILS_FINAL FOLDER
 if QA_or_QH == 'nfp2_QA':
-    max_mode_array                    = [1] *2 + [2] * 0 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
+    max_mode_array                    = [1] *2 + [2] * 7 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
     # quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2,  5: 8e+2}
     # DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
     # DMerc_fraction_mpol_mapping       = {1: 0.7,  2: 0.15,  3: 0.1,   4: 0.05,  5: 0.05}
-    quasisymmetry_weight_mpol_mapping = {1: 2e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2,  5: 8e+2}
-    DMerc_weight_mpol_mapping         = {1: 2e+12, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
-    DMerc_fraction_mpol_mapping       = {1: 0.1,  2: 0.15,  3: 0.1,   4: 0.05,  5: 0.05}
-    coils_objective_array = [1e3, 1.1e3, 1.2e3, 1.5e3, 1.8e3, 2.2e3, 2.5e3, 3.3e3, 3.4e3, 3.6e3, 4.0e3]
+    quasisymmetry_weight_mpol_mapping = {1: 3e+2, 2: 4e+2,  3: 5e+2,  4: 7e+2,  5: 8e+2}
+    DMerc_weight_mpol_mapping         = {1: 5e+13, 2: 5e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.1,  2: 0.1,  3: 0.1,   4: 0.05,  5: 0.05}
+    coils_objective_array    = [1e3, 1.1e3, 1.2e3, 1.3e3, 1.4e3, 1.5e3]
     JACOBIAN_THRESHOLD_array = [7e3, 5e2, 3e2, 2e2, 1e2]
     aspect_ratio_target = 6.5
     max_iota            = 0.9
@@ -74,25 +74,28 @@ if QA_or_QH == 'nfp2_QA':
     nmodes_coils        = 5
     R0                  = 11.14
     R1                  = 0.59*R0
-    LENGTH_THRESHOLD    = (4.2-0.1)*R0
+    LENGTH_THRESHOLD    = (4.2-0.0)*R0
     LENGTH_CON_WEIGHT   = 0.69
-    CURVATURE_THRESHOLD = (3.8-0.3)/R0
+    CURVATURE_THRESHOLD = (3.8-0.0)/R0
     CURVATURE_WEIGHT    = 7.8e-5
-    MSC_THRESHOLD       = (15.6-2)/R0
+    MSC_THRESHOLD       = (15.6-0)/R0
     MSC_WEIGHT          = 9.4e-5
-    CC_THRESHOLD        = (0.17+0.03)*R0
+    CC_THRESHOLD        = (0.17+0.00)*R0
     CC_WEIGHT           = 5.2e-1
     CS_THRESHOLD        = (0.17+0.03)*R0
     CS_WEIGHT           = 8.2e1
     ARCLENGTH_WEIGHT    = 3.5e-5
     bootstrap_mismatch_weight = 1e1
 elif QA_or_QH == 'nfp4_QH':
-    max_mode_array                    = [1] * 0 + [2] * 0 + [3] * 1 + [4] * 0 + [5] * 0 + [6] * 0
-    quasisymmetry_weight_mpol_mapping = {1: 3e+2,  2: 5e+2,  3: 7e+2,  4: 8e+2,  5: 9e+2}
-    DMerc_weight_mpol_mapping         = {1: 2e+13, 2: 5e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
-    DMerc_fraction_mpol_mapping       = {1: 0.1,   2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
-    coils_objective_array = [2e2, 5e2, 1e3]
-    JACOBIAN_THRESHOLD_array = [3e2, 2e2, 1e2, 9e1, 5e1]
+    max_mode_array                    = [1] * 2 + [2] * 2 + [3] * 5 + [4] * 0 + [5] * 0 + [6] * 0
+    # quasisymmetry_weight_mpol_mapping = {1: 3e+2,  2: 5e+2,  3: 7e+2,  4: 8e+2,  5: 9e+2}
+    # DMerc_weight_mpol_mapping         = {1: 2e+13, 2: 5e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    # DMerc_fraction_mpol_mapping       = {1: 0.1,   2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
+    quasisymmetry_weight_mpol_mapping = {1: 5e+2,  2: 6e+2,  3: 7e+2,  4: 8e+2,  5: 9e+2}
+    DMerc_weight_mpol_mapping         = {1: 1e+14, 2: 1e+14, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.05,   2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
+    coils_objective_array    = [2e2, 2.5e2, 3e2, 5e2, 7e2, 8e2, 9e2, 1e3]
+    JACOBIAN_THRESHOLD_array = [7e3, 5e2, 3e2, 2e2, 1e2]
     aspect_ratio_target = 5.0
     max_iota            = 1.9
     min_iota            = 1.02
@@ -143,10 +146,13 @@ elif QA_or_QH == 'nfp3_QA':
     ARCLENGTH_WEIGHT    = (3.7e-4-0.00e-4)
     bootstrap_mismatch_weight = 1e2
 elif QA_or_QH == 'nfp3_QH':
-    max_mode_array                    = [1] *0 + [2] * 1 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
-    quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 4e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
-    DMerc_weight_mpol_mapping         = {1: 1e+7, 2: 7e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
-    DMerc_fraction_mpol_mapping       = {1: 0.8,  2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
+    max_mode_array                    = [1] *2 + [2] * 7 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
+    # quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 4e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
+    # DMerc_weight_mpol_mapping         = {1: 1e+7, 2: 7e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    # DMerc_fraction_mpol_mapping       = {1: 0.8,  2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
+    quasisymmetry_weight_mpol_mapping = {1: 5e+2,  2: 6e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
+    DMerc_weight_mpol_mapping         = {1: 1e+14, 2: 1e+14, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.05,  2: 0.05,  3: 0.05,  4: 0.05,  5: 0.05}
     coils_objective_array    = [1e3, 1.1e3, 1.2e3, 1.3e3, 1.4e3, 1.5e3]
     JACOBIAN_THRESHOLD_array = [7e3, 5e2, 3e2, 2e2, 1e2]
     aspect_ratio_target = 6.8

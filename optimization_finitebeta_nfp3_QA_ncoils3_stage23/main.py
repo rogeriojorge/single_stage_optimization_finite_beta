@@ -57,14 +57,14 @@ MAXFEV_single_stage  = 50
 
 #### INITIAL COILS PROPERTIES BEING OBTAINED FROM OPTIMAL_COILS_FINAL FOLDER
 if QA_or_QH == 'nfp2_QA':
-    max_mode_array                    = [1] *2 + [2] * 0 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
+    max_mode_array                    = [1] *2 + [2] * 7 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
     # quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2,  5: 8e+2}
     # DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
     # DMerc_fraction_mpol_mapping       = {1: 0.7,  2: 0.15,  3: 0.1,   4: 0.05,  5: 0.05}
-    quasisymmetry_weight_mpol_mapping = {1: 2e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2,  5: 8e+2}
-    DMerc_weight_mpol_mapping         = {1: 2e+12, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
-    DMerc_fraction_mpol_mapping       = {1: 0.1,  2: 0.15,  3: 0.1,   4: 0.05,  5: 0.05}
-    coils_objective_array = [1e3, 1.1e3, 1.2e3, 1.5e3, 1.8e3, 2.2e3, 2.5e3, 3.3e3, 3.4e3, 3.6e3, 4.0e3]
+    quasisymmetry_weight_mpol_mapping = {1: 1e+2, 2: 2e+2,  3: 4e+2,  4: 7e+2,  5: 8e+2}
+    DMerc_weight_mpol_mapping         = {1: 5e+13, 2: 5e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
+    DMerc_fraction_mpol_mapping       = {1: 0.1,  2: 0.1,  3: 0.1,   4: 0.05,  5: 0.05}
+    coils_objective_array    = [1e3, 1.1e3, 1.2e3, 1.3e3, 1.4e3, 1.5e3]
     JACOBIAN_THRESHOLD_array = [7e3, 5e2, 3e2, 2e2, 1e2]
     aspect_ratio_target = 6.5
     max_iota            = 0.9
