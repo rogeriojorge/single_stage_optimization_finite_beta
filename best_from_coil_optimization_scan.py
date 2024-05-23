@@ -63,12 +63,12 @@ df = df[df["max_max_curvature"] < 50]
 
 succeeded = df["linking_number"] < 0.1
 if QA_or_QH == 'nfp2_QA':
-    succeeded = np.logical_and(succeeded, df["Jf"]                         < 5.0e-3)
-    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.9)
-    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.7)
-    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.07)
-    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 2.8)
-    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 48)
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 8.0e-4)
+    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.8)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.5)
+    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.05)
+    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 2.7)
+    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 52)
 elif QA_or_QH == 'nfp4_QH':
     succeeded = np.logical_and(succeeded, df["Jf"]                         < 3.0e-2)
     succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.8)

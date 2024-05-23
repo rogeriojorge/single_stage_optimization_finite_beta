@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 def main(file, OUT_DIR=""):
     vmec_final_class = Vmec(file, verbose=False)
-    b1 = Boozer(vmec_final_class, mpol=64, ntor=64)
+    b1 = Boozer(vmec_final_class, mpol=42, ntor=42)
     boozxform_nsurfaces=10
     print('Defining surfaces where to compute Boozer coordinates')
     booz_surfaces = np.linspace(0,1,boozxform_nsurfaces,endpoint=False)

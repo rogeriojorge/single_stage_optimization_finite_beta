@@ -15,10 +15,8 @@ mpi = MpiPartition()
 # cd optimization_finitebeta_nfp3_QA_ncoils3_stage23
 # ../src/vmecPlot2.py wout_final.nc;../src/vmecPlot2.py wout_final_freeb.nc;../src/booz_plot.py wout_final.nc;../src/booz_plot.py wout_final_freeb.nc
 
-results_folder = f'optimization_finitebeta_nfp2_QA_ncoils4_stage23'
-run_original_input = True
-run_freeb_input    = True
-create_freeb_surf  = True
+results_folder = f'optimization_finitebeta_nfp3_QA_ncoils3_stage23'
+run_freeb_and_original_input = True
 
 nphi_plot = 32
 ntheta_plot = 80
@@ -51,14 +49,14 @@ coils = bs.coils
 base_curves = [coils[i]._curve for i in range(ncoils)]
 base_currents = [coils[i]._current for i in range(ncoils)]
 
-if run_freeb_input:
-    nphi_mgrid = 24
+if run_freeb_and_original_input:
+    nphi_mgrid = 32
     if comm_world.rank == 0:
         mgrid_file = os.path.join(OUT_DIR, "mgrid.nc")
         bs.to_mgrid(
             mgrid_file, nr=64, nz=65, nphi=nphi_mgrid,
-            rmin=0.9*np.min(r0), rmax=1.1*np.max(r0),
-            zmin=1.1*np.min(z0), zmax=1.1*np.max(z0), nfp=surf.nfp,
+            rmin=0.7*np.min(r0), rmax=1.3*np.max(r0),
+            zmin=1.3*np.min(z0), zmax=1.3*np.max(z0), nfp=surf.nfp,
         )
     mpi.comm_world.Barrier()
     vmec = Vmec(vmec_file_input, mpi=mpi)
@@ -67,18 +65,23 @@ if run_freeb_input:
     vmec.indata.nzeta = nphi_mgrid
     vmec.indata.extcur[0] = 1.0
     
-    vmec.indata.ns_array   [:5] = [ 5,       16,   21,     51,   101]
-    vmec.indata.niter_array[:5] = [ 100,    300,  400,    500, 20000]
-    vmec.indata.ftol_array [:5] = [ 1e-9, 1e-10, 1e-11, 1e-11, 1e-14]
+    vmec.indata.ns_array   [:5] = [ 5,      16,   21,    51,   101]
+    vmec.indata.niter_array[:5] = [ 100,   300,  400,   400, 22000]
+    vmec.indata.ftol_array [:5] = [ 1e-9, 1e-9, 1e-9, 1e-10, 1e-14]
     
     vmec.write_input(input_freeb_file)
+    # print('Running once to get the free boundary')
     vmec.run()
-    vmec.write_input(input_freeb_file_from_wout)
     if comm_world.rank == 0:
         shutil.move(os.path.join(out_dir, f"{filename_output[:-3]}_000_000000.nc"), wout_freeb_file)
         os.remove(os.path.join(out_dir, f'{filename_input}_000_000000'))
+    # vmec.boundary = SurfaceRZFourier.from_wout(vmec.output_file)
+    vmec.boundary = SurfaceRZFourier.from_wout(wout_freeb_file)
+    # print('Running again to get the input file')
+    vmec.write_input(input_freeb_file_from_wout)
+    # vmec.run()
 
-if run_original_input:
+if run_freeb_and_original_input:
     vmec = Vmec(vmec_file_input, mpi=mpi)
     vmec.run()
     if comm_world.rank == 0:
@@ -88,8 +91,8 @@ if run_original_input:
 if os.path.isfile(wout_freeb_file):
     nphi_vmec_freeb = 28
     ntheta_vmec_freeb = 28
-    # vmec_freeb = Vmec(wout_freeb_file, mpi=mpi, verbose=False, nphi=nphi_vmec_freeb, ntheta=ntheta_vmec_freeb, range_surface='half period')
-    vmec_freeb = Vmec(input_freeb_file_from_wout, mpi=mpi, verbose=False, nphi=nphi_vmec_freeb, ntheta=ntheta_vmec_freeb, range_surface='half period')
+    vmec_freeb = Vmec(wout_freeb_file, mpi=mpi, verbose=False, nphi=nphi_vmec_freeb, ntheta=ntheta_vmec_freeb, range_surface='half period')
+    # vmec_freeb = Vmec(input_freeb_file_from_wout, mpi=mpi, verbose=False, nphi=nphi_vmec_freeb, ntheta=ntheta_vmec_freeb, range_surface='half period')
     surf_freeb = vmec_freeb.boundary
     nphi_big   = nphi_vmec_freeb * 2 * surf_freeb.nfp + 1
     ntheta_big = ntheta_vmec_freeb + 1
@@ -113,31 +116,47 @@ if os.path.isfile(wout_freeb_file):
 
 if os.path.exists(wout_freeb_file) and os.path.exists(os.path.join(out_dir, filename_output)):
     print('Do not use wout for plotting, use input')
-    plt.figure()
+    fig = plt.figure()
+    fig.set_size_inches(6,6)
+    ax=fig.add_subplot(111, label="1")
     for i, s in enumerate(s_array):
         # vmec_freeb = Vmec(wout_freeb_file, mpi=mpi, verbose=False, nphi=nphi_vmec_freeb, ntheta=ntheta_plot, range_surface='half period')
         # surf_freeb = vmec_freeb.boundary
         surf_freeb = SurfaceRZFourier.from_wout(wout_freeb_file, quadpoints_phi=np.linspace(0, 1, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
-        # surf_freeb = SurfaceRZFourier.from_vmec_input(input_freeb_file_from_wout, quadpoints_phi=np.linspace(0, 1, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1))
+        surf_freeb_input = SurfaceRZFourier.from_vmec_input(input_freeb_file_from_wout, quadpoints_phi=np.linspace(0, 1, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1))
         cross_section_freeb = surf_freeb.cross_section(phi=phi_plot)
+        cross_section_freeb_input = surf_freeb_input.cross_section(phi=phi_plot)
         r_interp_freeb = np.sqrt(cross_section_freeb[:, 0] ** 2 + cross_section_freeb[:, 1] ** 2)
+        r_interp_freeb_input = np.sqrt(cross_section_freeb_input[:, 0] ** 2 + cross_section_freeb_input[:, 1] ** 2)
         z_interp_freeb = cross_section_freeb[:, 2]
+        z_interp_freeb_input = cross_section_freeb_input[:, 2]
         
         # vmec_final = Vmec(os.path.join(out_dir, filename_output), mpi=mpi, verbose=False, nphi=nphi_plot, ntheta=ntheta_plot, range_surface='half period')
         # surf_final = vmec_final.boundary
         surf_final = SurfaceRZFourier.from_wout(os.path.join(out_dir, filename_output), quadpoints_phi=np.linspace(0, 1, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1), s=s)
-        # surf_final = SurfaceRZFourier.from_vmec_input(os.path.join(out_dir, filename_input), quadpoints_phi=np.linspace(0, 1, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1))
+        surf_final_input = SurfaceRZFourier.from_vmec_input(os.path.join(out_dir, filename_input), quadpoints_phi=np.linspace(0, 1, nphi_plot * 2 * surf_freeb.nfp + 1), quadpoints_theta=np.linspace(0, 1, ntheta_plot + 1))
         cross_section_final = surf_final.cross_section(phi=phi_plot)
+        cross_section_final_input = surf_final_input.cross_section(phi=phi_plot)
         r_interp_final = np.sqrt(cross_section_final[:, 0] ** 2 + cross_section_final[:, 1] ** 2)
+        r_interp_final_input = np.sqrt(cross_section_final_input[:, 0] ** 2 + cross_section_final_input[:, 1] ** 2)
         z_interp_final = cross_section_final[:, 2]
-        plt.plot(r_interp_final, z_interp_final, linewidth=1, c='r', label=f'Fixed Boundary' if i==0 else None)
-        plt.plot(r_interp_freeb, z_interp_freeb, linewidth=1, c='k', label=f'Free Boundary' if i==0 else None)
-    plt.legend()
+        z_interp_final_input = cross_section_final_input[:, 2]
+        
+        plt.plot(r_interp_final, z_interp_final, 'r', linewidth=3, label=f'Fixed Boundary' if i==0 else None)
+        plt.plot(r_interp_freeb, z_interp_freeb, 'k-.', linewidth=2, label=f'Free Boundary' if i==0 else None)
+        # plt.plot(r_interp_final_input, z_interp_final_input, 'g--', linewidth=3, label=f'Fixed Boundary input' if i==0 else None)
+        # plt.plot(r_interp_freeb_input, z_interp_freeb_input, 'b.-', linewidth=1, label=f'Free Boundary input' if i==0 else None)
+    plt.gca().set_aspect('equal',adjustable='box')
+    plt.legend(fontsize=12)
+    plt.xlabel('R', fontsize=22)
+    plt.ylabel('Z', fontsize=22)
+    ax.tick_params(axis='x', labelsize=16)
+    ax.tick_params(axis='y', labelsize=16)
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir,'Fixed_vs_Free_boundary.png'), dpi=300)
     # plt.show()
     plt.close()
-
+    
 if 'stage23' in results_folder:
     path_with_stage12 = os.path.join(this_path,results_folder.replace('stage23','stage12'))
     try:

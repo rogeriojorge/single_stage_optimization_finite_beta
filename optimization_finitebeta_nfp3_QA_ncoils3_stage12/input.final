@@ -10,7 +10,7 @@ MPOL = 5
 NTOR = 5
 NTHETA = 16
 NZETA = 14
-NS_ARRAY    =     16     51    101
+NS_ARRAY    =     16     51    201
 NITER_ARRAY =    300    500  20000
 FTOL_ARRAY  =  1e-09  1e-10  1e-14
 

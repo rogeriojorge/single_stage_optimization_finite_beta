@@ -51,42 +51,44 @@ optimize_stage2 = args.stage2
 optimize_stage3 = args.stage3
 MAXITER_stage_1 = 40
 MAXITER_stage_2 = 600
-tol_coils       = 1e-8
-MAXITER_single_stage = 40
-MAXFEV_single_stage  = 50
+tol_coils       = 1e-7
+MAXITER_single_stage = 45
+MAXFEV_single_stage  = 60
 
 #### INITIAL COILS PROPERTIES BEING OBTAINED FROM OPTIMAL_COILS_FINAL FOLDER
 if QA_or_QH == 'nfp2_QA':
-    max_mode_array                    = [1] *0 + [2] * 7 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
+    use_existing_coils = False
+    max_mode_array                    = [1]*6 + [2] * 0 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
     # quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 1e+2,  3: 4e+2,  4: 7e+2,  5: 8e+2}
     # DMerc_weight_mpol_mapping         = {1: 6e+9, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
     # DMerc_fraction_mpol_mapping       = {1: 0.7,  2: 0.15,  3: 0.1,   4: 0.05,  5: 0.05}
-    quasisymmetry_weight_mpol_mapping = {1: 3e+2, 2: 4e+2,  3: 5e+2,  4: 7e+2,  5: 8e+2}
+    quasisymmetry_weight_mpol_mapping = {1: 6e+2, 2: 6e+2,  3: 5e+2,  4: 7e+2,  5: 8e+2}
     DMerc_weight_mpol_mapping         = {1: 5e+13, 2: 5e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
     DMerc_fraction_mpol_mapping       = {1: 0.1,  2: 0.1,  3: 0.1,   4: 0.05,  5: 0.05}
-    coils_objective_array    = [1.5e3, 2e3, 3e3, 4e3, 5e3, 6e3]
-    JACOBIAN_THRESHOLD_array = [7e3, 5e2, 3e2, 2e2, 1e2, 5e1]
-    aspect_ratio_target = 6.5
+    coils_objective_array    = [5e3, 6e3, 7e3, 8e3]#, 9e3, 8e3, 7e3, 6e3, 5e3]
+    JACOBIAN_THRESHOLD_array = [6e2, 2e2, 8e1, 5e1, 3e1]
+    aspect_ratio_target = 5.5
     max_iota            = 0.9
     min_iota            = 0.15
-    min_average_iota    = 0.41
+    min_average_iota    = 0.51
     ncoils              = 4
     nmodes_coils        = 5
     R0                  = 11.14
     R1                  = 0.59*R0
     LENGTH_THRESHOLD    = (4.2-0.0)*R0
     LENGTH_CON_WEIGHT   = 0.69
-    CURVATURE_THRESHOLD = (3.8-0.0)/R0
+    CURVATURE_THRESHOLD = (3.8+2.2)/R0
     CURVATURE_WEIGHT    = 7.8e-5
-    MSC_THRESHOLD       = (15.6-0)/R0
+    MSC_THRESHOLD       = (15.6-0.0)/R0
     MSC_WEIGHT          = 9.4e-5
-    CC_THRESHOLD        = (0.17+0.00)*R0
+    CC_THRESHOLD        = (0.17-0.02)*R0
     CC_WEIGHT           = 5.2e-1
-    CS_THRESHOLD        = (0.17+0.00)*R0
+    CS_THRESHOLD        = (0.17-0.02)*R0
     CS_WEIGHT           = 8.2e1
-    ARCLENGTH_WEIGHT    = 3.5e-5
-    bootstrap_mismatch_weight = 1e1
+    ARCLENGTH_WEIGHT    = 3.5e-5-3.49e-5
+    bootstrap_mismatch_weight = 1e3
 elif QA_or_QH == 'nfp4_QH':
+    use_existing_coils = True
     max_mode_array                    = [1] * 2 + [2] * 2 + [3] * 5 + [4] * 0 + [5] * 0 + [6] * 0
     # quasisymmetry_weight_mpol_mapping = {1: 3e+2,  2: 5e+2,  3: 7e+2,  4: 8e+2,  5: 9e+2}
     # DMerc_weight_mpol_mapping         = {1: 2e+13, 2: 5e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
@@ -117,6 +119,7 @@ elif QA_or_QH == 'nfp4_QH':
     ARCLENGTH_WEIGHT    = (5.1e-6-3.0e-6)
     bootstrap_mismatch_weight = 1e2
 elif QA_or_QH == 'nfp3_QA':
+    use_existing_coils = True
     max_mode_array                    = [1] *1 + [2] * 7 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
     # quasisymmetry_weight_mpol_mapping = {1: 1e+1,  2: 1e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
     # DMerc_weight_mpol_mapping         = {1: 1e+13, 2: 2e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
@@ -146,6 +149,7 @@ elif QA_or_QH == 'nfp3_QA':
     ARCLENGTH_WEIGHT    = (3.7e-4-0.00e-4)
     bootstrap_mismatch_weight = 1e2
 elif QA_or_QH == 'nfp3_QH':
+    use_existing_coils = True
     max_mode_array                    = [1] *2 + [2] * 7 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
     # quasisymmetry_weight_mpol_mapping = {1: 1e+1, 2: 4e+2,  3: 6e+2,  4: 7e+2,  5: 8e+2}
     # DMerc_weight_mpol_mapping         = {1: 1e+7, 2: 7e+13, 3: 1e+14, 4: 3e+14, 5: 4e+14}
@@ -198,7 +202,7 @@ aspect_ratio_weight = 1e+2
 aminor_weight = 5e-2
 # quasisymmetry_weight = 1e+1
 weight_iota = 1e5
-volavgB_weight = 5e+0
+volavgB_weight = 1e2
 well_Weight = 1e2
 # DMerc_Weight = 1e+10
 betatotal_weight = 1e1
@@ -212,8 +216,8 @@ nquadpoints = 120
 diff_method = "forward"
 opt_method = 'trf'#'lm'
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-finite_difference_abs_step = 1e-5
-finite_difference_rel_step = 1e-3
+finite_difference_abs_step = 1e-4
+finite_difference_rel_step = 1e-2 #1e-3
 ftol_stage_1 = 1e-5
 rel_step_stage1 = 2e-5
 abs_step_stage1 = 2e-7
@@ -313,7 +317,7 @@ def create_coils_from_scratch(ncoils, R0, R1, nmodes_coils):
     base_currents += [total_current - sum(base_currents)]
     return base_curves, base_currents
 # Create base_curve and base_currents
-if selected_directory:
+if selected_directory and use_existing_coils:
     optimal_coils_path = os.path.join(optimal_coils_directory, selected_directory)
     try:
         bs_json_files = [file for file in os.listdir(optimal_coils_path) if 'biot_savart.json' in file]
@@ -485,8 +489,10 @@ def fun(dofss, prob_jacobian=None, info={'Nfeval': 0}):
 max_mode_previous = 0
 free_coil_dofs_all = JF.dofs_free_status
 for iteration, max_mode in enumerate(max_mode_array):
+    previous_J = 1e19
+    previous_previous_J = 1e19
     proc0_print(f'###############################################')
-    proc0_print(f'  Performing optimization for max_mode={max_mode}')
+    proc0_print(f'  Iteration {iteration} Performing optimization for max_mode={max_mode}')
     proc0_print(f'###############################################')
     vmec.indata.mpol = maxmodes_mpol_mapping[max_mode]
     vmec.indata.ntor = maxmodes_mpol_mapping[max_mode]
@@ -495,6 +501,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     surf.fix("rc(0,0)")
     
     coils_objective_weight = coils_objective_array[np.min((iteration, len(coils_objective_array)-1))]
+    proc0_print(f'  Coils objective weight = {coils_objective_weight}')
     JACOBIAN_THRESHOLD  = JACOBIAN_THRESHOLD_array[np.min((iteration, len(JACOBIAN_THRESHOLD_array)-1))]
     
     n_spline = np.min((np.max((iteration * 2 + 7, 9)), 15))
@@ -698,8 +705,8 @@ for iteration, max_mode in enumerate(max_mode_array):
         opt = make_optimizable(fun_J, prob, JF)
         free_coil_dofs = JF.dofs_free_status
         JF.fix_all()
-        abs_step = np.max((finite_difference_abs_step/(10**max_mode_previous), 1e-5))
-        rel_step = np.max((finite_difference_rel_step/(10**max_mode_previous), 1e-7))
+        abs_step = np.max((finite_difference_abs_step/(10**iteration), 1e-5))
+        rel_step = np.max((finite_difference_rel_step/(10**iteration), 1e-7))
         with MPIFiniteDifference(opt.J, mpi, diff_method=diff_method, abs_step=abs_step, rel_step=rel_step) as prob_jacobian:
             if mpi.proc0_world:
                 res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage, 'gtol': ftol}, tol=ftol)
