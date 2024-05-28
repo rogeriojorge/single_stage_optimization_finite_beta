@@ -9,7 +9,8 @@ from simsopt.mhd import VirtualCasing, Vmec
 from simsopt.field import BiotSavart, Current, coils_via_symmetries
 from simsopt.geo import (curves_to_vtk, create_equally_spaced_curves, SurfaceRZFourier,
                         LinkingNumber, CurveLength, CurveCurveDistance, ArclengthVariation,
-                        MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance)
+                        MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance,
+                        CurveRZFourier, CurveXYZFourier)
 from simsopt.objectives import SquaredFlux, QuadraticPenalty
 parent_path = os.path.dirname(os.path.abspath(__file__))
 ###########################################
@@ -22,14 +23,17 @@ if   args.type == 1: QA_or_QH = 'nfp2_QA'
 elif args.type == 2: QA_or_QH = 'nfp4_QH'
 elif args.type == 3: QA_or_QH = 'nfp3_QA'
 elif args.type == 4: QA_or_QH = 'nfp3_QH'
-elif args.type == 5: QA_or_QH = 'nfp3_QI'
+elif args.type == 5: QA_or_QH = 'nfp1_QI'
+elif args.type == 6: QA_or_QH = 'nfp2_QI'
+elif args.type == 7: QA_or_QH = 'nfp3_QI'
+elif args.type == 8: QA_or_QH = 'nfp4_QI'
 else: raise ValueError('Invalid type')
 ncoils = args.ncoils
 ###########################################
 create_surface_coils = False
 R0_factor = 11
 filename = 'wout_final.nc'
-MAXITER = 200 if 'QA' in QA_or_QH else 300
+MAXITER = 400
 R1_mean = 0.44*R0_factor
 R1_std = 0.4*R0_factor
 min_length_per_coil = 3.5*R0_factor
@@ -92,6 +96,7 @@ def run_optimization(
     max_curvature_weight,msc_threshold,msc_weight,
     cc_threshold,cc_weight,cs_threshold,
     cs_weight,arclength_weight,index,
+    sign_B_external_normal,
 ):
     directory = (
         f"ncoils_{ncoils}_order_{order}_R1_{R1:.2}_length_target_{length_target:.2}_weight_{length_weight:.2}"
@@ -99,7 +104,7 @@ def run_optimization(
         + f"_msc_{msc_threshold:.2}_weight_{msc_weight:.2}"
         + f"_cc_{cc_threshold:.2}_weight_{cc_weight:.2}"
         + f"_cs_{cs_threshold:.2}_weight_{cs_weight:.2}"
-        + f"_arclweight_{arclength_weight:.2}"
+        + f"_arclweight_{arclength_weight:.2}_sign_B_external_normal{sign_B_external_normal}"
     )
 
     print()
@@ -114,7 +119,27 @@ def run_optimization(
     os.mkdir(directory)
 
     # Create the initial coils:
-    base_curves = create_equally_spaced_curves(ncoils, nfp, stellsym=True, R0=R0, R1=R1, order=order, numquadpoints=order * 16)
+    # base_curves = create_equally_spaced_curves(ncoils, nfp, stellsym=True, R0=R0, R1=R1, order=order, numquadpoints=order * 16)
+    
+    ma = CurveRZFourier(np.linspace(0,1,(ncoils+1)*2*surf.nfp), len(vmec.wout.raxis_cc)-1, surf.nfp, False)
+    ma.rc[:] = vmec.wout.raxis_cc
+    ma.zs[:] = -vmec.wout.zaxis_cs[1:]
+    ma.x = ma.get_dofs()
+    gamma_curves = ma.gamma()
+    numquadpoints = order * 16
+    base_curves = []
+    for i in range(ncoils):
+        curve = CurveXYZFourier(quadpoints=numquadpoints, order=order)
+        angle = (i+0.5)*(2*np.pi)/((2)*surf.nfp*ncoils)
+        curve.set("xc(0)", gamma_curves[i+1,0])
+        curve.set("xc(1)", np.cos(angle)*R1)
+        curve.set("yc(0)", gamma_curves[i+1,1])
+        curve.set("yc(1)", np.sin(angle)*R1)
+        curve.set("zc(0)", gamma_curves[i+1,2])
+        curve.set("zs(1)", R1)
+        curve.x = curve.x  # need to do this to transfer data to C++
+        base_curves.append(curve)
+    
     # # base_currents = [Current(1e5) for i in range(ncoils)]
     # base_currents = [Current(1.0) * (1e5) for i in range(ncoils)]
     # base_currents[0].fix_all()
@@ -131,14 +156,14 @@ def run_optimization(
     if create_surface_coils:
         curves_to_vtk(curves, new_OUT_DIR + "curves_init", close=True)
         Bbs = bs.B().reshape((nphi, ntheta, 3))
-        BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
+        BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
         pointData = {"B.n/B": BdotN[:, :, None]}
         surf.to_vtk(new_OUT_DIR + "surf_init", extra_data=pointData)
 
     # surf_big.to_vtk(new_OUT_DIR + "surf_big")
 
     # Define the individual terms objective function:
-    Jf = SquaredFlux(surf, bs, target=vc.B_external_normal, definition="local")
+    Jf = SquaredFlux(surf, bs, target=sign_B_external_normal*vc.B_external_normal, definition="local")
     Jls = [CurveLength(c) for c in base_curves]
     Jccdist = CurveCurveDistance(curves, cc_threshold, num_basecurves=ncoils)
     Jcsdist = CurveSurfaceDistance(curves, surf, cs_threshold)
@@ -169,7 +194,7 @@ def run_optimization(
         grad = JF.dJ()
         jf = Jf.J()
         Bbs = bs.B().reshape((nphi, ntheta, 3))
-        BdotN = np.max(np.abs((np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)))
+        BdotN = np.max(np.abs((np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)))
         outstr = f"{iteration:4}  J={J:.1e}, Jf={jf:.1e}, max⟨B·n⟩/B={BdotN:.1e}"
         cl_string = ", ".join([f"{J.J():.1f}" for J in Jls])
         kap_string = ", ".join(f"{np.max(c.kappa()):.1f}" for c in base_curves)
@@ -192,7 +217,7 @@ def run_optimization(
         curves_to_vtk(curves, new_OUT_DIR + "curves_opt_big", close=True)
         curves_to_vtk(base_curves, new_OUT_DIR + "curves_opt", close=True)
         Bbs = bs.B().reshape((nphi, ntheta, 3))
-        BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
+        BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
         pointData = {"B.n/B": BdotN[:, :, None]}
         surf.to_vtk(new_OUT_DIR + "surf_opt", extra_data=pointData)
 
@@ -210,7 +235,7 @@ def run_optimization(
     bs.save(new_OUT_DIR + "biot_savart.json")
 
     Bbs = bs.B().reshape((nphi, ntheta, 3))
-    BdotN = np.max(np.abs(np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2))
+    BdotN = np.max(np.abs(np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2))
 
     results = {
         "nfp": nfp,
@@ -251,6 +276,7 @@ def run_optimization(
         "function_evaluations": res.nfev,
         "coil_currents": [c.get_value() for c in base_currents],
         "coil_surface_distance":  float(Jcsdist.shortest_distance()),
+        "sign_B_external_normal": sign_B_external_normal,
     }
 
     with open(new_OUT_DIR + "results.json", "w") as outfile:
@@ -297,6 +323,9 @@ for index in range(10000):
     
     # Weight for the arclength variation penalty in the objective function:
     arclength_weight = 10.0 ** rand(-9, -2)
+    
+    # sign_B_external_normal should be random -1 or 1
+    sign_B_external_normal = np.random.choice([-1, 1])
 
     run_optimization(
         R1, order,
@@ -313,4 +342,5 @@ for index in range(10000):
         cs_weight,
         arclength_weight,
         index,
+        sign_B_external_normal,
     )

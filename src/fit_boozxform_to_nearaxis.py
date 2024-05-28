@@ -7,9 +7,10 @@ import numpy as np
 import logging
 logger = logging.getLogger(__name__)
 from scipy.optimize import curve_fit
+from scipy.interpolate import InterpolatedUnivariateSpline
 import sys
 
-def from_boozxform(vmec_file, max_s_for_fit = 0.25, N_phi = 200, max_n_to_plot = 2, show=False, nNormal=None, savefig=True):
+def from_boozxform(vmec_file, max_s_for_fit = 0.16, N_phi = 200, max_n_to_plot = 2, show=False, nNormal=None, savefig=True):
 
     name=os.path.basename(vmec_file)[5:-3]
     
@@ -23,6 +24,31 @@ def from_boozxform(vmec_file, max_s_for_fit = 0.25, N_phi = 200, max_n_to_plot =
     b1.run()
     
     print('Done running BOOZ_XFORM')
+    # Boozer_I = b1.bx.Boozer_I
+    # Boozer_G = b1.bx.Boozer_G
+    # Boozer_iota = b1.bx.iota
+    Boozer_iota = np.zeros((b1.bx.ns_b+2))
+    Boozer_G = np.zeros((b1.bx.ns_b+2))
+    Boozer_I = np.zeros((b1.bx.ns_b+2))
+    Boozer_iota[1:-1] = b1.bx.iota
+    Boozer_iota[0] = 1.5*Boozer_iota[1] - 0.5*Boozer_iota[2]
+    Boozer_iota[-1] = 1.5*Boozer_iota[-2] - 0.5*Boozer_iota[-3]
+    Boozer_G[1:-1] = b1.bx.Boozer_G
+    Boozer_G[0] = 1.5*Boozer_G[1] - 0.5*Boozer_G[2]
+    Boozer_G[-1] = 1.5*Boozer_G[-2] - 0.5*Boozer_G[-3]
+    Boozer_I[1:-1] = b1.bx.Boozer_I
+    Boozer_I[0] = 1.5*Boozer_I[1] - 0.5*Boozer_I[2]
+    Boozer_I[-1] = 1.5*Boozer_I[-2] - 0.5*Boozer_I[-3]
+    
+    s_half_ext = np.zeros((b1.bx.ns_b+2))
+    s_half_ext[1:-1] = b1.bx.s_in
+    s_half_ext[-1] = 1
+    mask_ext = s_half_ext < max_s_for_fit
+    order = 3
+    G_spline = InterpolatedUnivariateSpline(s_half_ext, Boozer_G, k=order)
+    I_spline = InterpolatedUnivariateSpline(s_half_ext, Boozer_I, k=order)
+    iota_spline = InterpolatedUnivariateSpline(s_half_ext, Boozer_iota, k=order)
+    
     bmnc = np.transpose(b1.bx.bmnc_b)
     ixm = b1.bx.xm_b
     ixn = b1.bx.xn_b
@@ -30,7 +56,7 @@ def from_boozxform(vmec_file, max_s_for_fit = 0.25, N_phi = 200, max_n_to_plot =
     ns = vmec.wout.ns
     nfp = b1.bx.nfp
     Psi_a = np.abs(vmec.wout.phi[-1])
-    iotaVMECt = b1.bx.iota[0]
+    iotaVMECt = vmec.wout.iotaf[0]
     rc = vmec.wout.raxis_cc
     zs = -vmec.wout.zaxis_cs
     if vmec.wout.lasym__logical__:
@@ -39,17 +65,17 @@ def from_boozxform(vmec_file, max_s_for_fit = 0.25, N_phi = 200, max_n_to_plot =
     else:
         rs = []
         zc = []
-        
+    jdotb = vmec.wout.jdotb
+    ####################################################################################################
     print('Preparing coordinates for fit')
     s_full = np.linspace(0,1,ns)
+    mask_full = (s_full < max_s_for_fit)# & (s_full > 0.0001)
     ds = s_full[1] - s_full[0]
     #s_half = s_full[1:] - 0.5*ds
     s_half = s_full[jlist-1] - 0.5*ds
     mask = s_half < max_s_for_fit
     s_fine = np.linspace(0,1,400)
     sqrts_fine = s_fine
-    Boozer_I = b1.bx.Boozer_I
-    Boozer_G = b1.bx.Boozer_G
     phi = np.linspace(0,2*np.pi / nfp, N_phi)
     B0  = np.zeros(N_phi)
     B1s = np.zeros(N_phi)
@@ -58,40 +84,60 @@ def from_boozxform(vmec_file, max_s_for_fit = 0.25, N_phi = 200, max_n_to_plot =
     B2s = np.zeros(N_phi)
     B2c = np.zeros(N_phi)
     ####################################################################################################
+    print('Performing fit to vmec jdotb')
+    def model_1(x, a, b, c): return a + b*x**(1/4) + c*x**(1/2)
+    def model_2(x, a, b): return a + b*x**(1/2)
+    params_1, params_covariance_1 = curve_fit(model_1, s_full[mask_full], jdotb[mask_full])
+    params_2, params_covariance_2 = curve_fit(model_2, s_full[mask_full], jdotb[mask_full])
+    print(f' Modified jdotb:  jdotb_0 = {params_1[0]}, jdotb_12 = {params_1[1]}, jdotb_1 = {params_1[2]}')
+    print(f' Near-Axis jdotb: jdotb_0 = {params_2[0]}, jdotb_1 = {params_2[1]}')
+    plt.plot(np.sqrt(s_full), jdotb, 'o-', label='jdotb(r)', linewidth=4.0)
+    plt.plot(np.sqrt(s_fine), model_2(s_fine, *params_2), 'g--', label=r'Near-Axis Model $jdotb=jdotb_0 + r jdotb_1$', linewidth=3.5)
+    plt.plot(np.sqrt(s_fine), model_1(s_fine, *params_1), 'r--', label=r'Modified Model $jdotb=jdotb_0 + \sqrt{r} jdotb_{1/2} + r jdotb_1$', linewidth=3.5)
+    plt.legend(fontsize=10)
+    plt.xlabel(r'$r=\sqrt{s}$', fontsize=14)
+    plt.ylabel(r'$\bf J \cdot \bf B$', fontsize=14)
+    plt.xlim([0,np.sqrt(max_s_for_fit)])
+    # plt.ylim([0.0,jdotb[mask_full][-1]])
+    if jdotb[mask_full][-1] > 0: plt.ylim([0.95*np.min(jdotb[mask_full]),1.05*np.max(jdotb[mask_full])])
+    else: plt.ylim([1.05*np.min(jdotb[mask_full]),0.95*np.max(jdotb[mask_full])])
+    if show: plt.show()
+    if savefig: plt.savefig(f'NAE_Boozer_jdotb_fit_{name}.png',dpi=300)
+    plt.close()
+    ####################################################################################################
     print('Performing fit to Boozer I')
     def model_1(x, a): return a*x**(5/4)
     def model_2(x, a): return a*x**(4/4)
-    params_1, params_covariance_1 = curve_fit(model_1, s_half[mask], Boozer_I[mask])
-    params_2, params_covariance_2 = curve_fit(model_2, s_half[mask], Boozer_I[mask])
-    print(f'  I_5/2 = {params_1[0]}')
-    print(f'  I_2 = {params_2[0]}')
-    plt.plot(np.sqrt(s_half), Boozer_I, 'o-', label='Boozer I(r)', linewidth=4.0)
+    params_1, params_covariance_1 = curve_fit(model_1, s_half_ext[mask_ext], Boozer_I[mask_ext])
+    params_2, params_covariance_2 = curve_fit(model_2, s_half_ext[mask_ext], Boozer_I[mask_ext])
+    print(f' Modified I:  I_5/2 = {params_1[0]}')
+    print(f' Near-Axis I: I_2 = {params_2[0]}')
+    plt.plot(np.sqrt(s_half_ext), Boozer_I, 'o-', label='Boozer I(r)', linewidth=4.0)
     plt.plot(np.sqrt(s_fine), model_2(s_fine, *params_2), 'g--', label=r'Near-Axis Model $I=r^2 I_2$', linewidth=3.5)
     plt.plot(np.sqrt(s_fine), model_1(s_fine, *params_1), 'r--', label=r'Modified Model $I=r^{5/2} I_{5/2}$', linewidth=3.5)
     plt.legend(fontsize=14)
     plt.xlabel(r'$r=\sqrt{s}$', fontsize=14)
     plt.ylabel(r'$I$', fontsize=14)
     plt.xlim([0,np.sqrt(max_s_for_fit)])
-    plt.ylim([0.0,Boozer_I[mask][-1]])
+    plt.ylim([0.0,Boozer_I[mask_ext][-1]])
     if show: plt.show()
     if savefig: plt.savefig(f'NAE_Boozer_I_fit_{name}.png',dpi=300)
     plt.close()
     ####################################################################################################
     print('Performing fit to Boozer iota')
-    Boozer_iota = b1.bx.iota
     print(f' iotaVMEC = {iotaVMECt}')
-    def model_1(x, a, b): return a + b*x**(1/2)
+    def model_1(x, a, b, c): return a + b*x + c*x**(3/2)
     def model_2(x, a, b): return a + b*x
-    params_1, params_covariance_1 = curve_fit(model_1, s_half[mask], Boozer_iota[mask])
-    params_2, params_covariance_2 = curve_fit(model_2, s_half[mask], Boozer_iota[mask])
-    print(f' Modified  iota: iota_0 = {params_1[0]}, iota_1 = {params_1[1]}')
+    params_1, params_covariance_1 = curve_fit(model_1, s_half_ext[mask_ext], Boozer_iota[mask_ext])
+    params_2, params_covariance_2 = curve_fit(model_2, s_half_ext[mask_ext], Boozer_iota[mask_ext])
+    print(f' Modified  iota: iota_0 = {params_1[0]}, iota_2 = {params_1[1]}, iota_3 = {params_1[2]}')
     print(f' Near-Axis iota: iota_0 = {params_2[0]}, iota_2 = {params_2[1]}')
-    plt.plot(np.sqrt(s_half), Boozer_iota, 'o-', label=r'Boozer $\iota(r)$', linewidth=4.0)
+    plt.plot(np.sqrt(s_half_ext), Boozer_iota, 'o-', label=r'Boozer $\iota(r)$', linewidth=4.0)
     plt.plot(np.sqrt(s_fine), model_2(s_fine, *params_2), 'g--', label=r'Near-Axis Model $\iota=\iota_0 + r^2 \iota_2$', linewidth=3.5)
-    plt.plot(np.sqrt(s_fine), model_1(s_fine, *params_1), 'r--', label=r'Modified Model $\iota=\iota_0 + r \iota_1$', linewidth=3.5)
+    plt.plot(np.sqrt(s_fine), model_1(s_fine, *params_1), 'r--', label=r'Modified Model $\iota=\iota_0 + r^2 \iota_2 + r^{3} \iota_{3}$', linewidth=3.5)
     plt.xlim([0,np.sqrt(max_s_for_fit)])
-    if Boozer_iota[mask][-1] > 0: plt.ylim([0.95*np.min(Boozer_iota[mask]),1.05*np.max(Boozer_iota[mask])])
-    else: plt.ylim([1.05*np.min(Boozer_iota[mask]),0.95*np.max(Boozer_iota[mask])])
+    if Boozer_iota[mask_ext][-1] > 0: plt.ylim([0.95*np.min(Boozer_iota[mask_ext]),1.05*np.max(Boozer_iota[mask_ext])])
+    else: plt.ylim([1.05*np.min(Boozer_iota[mask_ext]),0.95*np.max(Boozer_iota[mask_ext])])
     plt.legend(fontsize=14)
     plt.xlabel(r'$r=\sqrt{s}$', fontsize=14)
     plt.ylabel(r'$\iota$', fontsize=14)
@@ -103,16 +149,16 @@ def from_boozxform(vmec_file, max_s_for_fit = 0.25, N_phi = 200, max_n_to_plot =
     print('Performing fit to Boozer G')
     def model_1(x, a, b, c): return a + b*x + c*x**(5/4)
     def model_2(x, a, b):    return a + b*x
-    params_1, params_covariance_1 = curve_fit(model_1, s_half[mask], Boozer_G[mask])
-    params_2, params_covariance_2 = curve_fit(model_2, s_half[mask], Boozer_G[mask])
+    params_1, params_covariance_1 = curve_fit(model_1, s_half_ext[mask_ext], Boozer_G[mask_ext])
+    params_2, params_covariance_2 = curve_fit(model_2, s_half_ext[mask_ext], Boozer_G[mask_ext])
     print(f' Modified  G: G_0 = {params_1[0]}, G_2 = {params_1[1]}, G_5/2 = {params_1[2]}')
     print(f' Near-Axis G: G_0 = {params_2[0]}, G_2 = {params_2[1]}')
-    plt.plot(np.sqrt(s_half), Boozer_G, 'o-', label=r'Boozer $G(r)$', linewidth=4.0)
+    plt.plot(np.sqrt(s_half_ext), Boozer_G, 'o-', label=r'Boozer $G(r)$', linewidth=4.0)
     plt.plot(np.sqrt(s_fine), model_2(s_fine, *params_2), 'g--', label=r'Near-Axis Model $G=G_0 + r^2 G_2$', linewidth=3.5)
     plt.plot(np.sqrt(s_fine), model_1(s_fine, *params_1), 'r--', label=r'Modified Model  $G=G_0 + r^2 G_2 + r^{5/2} G_{5/2}$', linewidth=3.5)
     plt.xlim([0,np.sqrt(max_s_for_fit)])
-    if Boozer_G[mask][-1] > 0: plt.ylim([0.999*np.min(Boozer_G[mask]),1.001*np.max(Boozer_G[mask])])
-    else: plt.ylim([1.001*np.min(Boozer_G[mask]),0.999*np.max(Boozer_G[mask])])
+    if Boozer_G[mask_ext][-1] > 0: plt.ylim([0.999*np.min(Boozer_G[mask_ext]),1.001*np.max(Boozer_G[mask_ext])])
+    else: plt.ylim([1.001*np.min(Boozer_G[mask_ext]),0.999*np.max(Boozer_G[mask_ext])])
     plt.legend(fontsize=14)
     plt.xlabel(r'$r=\sqrt{s}$', fontsize=14)
     plt.ylabel(r'$G$', fontsize=14)

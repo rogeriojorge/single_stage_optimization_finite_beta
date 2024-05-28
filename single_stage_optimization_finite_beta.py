@@ -101,7 +101,7 @@ bs.set_points(surf.gamma().reshape((-1, 3)))
 Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
 BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal
 if comm_world.rank == 0:
-    curves_to_vtk(curves, os.path.join(coils_results_path, "curves_init"))
+    curves_to_vtk(curves, os.path.join(coils_results_path, "curves_init"), close=True)
     pointData = {"B_N": BdotN_surf[:, :, None]}
     surf.to_vtk(os.path.join(coils_results_path, "surf_init"), extra_data=pointData)
 ##########################################################################################
@@ -271,7 +271,7 @@ bs.set_points(surf.gamma().reshape((-1, 3)))
 Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
 BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal
 if comm_world.rank == 0:
-    curves_to_vtk(curves, os.path.join(coils_results_path, "curves_after_stage2"))
+    curves_to_vtk(curves, os.path.join(coils_results_path, "curves_after_stage2"), close=True)
     pointData = {"B_N": BdotN_surf[:, :, None]}
     surf.to_vtk(os.path.join(coils_results_path, "surf_after_stage2"), extra_data=pointData)
 proc0_print(f'  Performing single stage optimization with ~{MAXITER_single_stage} iterations')
@@ -295,7 +295,7 @@ with MPIFiniteDifference(
 Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
 BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal
 if comm_world.rank == 0:
-    curves_to_vtk(curves, os.path.join(coils_results_path, "curves_opt"))
+    curves_to_vtk(curves, os.path.join(coils_results_path, "curves_opt"), close=True)
     pointData = {"B_N": BdotN_surf[:, :, None]}
     surf.to_vtk(os.path.join(coils_results_path, "surf_opt"), extra_data=pointData)
 bs.save(os.path.join(coils_results_path, "biot_savart_opt.json"))

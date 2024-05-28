@@ -1,4 +1,5 @@
 import numpy as np
+from time import time
 from simsopt.mhd import Boozer
 from scipy.interpolate import UnivariateSpline
 from scipy.optimize import fsolve
@@ -39,6 +40,7 @@ def QuasiIsodynamicResidual(vmec,snorms,weights=None,
                     so when optimizing with more modes, having this as True cause the optimization
                     to crash.
     """
+    # start_time = time()
     ################################################################
     ############################ SETUP #############################
     ################################################################
@@ -284,6 +286,7 @@ def QuasiIsodynamicResidual(vmec,snorms,weights=None,
         # print("("+s+") =", np.sum((out[si,:] / np.sqrt(nalpha) )**2))
     out = out.flatten()
     out = out / np.sqrt(nalpha)
+    # print(f"Time taken = {time()-start_time}s")
     return out    
 
 # A helper function that outputs the values of phiBs when Ba=Bj

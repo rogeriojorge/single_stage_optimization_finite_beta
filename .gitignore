@@ -28,6 +28,7 @@ fieldlines_*
 jdotB_log*
 sfincsOutput.h5
 scan
+mgrid.nc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -33,6 +33,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     bvco = f.variables['bvco'][()]
     jcuru = f.variables['jcuru'][()]
     jcurv = f.variables['jcurv'][()]
+    DMerc = f.variables['DMerc'][()]
     lasym = f.variables['lasym__logical__'][()]
     if lasym==1:
         rmns = f.variables['rmns'][()]
@@ -67,6 +68,8 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
 
     print("nfp: ",nfp)
     print("ns: ",ns)
+    
+    print("DMerc: ",DMerc)
 
     mpol = f.variables['mpol'][()]
     print("mpol: ",mpol)

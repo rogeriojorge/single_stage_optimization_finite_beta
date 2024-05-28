@@ -12,10 +12,10 @@ from simsopt.util import MpiPartition, proc0_print, comm_world
 this_path = os.path.dirname(os.path.abspath(__file__))
 mpi = MpiPartition()
 
-# cd optimization_finitebeta_nfp3_QA_ncoils3_stage23
+# cd results_folder
 # ../src/vmecPlot2.py wout_final.nc;../src/vmecPlot2.py wout_final_freeb.nc;../src/booz_plot.py wout_final.nc;../src/booz_plot.py wout_final_freeb.nc
 
-results_folder = f'optimization_finitebeta_nfp3_QA_ncoils3_stage23'
+results_folder = f'optimization_finitebeta_nfp2_QA_ncoils5_stage23'
 run_freeb_and_original_input = True
 
 nphi_plot = 32
