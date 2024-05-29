@@ -263,7 +263,8 @@ Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
 BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
 if comm_world.rank == 0:
     curves_to_vtk(curves, os.path.join(coils_results_path, "curves_init"), close=True)
-    pointData = {"B.n/B": BdotN_surf[:, :, None]}
+    Bmod = bs.AbsB().reshape((nphi_VMEC,ntheta_VMEC,1))
+    pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
     surf.to_vtk(os.path.join(coils_results_path, "surf_init"), extra_data=pointData)
 bs.set_points(surf_big.gamma().reshape((-1, 3)))
 Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
@@ -606,7 +607,8 @@ for iteration, max_mode in enumerate(max_mode_array):
     if comm_world.rank == 0:
         curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_after_stage12_maxmode{max_mode}"), close=True)
         curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_after_stage12_maxmode{max_mode}"), close=True)
-        pointData = {"B.n/B": BdotN_surf[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi_VMEC,ntheta_VMEC,1))
+        pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
         surf.to_vtk(os.path.join(coils_results_path, f"surf_after_stage12_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf_big.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
@@ -637,7 +639,8 @@ for iteration, max_mode in enumerate(max_mode_array):
     if comm_world.rank == 0:
         curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_opt_maxmode{max_mode}"), close=True)
         curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_opt_maxmode{max_mode}"), close=True)
-        pointData = {"B.n/B": BdotN_surf[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi_VMEC,ntheta_VMEC,1))
+        pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
         surf.to_vtk(os.path.join(coils_results_path, f"surf_opt_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf_big.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))

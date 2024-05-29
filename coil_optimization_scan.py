@@ -157,7 +157,8 @@ def run_optimization(
         curves_to_vtk(curves, new_OUT_DIR + "curves_init", close=True)
         Bbs = bs.B().reshape((nphi, ntheta, 3))
         BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
-        pointData = {"B.n/B": BdotN[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi,ntheta,1))
+        pointData = {"B.n/B": BdotN[:, :, None], "B": Bmod}
         surf.to_vtk(new_OUT_DIR + "surf_init", extra_data=pointData)
 
     # surf_big.to_vtk(new_OUT_DIR + "surf_big")
@@ -218,7 +219,8 @@ def run_optimization(
         curves_to_vtk(base_curves, new_OUT_DIR + "curves_opt", close=True)
         Bbs = bs.B().reshape((nphi, ntheta, 3))
         BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
-        pointData = {"B.n/B": BdotN[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi,ntheta,1))
+        pointData = {"B.n/B": BdotN[:, :, None], "B": Bmod}
         surf.to_vtk(new_OUT_DIR + "surf_opt", extra_data=pointData)
 
     # bs_big = BiotSavart(coils)

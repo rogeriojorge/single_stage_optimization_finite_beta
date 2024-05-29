@@ -5,7 +5,10 @@ type=${1:-1}
 echo "The value of type is $type"
 output_folder="scan_output_$type"
 RUN_PY_PATH="/Users/rogeriojorge/local/single_stage_optimization_finite_beta/coil_optimization_scan.py"
-run_configurations=("2:2" "3:4" "4:4" "5:2" "6:0" "7:0")
+# run_configurations=("2:0" "3:0" "4:0" "5:0" "6:0" "7:0" "8:1" "9:1" "10:2" "11:3" "12:3") ## THIS IS FOR NFP 1 QI
+# run_configurations=("2:0" "3:0" "4:3" "5:3" "6:2")
+# run_configurations=("2:2" "3:1" "4:0" "5:0" "6:0")
+run_configurations=("2:2" "3:4" "4:4" "5:2" "6:1")
 create_output_txt_files=false #true
 
 # Counter for the total number of Python runs

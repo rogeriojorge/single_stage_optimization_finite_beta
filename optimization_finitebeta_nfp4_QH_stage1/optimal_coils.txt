@@ -1,0 +1,8 @@
+best_from_coil_optimization_scan.py
+Number of runs before filtering: 3905
+Number of runs after filtering: 1
+Best Pareto-optimal results (total of 1):
+                                              directory        Jf  max_max_curvature  average_length_per_coil  max_mean_squared_curvature  coil_coil_distance  coil_surface_distance
+1403  ncoils_4_order_15_R1_6.3_length_target_4.8e+01...  0.003338           0.874398                48.504689                    0.150594            0.552395               1.238007
+Directory names only:
+ncoils_4_order_15_R1_6.3_length_target_4.8e+01_weight_0.0013_max_curvature_0.3_weight_0.0028_msc_1.8_weight_2.6e-05_cc_0.55_weight_1.7e+01_cs_0.82_weight_4.3e+01_arclweight_5.4e-05_sign_B_external_normal-1.0

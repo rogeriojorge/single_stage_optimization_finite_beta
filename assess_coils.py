@@ -112,7 +112,8 @@ if interpolate_field:
         bs.set_points(surf_vmec.gamma().reshape((-1, 3)))
         Bbs = bs.B().reshape((nphi, ntheta, 3))
         BdotN_surf = np.sum(Bbs * surf_vmec.unitnormal(), axis=2) / np.linalg.norm(Bbs, axis=2)
-        pointData = {"B.n/B": BdotN_surf[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi,ntheta,1))
+        pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
         surf_vmec.to_vtk("surf_assess_coils", extra_data=pointData)
         proc0_print("Printed surface. Exiting.")
         exit()

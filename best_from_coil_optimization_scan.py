@@ -66,33 +66,63 @@ df = df[df["max_max_curvature"] < 50]
 
 succeeded = df["linking_number"] < 0.1
 if QA_or_QH == 'nfp2_QA':
-    succeeded = np.logical_and(succeeded, df["Jf"]                         < 1.0e-4)
-    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.4)
-    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.7)
-    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.11)
-    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 2.5)
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 2.0e-3)
+    succeeded = np.logical_and(succeeded, df["ncoils"]                     < 5)
+    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 2.0)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.6)
+    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.10)
+    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 3.0)
     succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 52)
 elif QA_or_QH == 'nfp4_QH':
-    succeeded = np.logical_and(succeeded, df["Jf"]                         < 3.0e-2)
-    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.8)
-    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 4.0)
-    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.4)
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 4.0e-3)
+    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.5)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 1.0)
+    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.2)
     succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 1.0)
-    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 48)
+    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 50)
 elif QA_or_QH == 'nfp3_QA':
-    succeeded = np.logical_and(succeeded, df["Jf"]                         < 5.0e-3)
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 1.0e-3)
     succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.5)
-    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.7)
-    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.1)
-    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 2.1)
-    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 48)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.4)
+    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.11)
+    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 2.5)
+    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 50)
 elif QA_or_QH == 'nfp3_QH':
-    succeeded = np.logical_and(succeeded, df["Jf"]                         < 7.5e-3)
-    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.90)
-    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 1.5)
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 1.5e-3)
+    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.6)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 3.0)
+    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.2)
+    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 1.5)
+    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 49)
+elif QA_or_QH == 'nfp1_QI':
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 4.0e-3)
+    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.0)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 1.0)
+    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.3)
+    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 1.2)
+    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 52)
+elif QA_or_QH == 'nfp2_QI':
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 2.0e-3)
+    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.0)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.8)
     succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.3)
     succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 1.7)
-    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 48)
+    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 52)
+elif QA_or_QH == 'nfp3_QI':
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 1.0e-3)
+    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.0)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 2.0)
+    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.3)
+    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 1.5)
+    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 50)
+elif QA_or_QH == 'nfp4_QI':
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 3.0e-2)
+    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.65)
+    # succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.8)
+    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.9)
+    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.3)
+    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 0.8)
+    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 52)
 
 #########################################################
 # End of filtering criteria
@@ -245,7 +275,7 @@ surf = SurfaceRZFourier.from_vmec_input(filename, range="half period", nphi=nphi
 surf_big = SurfaceRZFourier(dofs=surf.dofs,nfp=nfp, mpol=surf.mpol,ntor=surf.ntor,
                             quadpoints_phi=quadpoints_phi,quadpoints_theta=quadpoints_theta)
 
-def process_surface_and_flux(bs, surf, ncoils, R1, surf_big=None, new_OUT_DIR="", prefix="surf_opt"):
+def process_surface_and_flux(bs, surf, ncoils, R1, surf_big=None, new_OUT_DIR="", prefix="surf_opt", sign_B_external_normal=1.0):
     vc = VirtualCasing.load(os.path.join(this_path,'vcasing_final.nc'))
     bs.set_points(surf.gamma().reshape((-1, 3)))
     initial_curves = create_equally_spaced_curves(ncoils, nfp, stellsym=True, R0=surf.get_rc(0, 0), R1=R1, order=5, numquadpoints=120)
@@ -255,14 +285,17 @@ def process_surface_and_flux(bs, surf, ncoils, R1, surf_big=None, new_OUT_DIR=""
     base_curves = curves[:ncoils]
     curves_to_vtk(base_curves, os.path.join(new_OUT_DIR,"curves_opt"), close=True)
     Bbs = bs.B().reshape((nphi, ntheta, 3))
-    BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
-    pointData = {"B.n/B": BdotN[:, :, None]}
+    # sign_B_external_normal=-1.0
+    BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
+    Bmod = bs.AbsB().reshape((nphi,ntheta,1))
+    pointData = {"B.n/B": BdotN[:, :, None], "B": Bmod}
     surf.to_vtk(os.path.join(new_OUT_DIR, prefix), extra_data=pointData)
     if surf_big is not None:
         bs.set_points(surf_big.gamma().reshape((-1, 3)))
         Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
         BdotN = (np.sum(Bbs * surf_big.unitnormal(), axis=2)) / np.linalg.norm(Bbs, axis=2)
-        pointData = {"B.n/B": BdotN[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi_big,ntheta_big,1))
+        pointData = {"B.n/B": BdotN[:, :, None], "B": Bmod}
         surf_big.to_vtk(os.path.join(new_OUT_DIR, prefix + "_big"), extra_data=pointData)
 
 # Copy the best results to a separate directory
@@ -273,9 +306,11 @@ if os.path.exists(optimal_coils_path):
 for dirname in df_pareto["directory"]:
     ncoils = int(  re.search(r"ncoils_(\d+)", dirname).group(1))
     R1     = float(re.search(r"R1_([\d.]+)",  dirname).group(1))
+    try:    sign_B_external_normal = float(re.search(r"sign_B_external_normal([\d.]+)",  dirname).group(1))
+    except: sign_B_external_normal = -1.0
     source_dir = os.path.join(out_dir, dirname)
     destination_dir = os.path.join(optimal_coils_path, dirname)
     shutil.copytree(source_dir, destination_dir, dirs_exist_ok=True)
     bs=load(os.path.join(source_dir,"biot_savart.json"))
-    process_surface_and_flux(bs, surf, ncoils=ncoils, R1=R1, surf_big=surf_big, new_OUT_DIR=destination_dir)
+    process_surface_and_flux(bs, surf, ncoils=ncoils, R1=R1, surf_big=surf_big, new_OUT_DIR=destination_dir, sign_B_external_normal=sign_B_external_normal)
     

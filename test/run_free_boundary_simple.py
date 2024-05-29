@@ -35,7 +35,8 @@ vc = VirtualCasing.from_vmec(filename_output, src_nphi=nphi_vmec, trgt_nphi=nphi
 ## Create surf and curves figures
 Bbs = bs.B().reshape((nphi_vmec, ntheta_vmec, 3))
 BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) + vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
-pointData = {"B.n/B": BdotN_surf[:, :, None]}
+Bmod = bs.AbsB().reshape((nphi_vmec,ntheta_vmec,1))
+pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
 surf.to_vtk("surf", extra_data=pointData)
 curves_to_vtk(base_curves, "curves", close=True)
 ## Create the mgrid file

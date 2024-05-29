@@ -22,12 +22,12 @@ nphi_plot = 32
 ntheta_plot = 80
 s_array = [0.05, 0.25, 0.55, 1.0]
 phi_plot=np.pi/2#np.pi/3
+nphi_mgrid = 32
 
 filename_input  = f'input.final'
 filename_output = f"wout_final.nc"
 coils_file = f'biot_savart_opt.json'
 ncoils = int(re.search(r'ncoils(\d+)', results_folder).group(1))
-
 
 out_dir = os.path.join(this_path,results_folder)
 os.makedirs(out_dir, exist_ok=True)
@@ -50,11 +50,10 @@ base_curves = [coils[i]._curve for i in range(ncoils)]
 base_currents = [coils[i]._current for i in range(ncoils)]
 
 if run_freeb_and_original_input:
-    nphi_mgrid = 32
     if comm_world.rank == 0:
         mgrid_file = os.path.join(OUT_DIR, "mgrid.nc")
         bs.to_mgrid(
-            mgrid_file, nr=64, nz=65, nphi=nphi_mgrid,
+            mgrid_file, nr=32, nz=32, nphi=nphi_mgrid,
             rmin=0.7*np.min(r0), rmax=1.3*np.max(r0),
             zmin=1.3*np.min(z0), zmax=1.3*np.max(z0), nfp=surf.nfp,
         )
@@ -103,14 +102,16 @@ if os.path.isfile(wout_freeb_file):
     bs.set_points(surf_freeb.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_vmec_freeb, ntheta_vmec_freeb, 3))
     BdotN_surf = (np.sum(Bbs * surf_freeb.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
+    Bmod = bs.AbsB().reshape((nphi_vmec_freeb,ntheta_vmec_freeb,1))
     if comm_world.rank == 0:
-        pointData = {"B.n/B": BdotN_surf[:, :, None]}
+        pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
         surf_freeb.to_vtk(os.path.join(OUT_DIR, "surf_freeb"), extra_data=pointData)
     bs.set_points(surf_freeb_big.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
     BdotN_surf = np.sum(Bbs * surf_freeb_big.unitnormal(), axis=2) / np.linalg.norm(Bbs, axis=2)
+    Bmod = bs.AbsB().reshape((nphi_big,ntheta_big,1))
     if comm_world.rank == 0:
-        pointData = {"Bcoils.n/B": BdotN_surf[:, :, None]}
+        pointData = {"Bcoils.n/B": BdotN_surf[:, :, None], "B": Bmod}
         surf_freeb_big.to_vtk(os.path.join(OUT_DIR, "surf_freeb_big"), extra_data=pointData)
     bs.set_points(surf.gamma().reshape((-1, 3)))
 
