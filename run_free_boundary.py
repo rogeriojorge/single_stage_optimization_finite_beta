@@ -8,6 +8,7 @@ from simsopt import load
 from simsopt.mhd import Vmec, VirtualCasing
 from simsopt.util import MpiPartition
 from simsopt.geo import SurfaceRZFourier
+from simsopt.field import BiotSavart, Current, coils_via_symmetries
 from simsopt.util import MpiPartition, proc0_print, comm_world
 this_path = os.path.dirname(os.path.abspath(__file__))
 mpi = MpiPartition()
@@ -15,14 +16,14 @@ mpi = MpiPartition()
 # cd results_folder
 # ../src/vmecPlot2.py wout_final.nc;../src/vmecPlot2.py wout_final_freeb.nc;../src/booz_plot.py wout_final.nc;../src/booz_plot.py wout_final_freeb.nc
 
-results_folder = f'optimization_finitebeta_nfp2_QA_ncoils5_stage23'
+results_folder = f'optimization_finitebeta_nfp2_QA_ncoils4_stage2'
 run_freeb_and_original_input = True
 
 nphi_plot = 32
 ntheta_plot = 80
 s_array = [0.05, 0.25, 0.55, 1.0]
-phi_plot=np.pi/2#np.pi/3
-nphi_mgrid = 32
+phi_plot=0#np.pi/2#np.pi/3
+nphi_mgrid = 48
 
 filename_input  = f'input.final'
 filename_output = f"wout_final.nc"
@@ -46,14 +47,17 @@ coils_filename = os.path.join(OUT_DIR,coils_file)
 bs = load(coils_filename)
 
 coils = bs.coils
-base_curves = [coils[i]._curve for i in range(ncoils)]
-base_currents = [coils[i]._current for i in range(ncoils)]
+# base_curves = [coils[i]._curve for i in range(ncoils)]
+# base_currents = [coils[i]._current for i in range(ncoils)]
+# coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, stellsym=True)
+# curves = [c.curve for c in coils]
+# bs = BiotSavart(coils)
 
 if run_freeb_and_original_input:
     if comm_world.rank == 0:
         mgrid_file = os.path.join(OUT_DIR, "mgrid.nc")
         bs.to_mgrid(
-            mgrid_file, nr=32, nz=32, nphi=nphi_mgrid,
+            mgrid_file, nr=64, nz=64, nphi=nphi_mgrid,
             rmin=0.7*np.min(r0), rmax=1.3*np.max(r0),
             zmin=1.3*np.min(z0), zmax=1.3*np.max(z0), nfp=surf.nfp,
         )
@@ -63,10 +67,17 @@ if run_freeb_and_original_input:
     vmec.indata.mgrid_file = mgrid_file
     vmec.indata.nzeta = nphi_mgrid
     vmec.indata.extcur[0] = 1.0
+    vmec.indata.mpol=3
+    vmec.indata.ntor=3
     
-    vmec.indata.ns_array   [:5] = [ 5,      16,   21,    51,   101]
-    vmec.indata.niter_array[:5] = [ 100,   300,  400,   400, 22000]
-    vmec.indata.ftol_array [:5] = [ 1e-9, 1e-9, 1e-9, 1e-10, 1e-14]
+    n_indices = 2
+    vmec.indata.delt = 0.5
+    vmec.indata.ns_array   [:n_indices] = [ 5,      16]#,   21,    51,   101]
+    vmec.indata.ns_array   [n_indices:] = [0]*(100-n_indices)
+    vmec.indata.niter_array[:n_indices] = [ 100,   5500]#,  400,   400, 22000]
+    vmec.indata.niter_array[n_indices:] = [0]*(100-n_indices)
+    vmec.indata.ftol_array [:n_indices] = [ 1e-9, 1e-14]#, 1e-9, 1e-10, 1e-14]
+    vmec.indata.ftol_array   [n_indices:] = [0]*(100-n_indices)
     
     vmec.write_input(input_freeb_file)
     # print('Running once to get the free boundary')

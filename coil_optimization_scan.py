@@ -145,7 +145,7 @@ def run_optimization(
     # base_currents[0].fix_all()
     base_currents = [Current(total_current / ncoils * 1e-7) * 1e7 for _ in range(ncoils-1)]
     total_current = Current(total_current)
-    # total_current.fix_all()
+    total_current.fix_all()
     base_currents += [total_current - sum(base_currents)]
 
     coils = coils_via_symmetries(base_curves, base_currents, nfp, True)

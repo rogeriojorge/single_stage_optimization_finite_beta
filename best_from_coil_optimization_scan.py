@@ -67,7 +67,7 @@ df = df[df["max_max_curvature"] < 50]
 succeeded = df["linking_number"] < 0.1
 if QA_or_QH == 'nfp2_QA':
     succeeded = np.logical_and(succeeded, df["Jf"]                         < 2.0e-3)
-    succeeded = np.logical_and(succeeded, df["ncoils"]                     < 5)
+    # succeeded = np.logical_and(succeeded, df["ncoils"]                     < 5)
     succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 2.0)
     succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.6)
     succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.10)
@@ -118,7 +118,6 @@ elif QA_or_QH == 'nfp3_QI':
 elif QA_or_QH == 'nfp4_QI':
     succeeded = np.logical_and(succeeded, df["Jf"]                         < 3.0e-2)
     succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.65)
-    # succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.8)
     succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.9)
     succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.3)
     succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 0.8)
