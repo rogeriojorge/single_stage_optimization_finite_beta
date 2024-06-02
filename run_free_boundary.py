@@ -84,7 +84,8 @@ if run_freeb_and_original_input:
     vmec.run()
     if comm_world.rank == 0:
         shutil.move(os.path.join(out_dir, f"{filename_output[:-3]}_000_000000.nc"), wout_freeb_file)
-        os.remove(os.path.join(out_dir, f'{filename_input}_000_000000'))
+        try: os.remove(os.path.join(out_dir, f'{filename_input}_000_000000'))
+        except Exception as e: print(e)
     # vmec.boundary = SurfaceRZFourier.from_wout(vmec.output_file)
     vmec.boundary = SurfaceRZFourier.from_wout(wout_freeb_file)
     # print('Running again to get the input file')
