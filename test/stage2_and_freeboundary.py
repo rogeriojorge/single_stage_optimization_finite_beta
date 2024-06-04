@@ -24,11 +24,11 @@ do_FreeBoundary = True
 nfieldlines = 6
 tmax_fl = 8000
 nphi = 64
-ntheta = 34
+ntheta = 32
 #################################################
-## CHOOSE BETWEEN input.final (finite beta, does not work) and input.rotating_ellipse (vacuum, works)
-filename = os.path.join(this_path,"input.final")
+# filename = os.path.join(this_path,"input.final")
 # filename = os.path.join(this_path,"input.rotating_ellipse")
+filename = os.path.join(this_path,"input.LandremanPaul2021_QA_lowres")
 #################################################
 ## CHOOSE TO EXPLICITLY RUN VMEC IN VACUUM OR NOT
 run_in_vacuum = True
@@ -56,7 +56,7 @@ s_array = np.abs(np.linspace(-1,0,vmec.wout.ns)) if 'ellipse' in filename else n
 s_array = s_array[indices_to_plot]
 ################ STAGE 2 OPTIMIZATION ################
 if do_stage_2:
-    ncoils = 3
+    ncoils = 4 if 'LandremanPaul2021' in filename else 3
     R0_coils = np.sum(vmec.wout.raxis_cc)
     R1_coils = np.min((vmec.wout.Aminor_p*2.6,R0_coils/1.4))
     order = 12
@@ -64,11 +64,11 @@ if do_stage_2:
     LENGTH_THRESHOLD = 26*R0_coils/5
     CC_THRESHOLD = 0.50*R0_coils/5
     CC_WEIGHT = 1000
-    CURVATURE_THRESHOLD = 4.0
+    CURVATURE_THRESHOLD = 6 if 'LandremanPaul2021' in filename else 4
     CURVATURE_WEIGHT = 1e-2
-    MSC_THRESHOLD = 1.0
+    MSC_THRESHOLD = 6 if 'LandremanPaul2021' in filename else 1
     MSC_WEIGHT = 1e-2
-    MAXITER = 500
+    MAXITER = 1500
     proc0_print(f'Loading VMEC file {filename}')
     base_curves = create_equally_spaced_curves(ncoils, s.nfp, stellsym=True, R0=R0_coils, R1=R1_coils, order=order)
     base_currents = [Current(1)*1e5 for i in range(ncoils)]
@@ -82,8 +82,8 @@ if do_stage_2:
     bs.set_points(s.gamma().reshape((-1, 3)))
     curves = [c.curve for c in coils]
     if comm_world is None or comm_world.rank == 0:
-        curves_to_vtk(curves, "curves_init")
-        curves_to_vtk(base_curves, "base_curves_init")
+        curves_to_vtk(curves, "curves_init", close=True)
+        curves_to_vtk(base_curves, "base_curves_init", close=True)
         Bbs = bs.B().reshape((nphi, ntheta, 3))
         BdotN = (np.sum(Bbs * s.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
         Bmod = bs.AbsB().reshape((nphi,ntheta,1))
@@ -122,8 +122,8 @@ if do_stage_2:
     proc0_print(f'Performing stage 2 optimization')
     res = minimize(fun, dofs, jac=True, method='L-BFGS-B', options={'maxiter': MAXITER, 'maxcor': 300}, tol=1e-15)
     print(res.message)
-    curves_to_vtk(curves, "curves_opt")
-    curves_to_vtk(base_curves, "base_curves_opt")
+    curves_to_vtk(curves, "curves_opt", close=True)
+    curves_to_vtk(base_curves, "base_curves_opt", close=True)
     Bbs = bs.B().reshape((nphi, ntheta, 3))
     BdotN = (np.sum(Bbs * s.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
     Bmod = bs.AbsB().reshape((nphi,ntheta,1))
@@ -220,7 +220,7 @@ if do_FreeBoundary:
             Bbs = bs.B().reshape((nphi, ntheta, 3))
             BdotN = (np.sum(Bbs * surf_original.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
             Bmod = bs.AbsB().reshape((nphi,ntheta,1))
-            surf_original.to_vtk(os.path.join(this_path,"surf_original"), extra_data= {"B.n/B": BdotN[:, :, None], "B": Bmod})
+            surf_original.to_vtk(os.path.join(this_path,"surf_opt_big"), extra_data= {"B.n/B": BdotN[:, :, None], "B": Bmod})
         cross_section_original = surf_original.cross_section(phi=0)
         r_original = np.sqrt(cross_section_original[:, 0] ** 2 + cross_section_original[:, 1] ** 2)
         z_original = cross_section_original[:, 2]

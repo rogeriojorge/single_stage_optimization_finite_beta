@@ -29,6 +29,8 @@ jdotB_log*
 sfincsOutput.h5
 scan
 mgrid.nc
+*.gif
+*between*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
