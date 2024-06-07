@@ -15,11 +15,11 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_finitebeta_nfp2_QA_ncoils3'
-coils_file = f'biot_savart_opt.json'
-ncoils = int(re.search(r'ncoils(\d+)', results_folder).group(1))
+results_folder = f'optimization_finitebeta_nfp2_QA_stage1'
+coils_file = f'biot_savart.json'
+ncoils = 5#int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
-nfieldlines = 25
+nfieldlines = 10
 tmax_fl = 5000 # 20000
 degree = 4
 extend_distance = 0.05 # 0.2

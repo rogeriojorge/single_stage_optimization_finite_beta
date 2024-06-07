@@ -38,6 +38,12 @@ from configs import (args, QA_or_QH, optimize_stage1, optimize_stage1_with_coils
                      quasiisodynamic_weight_mpol_mapping, bootstrap_mismatch_weight, sign_B_external_normal, optimize_DMerc,
 )
 
+##### NEXT STEP #######
+##### NEXT STEP #######
+# Increate the order of the coils and weights for coils iteratively
+# Zeroing out the higher order gradients can be good enough in order to not keep creating new coils everytime
+##### NEXT STEP #######
+
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################

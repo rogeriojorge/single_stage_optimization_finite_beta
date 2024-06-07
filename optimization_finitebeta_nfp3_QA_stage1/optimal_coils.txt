@@ -1,12 +1,10 @@
 best_from_coil_optimization_scan.py
-Number of runs before filtering: 1284
-Number of runs after filtering: 3
-Best Pareto-optimal results (total of 3):
-                                              directory        Jf  max_max_curvature  average_length_per_coil  max_mean_squared_curvature  coil_coil_distance  coil_surface_distance
-586   ncoils_3_order_14_R1_5.7_length_target_4.6e+01...  0.000375           0.371593                45.715873                    0.082335            1.643341               2.687604
-795   ncoils_5_order_12_R1_5.8_length_target_4.3e+01...  0.000458           0.340118                42.760501                    0.061881            1.699081               2.582937
-1019  ncoils_4_order_13_R1_5.9_length_target_4.3e+01...  0.000844           0.339433                43.127224                    0.055948            1.708220               2.637821
+Number of runs before filtering: 861
+Number of runs after filtering: 2
+Best Pareto-optimal results (total of 2):
+                                             directory        Jf  max_max_curvature  average_length_per_coil  max_mean_squared_curvature  coil_coil_distance  coil_surface_distance
+586  ncoils_3_order_14_R1_5.7_length_target_4.6e+01...  0.000375           0.371593                45.715873                    0.082335            1.643341               2.687604
+795  ncoils_5_order_12_R1_5.8_length_target_4.3e+01...  0.000458           0.340118                42.760501                    0.061881            1.699081               2.582937
 Directory names only:
 ncoils_3_order_14_R1_5.7_length_target_4.6e+01_weight_0.007_max_curvature_0.3_weight_0.0018_msc_1.9_weight_2.8e-05_cc_1.6_weight_1.8_cs_2.7_weight_0.26_arclweight_0.0023_sign_B_external_normal-1.0
 ncoils_5_order_12_R1_5.8_length_target_4.3e+01_weight_0.011_max_curvature_0.23_weight_0.0028_msc_0.16_weight_0.00033_cc_1.7_weight_0.014_cs_2.6_weight_0.23_arclweight_0.0004_sign_B_external_normal-1.0
-ncoils_4_order_13_R1_5.9_length_target_4.3e+01_weight_2.0_max_curvature_0.23_weight_0.0043_msc_1.6_weight_1.6e-05_cc_1.7_weight_0.075_cs_2.6_weight_0.53_arclweight_1.2e-09_sign_B_external_normal-1.0

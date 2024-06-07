@@ -145,7 +145,7 @@ def run_optimization(
     # base_currents[0].fix_all()
     base_currents = [Current(total_current / ncoils * 1e-7) * 1e7 for _ in range(ncoils-1)]
     total_current = Current(total_current)
-    # total_current.fix_all()
+    total_current.fix_all()
     base_currents += [total_current - sum(base_currents)]
 
     coils = coils_via_symmetries(base_curves, base_currents, nfp, True)
@@ -157,7 +157,8 @@ def run_optimization(
         curves_to_vtk(curves, new_OUT_DIR + "curves_init", close=True)
         Bbs = bs.B().reshape((nphi, ntheta, 3))
         BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
-        pointData = {"B.n/B": BdotN[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi,ntheta,1))
+        pointData = {"B.n/B": BdotN[:, :, None], "B": Bmod}
         surf.to_vtk(new_OUT_DIR + "surf_init", extra_data=pointData)
 
     # surf_big.to_vtk(new_OUT_DIR + "surf_big")
@@ -202,7 +203,7 @@ def run_optimization(
         outstr += f", Len=sum([{cl_string}])={sum(J.J() for J in Jls):.1f}, ϰ=[{kap_string}], ∫ϰ²/L=[{msc_string}]"
         outstr += f", C-C-Sep={Jccdist.shortest_distance():.2f}"
         outstr += f", C-S-Sep={Jcsdist.shortest_distance():.2f}"
-        # outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
+        outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
         outstr += f", max curr={max(c.get_value() for c in base_currents):.1e}"
         print(outstr)
         iteration += 1
@@ -218,7 +219,8 @@ def run_optimization(
         curves_to_vtk(base_curves, new_OUT_DIR + "curves_opt", close=True)
         Bbs = bs.B().reshape((nphi, ntheta, 3))
         BdotN = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
-        pointData = {"B.n/B": BdotN[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi,ntheta,1))
+        pointData = {"B.n/B": BdotN[:, :, None], "B": Bmod}
         surf.to_vtk(new_OUT_DIR + "surf_opt", extra_data=pointData)
 
     # bs_big = BiotSavart(coils)

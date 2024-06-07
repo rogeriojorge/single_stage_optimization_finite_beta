@@ -1,10 +1,18 @@
 best_from_coil_optimization_scan.py
-Number of runs before filtering: 1251
-Number of runs after filtering: 2
-Best Pareto-optimal results (total of 2):
-                                              directory        Jf  max_max_curvature  average_length_per_coil  max_mean_squared_curvature  coil_coil_distance  coil_surface_distance
-1068  ncoils_5_order_14_R1_6.7_length_target_4.3e+01...  0.000815           1.589977                42.577155                    0.177250            1.332361               1.698923
-1243  ncoils_5_order_9_R1_7.0_length_target_3.9e+01_...  0.000891           0.598218                39.062718                    0.112177            1.049316               1.648145
+Number of runs before filtering: 400
+Number of runs after filtering: 7
+Best Pareto-optimal results (total of 5):
+                                              directory        Jf  ...  coil_coil_distance  coil_surface_distance
+381   ncoils_4_order_14_R1_5.5_length_target_4.9e+01...  0.002176  ...            1.099162               1.601655
+512   ncoils_5_order_9_R1_6.4_length_target_4.3e+01_...  0.002094  ...            1.759515               1.595275
+1181  ncoils_4_order_9_R1_5.2_length_target_5e+01_we...  0.002891  ...            1.090250               1.651090
+1224  ncoils_5_order_13_R1_7.3_length_target_4.1e+01...  0.001706  ...            1.094316               1.532627
+1243  ncoils_5_order_9_R1_7.0_length_target_3.9e+01_...  0.000891  ...            1.049316               1.648145
+
+[5 rows x 7 columns]
 Directory names only:
-ncoils_5_order_14_R1_6.7_length_target_4.3e+01_weight_0.02_max_curvature_0.26_weight_2.3e-05_msc_0.22_weight_4.6e-07_cc_1.3_weight_0.16_cs_1.6_weight_2.6e+01_arclweight_1.2e-09_sign_B_external_normal-1.0
+ncoils_4_order_14_R1_5.5_length_target_4.9e+01_weight_0.14_max_curvature_0.34_weight_1e-05_msc_1.1_weight_0.00041_cc_1.1_weight_0.36_cs_0.65_weight_8.3_arclweight_0.003_sign_B_external_normal-1.0
+ncoils_5_order_9_R1_6.4_length_target_4.3e+01_weight_0.018_max_curvature_0.23_weight_0.00079_msc_0.8_weight_0.00012_cc_1.8_weight_0.028_cs_1.7_weight_0.002_arclweight_1.5e-06_sign_B_external_normal-1.0
+ncoils_4_order_9_R1_5.2_length_target_5e+01_weight_0.0073_max_curvature_0.36_weight_0.0067_msc_1.3_weight_1.5e-05_cc_1.1_weight_2.8_cs_0.62_weight_0.007_arclweight_4.3e-06_sign_B_external_normal-1.0
+ncoils_5_order_13_R1_7.3_length_target_4.1e+01_weight_1.1_max_curvature_0.22_weight_0.00015_msc_0.41_weight_0.00086_cc_1.1_weight_4.3_cs_1.5_weight_0.0053_arclweight_0.00032_sign_B_external_normal1.0
 ncoils_5_order_9_R1_7.0_length_target_3.9e+01_weight_0.011_max_curvature_0.3_weight_0.0003_msc_0.54_weight_6.7e-05_cc_1.1_weight_0.45_cs_1.7_weight_0.019_arclweight_8.2e-06_sign_B_external_normal-1.0

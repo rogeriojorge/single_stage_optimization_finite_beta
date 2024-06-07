@@ -58,7 +58,7 @@ for results_file in results:
             data[key] = [value]
 
     df = pd.concat([df, pd.DataFrame(data)], ignore_index=True)
-df = df[df["max_max_curvature"] < 50]
+df = df[df["max_max_curvature"] < 0.8]
 # df = df[df["ncoils"] == 3]
 #########################################################
 # Here you can define criteria to filter out the most interesting runs.
@@ -66,7 +66,8 @@ df = df[df["max_max_curvature"] < 50]
 
 succeeded = df["linking_number"] < 0.1
 if QA_or_QH == 'nfp2_QA':
-    succeeded = np.logical_and(succeeded, df["Jf"]                         < 2.0e-3)
+    # df = df[df["max_max_curvature"] < 0.8]
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 1.0e-3)
     # succeeded = np.logical_and(succeeded, df["ncoils"]                     < 5)
     succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 2.0)
     succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.6)
@@ -75,13 +76,13 @@ if QA_or_QH == 'nfp2_QA':
     succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 52)
 elif QA_or_QH == 'nfp4_QH':
     succeeded = np.logical_and(succeeded, df["Jf"]                         < 4.0e-3)
-    succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.5)
-    succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 1.0)
-    succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.2)
-    succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 1.0)
-    succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 50)
+    # succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 0.5)
+    # succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 1.0)
+    # succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.2)
+    # succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 1.0)
+    # succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 50)
 elif QA_or_QH == 'nfp3_QA':
-    succeeded = np.logical_and(succeeded, df["Jf"]                         < 1.0e-3)
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 6.0e-4)
     succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.5)
     succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 0.4)
     succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.11)
@@ -109,7 +110,7 @@ elif QA_or_QH == 'nfp2_QI':
     succeeded = np.logical_and(succeeded, df["coil_surface_distance"]      > 1.7)
     succeeded = np.logical_and(succeeded, df["average_length_per_coil"]    < 52)
 elif QA_or_QH == 'nfp3_QI':
-    succeeded = np.logical_and(succeeded, df["Jf"]                         < 1.0e-3)
+    succeeded = np.logical_and(succeeded, df["Jf"]                         < 5.0e-3)
     succeeded = np.logical_and(succeeded, df["coil_coil_distance"]         > 1.0)
     succeeded = np.logical_and(succeeded, df["max_max_curvature"]          < 2.0)
     succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.3)
@@ -167,7 +168,7 @@ os.chdir(this_path)
 plt.figure(figsize=(14.5, 8))
 plt.rc("font", size=8)
 nrows = 4
-ncols = 6
+ncols = 5
 markersize = 5
 
 subplot_index = 1

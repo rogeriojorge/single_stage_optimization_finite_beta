@@ -203,7 +203,7 @@ def run_optimization(
         outstr += f", Len=sum([{cl_string}])={sum(J.J() for J in Jls):.1f}, ϰ=[{kap_string}], ∫ϰ²/L=[{msc_string}]"
         outstr += f", C-C-Sep={Jccdist.shortest_distance():.2f}"
         outstr += f", C-S-Sep={Jcsdist.shortest_distance():.2f}"
-        # outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
+        outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
         outstr += f", max curr={max(c.get_value() for c in base_currents):.1e}"
         print(outstr)
         iteration += 1
