@@ -38,13 +38,19 @@ from configs import (args, QA_or_QH, optimize_stage1, optimize_stage1_with_coils
                      quasiisodynamic_weight_mpol_mapping, bootstrap_mismatch_weight, sign_B_external_normal, optimize_DMerc,
 )
 
+##### NEXT STEP #######
+##### NEXT STEP #######
+# Increate the order of the coils and weights for coils iteratively
+# Zeroing out the higher order gradients can be good enough in order to not keep creating new coils everytime
+##### NEXT STEP #######
+
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
 use_original_vmec_inut = False # if true, use nfp2_QA_original or nfp4_QH_original
 MAXITER_stage_1 = 40
-MAXITER_stage_2 = 600
-tol_coils       = 1e-9
+MAXITER_stage_2 = 400
+tol_coils       = 1e-7
 MAXITER_single_stage = 45
 MAXFEV_single_stage  = 60
 
@@ -68,6 +74,9 @@ MAXFEV_single_stage  = 60
 # ‘cauchy’ : rho(z) = ln(1 + z). Severely weakens outliers influence, but may cause difficulties in optimization process.
 # ‘arctan’ : rho(z) = arctan(z). Limits a maximum loss on a single residual, has properties similar to ‘cauchy’.
 
+run_vacuum = False ## CHECK THIS
+initialize_coils_from_equally_spaced_curves = False
+
 optimize_Well  = False
 optimize_aminor = False
 optimize_mean_iota = True
@@ -86,15 +95,15 @@ nphi_VMEC   = 28# if (optimize_stage2 or optimize_stage3) else 8
 ntheta_VMEC = 28# if (optimize_stage2 or optimize_stage3) else 8
 vc_src_nphi = ntheta_VMEC
 ftol = 1e-4
-nquadpoints = 100
+nquadpoints = 120
 diff_method = "centered"
 opt_method = 'trf' #'lm'
 quasisymmetry_target_surfaces = np.linspace(0,1,10,endpoint=True) #[0.3, 0.5, 0.9] if 'QI' in QA_or_QH else np.linspace(0,1,10,endpoint=True) 
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 0
 ftol_stage_1 = 1e-5
-rel_step_stage1 = 1e-2
-abs_step_stage1 = 1e-5
+rel_step_stage1 = 9e-3
+abs_step_stage1 = 1.5e-5
 initial_DMerc_index = 2
 ## Self-consistent bootstrap current
 beta = 2.5 #%
@@ -147,11 +156,16 @@ quadpoints_theta = np.linspace(0, 1, ntheta_big)
 quadpoints_phi   = np.linspace(0, 1, nphi_big)
 surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=surf.ntor, quadpoints_phi=quadpoints_phi, quadpoints_theta=quadpoints_theta, stellsym=surf.stellsym)
 ## Set pressure and current for self-consistent bootstrap current
-vmec.unfix('phiedge')
-vmec.pressure_profile = pressure_Pa
-vmec.n_pressure = 7
-vmec.indata.pcurr_type = 'cubic_spline_ip'
-vmec.n_current = 50
+if run_vacuum:
+    zero_pressure_Pa = ProfileScaled(pressure_Pa, 0)
+    vmec.pressure_profile = zero_pressure_Pa
+    sign_B_external_normal = 0
+else:
+    vmec.unfix('phiedge')
+    vmec.pressure_profile = pressure_Pa
+    vmec.n_pressure = 7
+    vmec.indata.pcurr_type = 'cubic_spline_ip'
+    vmec.n_current = 50
 ## Finite Beta Virtual Casing Principle
 vc = VirtualCasing.from_vmec(vmec, src_nphi=vc_src_nphi, trgt_nphi=nphi_VMEC, trgt_ntheta=ntheta_VMEC, filename=None)
 total_current_vmec = vmec.external_current() / (2 * surf.nfp)
@@ -189,28 +203,31 @@ else:
     selected_directory = ''
 # Define function for creating coils from scratch
 def create_coils_from_scratch(ncoils, R0, R1, nmodes_coils):
-    # base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
-    ma = CurveRZFourier(np.linspace(0,1,(ncoils+1)*2*surf.nfp), len(vmec.wout.raxis_cc)-1, surf.nfp, False)
-    ma.rc[:] = vmec.wout.raxis_cc
-    ma.zs[:] = -vmec.wout.zaxis_cs[1:]
-    ma.x = ma.get_dofs()
-    gamma_curves = ma.gamma()
-    numquadpoints = nquadpoints
-    base_curves = []
-    for i in range(ncoils):
-        curve = CurveXYZFourier(numquadpoints, nmodes_coils)
-        angle = (i+0.5)*(2*np.pi)/((2)*surf.nfp*ncoils)
-        curve.set("xc(0)", gamma_curves[i+1,0])
-        curve.set("xc(1)", np.cos(angle)*R1)
-        curve.set("yc(0)", gamma_curves[i+1,1])
-        curve.set("yc(1)", np.sin(angle)*R1)
-        curve.set("zc(0)", gamma_curves[i+1,2])
-        curve.set("zs(1)", R1)
-        curve.x = curve.x  # need to do this to transfer data to C++
-        base_curves.append(curve)
+    if initialize_coils_from_equally_spaced_curves:
+        base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
+    else:
+        ma = CurveRZFourier(np.linspace(0,1,(ncoils+1)*2*surf.nfp), len(vmec.wout.raxis_cc)-1, surf.nfp, False)
+        ma.rc[:] = vmec.wout.raxis_cc
+        ma.zs[:] = -vmec.wout.zaxis_cs[1:]
+        ma.x = ma.get_dofs()
+        gamma_curves = ma.gamma()
+        numquadpoints = nquadpoints
+        base_curves = []
+        for i in range(ncoils):
+            curve = CurveXYZFourier(numquadpoints, nmodes_coils)
+            angle = (i+0.5)*(2*np.pi)/((2)*surf.nfp*ncoils)
+            curve.set("xc(0)", gamma_curves[i+1,0])
+            curve.set("xc(1)", np.cos(angle)*R1)
+            curve.set("yc(0)", gamma_curves[i+1,1])
+            curve.set("yc(1)", np.sin(angle)*R1)
+            curve.set("zc(0)", gamma_curves[i+1,2])
+            curve.set("zs(1)", R1)
+            curve.x = curve.x  # need to do this to transfer data to C++
+            base_curves.append(curve)
     
     base_currents = [Current(total_current_vmec / ncoils * 1e-7) * 1e7 for _ in range(ncoils - 1)]
-    total_current = Current(total_current_vmec)
+    total_current = Current(total_current_vmec)*1
+    total_current.fix_all()
     base_currents += [total_current - sum(base_currents)]
     return base_curves, base_currents
 # Create base_curve and base_currents
@@ -223,7 +240,11 @@ if selected_directory and use_existing_coils:
         curves = [c.curve for c in bs.coils]
         currents = [c._current for c in bs.coils]
         base_curves = curves[:ncoils]
-        base_currents = currents[:ncoils]
+        # base_currents = currents[:ncoils]
+        base_currents = currents[:ncoils-1]
+        total_current = Current(total_current_vmec)*1
+        total_current.fix_all()
+        base_currents += [total_current - sum(base_currents)]
     except Exception as e:
         print(e)
         proc0_print('Error reading coil files, falling back to creating coils from scratch.')
@@ -249,12 +270,11 @@ else:
 #     base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
 #     base_currents = [Current(total_current_vmec / ncoils * 1e-7) * 1e7 for _ in range(ncoils-1)]
 #     total_current = Current(total_current_vmec)
-#     # total_current.fix_all()
+#     total_current.fix_all()
 #     base_currents += [total_current - sum(base_currents)]
 coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, stellsym=True)
 curves = [c.curve for c in coils]
 bs = BiotSavart(coils)
-
 ##########################################################################################
 ##########################################################################################
 # Save initial surface and coil data
@@ -263,7 +283,8 @@ Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
 BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
 if comm_world.rank == 0:
     curves_to_vtk(curves, os.path.join(coils_results_path, "curves_init"), close=True)
-    pointData = {"B.n/B": BdotN_surf[:, :, None]}
+    Bmod = bs.AbsB().reshape((nphi_VMEC,ntheta_VMEC,1))
+    pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
     surf.to_vtk(os.path.join(coils_results_path, "surf_init"), extra_data=pointData)
 bs.set_points(surf_big.gamma().reshape((-1, 3)))
 Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
@@ -403,47 +424,51 @@ for iteration, max_mode in enumerate(max_mode_array):
     
     n_spline = np.min((np.max((iteration * 2 + 7, 9)), 15))
     s_spline = np.linspace(0, 1, n_spline)
-    if 'QI' in QA_or_QH:
-        redl_s = np.linspace(0, 1, 22)
-        redl_geom = RedlGeomVmec(vmec, redl_s[1:-1])  # Drop s=0 and s=1 to avoid problems with epsilon=0 and p=0    
+    if run_vacuum:
+        zero_current = ProfileSpline(s_spline, 0*s_spline)
+        vmec.current_profile = zero_current
     else:
-        booz = Boozer(vmec, mpol=12, ntor=12)
-        ns = 50
-        s_full = np.linspace(0, 1, ns)
-        ds = s_full[1] - s_full[0]
-        s_half = s_full[1:] - 0.5 * ds
-        s_redl = []
-        for s in s_spline:
-            index = np.argmin(np.abs(s_half - s))
-            s_redl.append(s_half[index])
-        assert len(s_redl) == len(set(s_redl))
-        assert len(s_redl) == len(s_spline)
-        s_redl = np.array(s_redl)
-        redl_geom = RedlGeomBoozer(booz, s_redl, helicity_n=helicity_n)#, helicity_m=helicity_m)
-        
-        if iteration == 0:
-            if use_original_vmec_inut:
-                current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
-                factor = -1e6
-            else:
-                s_spline = vmec.indata.ac_aux_s
-                f_spline = vmec.indata.ac_aux_f
-                index = np.where(s_spline[1:] <= 0)[0][0] + 1
-                s_spline = s_spline[:index]
-                f_spline = f_spline[:index]
-                factor = -2e6
-                current0 = ProfileSpline(s_spline, f_spline / factor)
-                s_spline = np.linspace(0, 1, n_spline)
-                current = current0.resample(s_spline)
+        if 'QI' in QA_or_QH:
+            redl_s = np.linspace(0, 1, 22)
+            redl_geom = RedlGeomVmec(vmec, redl_s[1:-1])  # Drop s=0 and s=1 to avoid problems with epsilon=0 and p=0    
         else:
-            current = current.resample(s_spline)
+            booz = Boozer(vmec, mpol=12, ntor=12)
+            ns = 50
+            s_full = np.linspace(0, 1, ns)
+            ds = s_full[1] - s_full[0]
+            s_half = s_full[1:] - 0.5 * ds
+            s_redl = []
+            for s in s_spline:
+                index = np.argmin(np.abs(s_half - s))
+                s_redl.append(s_half[index])
+            assert len(s_redl) == len(set(s_redl))
+            assert len(s_redl) == len(s_spline)
+            s_redl = np.array(s_redl)
+            redl_geom = RedlGeomBoozer(booz, s_redl, helicity_n=helicity_n)#, helicity_m=helicity_m)
+            
+            if iteration == 0:
+                if use_original_vmec_inut:
+                    current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
+                    factor = -1e6
+                else:
+                    s_spline = vmec.indata.ac_aux_s
+                    f_spline = vmec.indata.ac_aux_f
+                    index = np.where(s_spline[1:] <= 0)[0][0] + 1
+                    s_spline = s_spline[:index]
+                    f_spline = f_spline[:index]
+                    factor = -2e6
+                    current0 = ProfileSpline(s_spline, f_spline / factor)
+                    s_spline = np.linspace(0, 1, n_spline)
+                    current = current0.resample(s_spline)
+            else:
+                current = current.resample(s_spline)
 
-        current.unfix_all()
-        vmec.current_profile = ProfileScaled(current, factor)
+            current.unfix_all()
+            vmec.current_profile = ProfileScaled(current, factor)
 
-    logfile = None
-    if mpi.proc0_world: logfile = f'jdotB_log_max_mode{max_mode}'
-    bootstrap_mismatch = VmecRedlBootstrapMismatch(redl_geom, ne, Te, Ti, Zeff, helicity_n=helicity_n, logfile=logfile)#, helicity_m=helicity_m)
+        logfile = None
+        if mpi.proc0_world: logfile = f'jdotB_log_max_mode{max_mode}'
+        bootstrap_mismatch = VmecRedlBootstrapMismatch(redl_geom, ne, Te, Ti, Zeff, helicity_n=helicity_n, logfile=logfile)#, helicity_m=helicity_m)
     
     # Define QI objective functions
     partial_QI               = partial(QuasiIsodynamicResidual,snorms=snorms, nphi=nphi_QI, nalpha=nalpha_QI, nBj=nBj_QI, mpol=mpol_QI, ntor=ntor_QI, nphi_out=nphi_out_QI, arr_out=arr_out_QI)
@@ -460,6 +485,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     def iota_min_objective(vmec):         return np.min((np.min(np.abs(vmec.wout.iotaf))-min_iota,0))
     def iota_mean_min_objective(vmec):    return np.min((np.abs(vmec.mean_iota())-min_average_iota,0))
     def iota_max_objective(vmec):         return np.max((np.max(np.abs(vmec.wout.iotaf))-max_iota,0))
+    ### REPLACE VOLAVGB WITH TARGET EXTERNAL CURRENT (vmec.external_current() should be equal to target Boozer G)
     def volavgB_objective(vmec):          return vmec.wout.volavgB
     len_DMerc = len(vmec.wout.DMerc[initial_DMerc_index:])
     index_DMerc = int(len_DMerc * DMerc_fraction_mpol_mapping[max_mode])
@@ -495,7 +521,7 @@ for iteration, max_mode in enumerate(max_mode_array):
         # objective_tuple.append((bootstrap_mismatch.residuals, 0, bootstrap_mismatch_weight))
         # objective_tuple.append((qs.residuals, 0, quasisymmetry_weight_mpol_mapping[max_mode]))
     else:
-        objective_tuple.append((bootstrap_mismatch.residuals, 0, bootstrap_mismatch_weight))
+        if not run_vacuum: objective_tuple.append((bootstrap_mismatch.residuals, 0, bootstrap_mismatch_weight))
         # objective_tuple.append((qs.residuals, 0, quasisymmetry_weight))
         objective_tuple.append((qs.residuals, 0, quasisymmetry_weight_mpol_mapping[max_mode]))
     # Put all together
@@ -527,7 +553,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     # proc0_print("Initial DMerc objective:", DMerc_optimizable.J())
     proc0_print("Initial Aminor:", vmec.wout.Aminor_p)
     proc0_print("Initial betatotal:", vmec.wout.betatotal)
-    proc0_print("Initial bootstrap_mismatch:", bootstrap_mismatch.J())
+    if not run_vacuum: proc0_print("Initial bootstrap_mismatch:", bootstrap_mismatch.J())
     proc0_print("Initial squared flux:", Jf.J())
     ### Stage 1 optimization
     if optimize_stage1:
@@ -606,7 +632,8 @@ for iteration, max_mode in enumerate(max_mode_array):
     if comm_world.rank == 0:
         curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_after_stage12_maxmode{max_mode}"), close=True)
         curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_after_stage12_maxmode{max_mode}"), close=True)
-        pointData = {"B.n/B": BdotN_surf[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi_VMEC,ntheta_VMEC,1))
+        pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
         surf.to_vtk(os.path.join(coils_results_path, f"surf_after_stage12_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf_big.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
@@ -637,7 +664,8 @@ for iteration, max_mode in enumerate(max_mode_array):
     if comm_world.rank == 0:
         curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_opt_maxmode{max_mode}"), close=True)
         curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_opt_maxmode{max_mode}"), close=True)
-        pointData = {"B.n/B": BdotN_surf[:, :, None]}
+        Bmod = bs.AbsB().reshape((nphi_VMEC,ntheta_VMEC,1))
+        pointData = {"B.n/B": BdotN_surf[:, :, None], "B": Bmod}
         surf.to_vtk(os.path.join(coils_results_path, f"surf_opt_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf_big.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
@@ -710,7 +738,7 @@ proc0_print("Final volavgB:", vmec.wout.volavgB)
 proc0_print("Final min DMerc:", np.min(vmec.wout.DMerc[initial_DMerc_index:]))
 proc0_print("Final Aminor:", vmec.wout.Aminor_p)
 proc0_print("Final betatotal:", vmec.wout.betatotal)
-proc0_print("Final bootstrap_mismatch:", bootstrap_mismatch.J())
+if not run_vacuum: proc0_print("Final bootstrap_mismatch:", bootstrap_mismatch.J())
 proc0_print("Final squared flux:", Jf.J())
 
 BdotN_surf = (np.sum(Bbs * surf.unitnormal(), axis=2) - sign_B_external_normal*vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)

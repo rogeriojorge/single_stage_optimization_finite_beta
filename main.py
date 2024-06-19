@@ -102,8 +102,8 @@ quasisymmetry_target_surfaces = np.linspace(0,1,10,endpoint=True) #[0.3, 0.5, 0.
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 0
 ftol_stage_1 = 1e-5
-rel_step_stage1 = 1e-2
-abs_step_stage1 = 1e-5
+rel_step_stage1 = 9e-3
+abs_step_stage1 = 1.5e-5
 initial_DMerc_index = 2
 ## Self-consistent bootstrap current
 beta = 2.5 #%

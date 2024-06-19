@@ -33,7 +33,7 @@ bootstrap_mismatch_weight = 1e2
 optimize_DMerc = True
 use_existing_coils = False
 #### INITIAL COILS PROPERTIES BEING OBTAINED FROM OPTIMAL_COILS_FINAL FOLDER
-if QA_or_QH == 'nfp2_QA':
+if QA_or_QH == 'nfp2_QA': ## type 1
     sign_B_external_normal = 1
     use_existing_coils = False
     max_mode_array                    = [1]*1#[1,2]*2 + [2] * 0 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
@@ -63,7 +63,7 @@ if QA_or_QH == 'nfp2_QA':
     CS_WEIGHT           = 0.18
     ARCLENGTH_WEIGHT    = 4.2e-8
     bootstrap_mismatch_weight = 1e3
-elif QA_or_QH == 'nfp4_QH':
+elif QA_or_QH == 'nfp4_QH': ## type 2
     optimize_DMerc = True
     sign_B_external_normal = -1
     max_mode_array                    = [1,2,3]*3 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
@@ -93,7 +93,7 @@ elif QA_or_QH == 'nfp4_QH':
     CS_WEIGHT           = 6.0e-2
     ARCLENGTH_WEIGHT    = (5.1e-6-3.0e-6)
     bootstrap_mismatch_weight = 1e2
-elif QA_or_QH == 'nfp3_QA':
+elif QA_or_QH == 'nfp3_QA': ## type 3
     sign_B_external_normal = -1
     max_mode_array                    = [1,2]*2 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
     quasisymmetry_weight_mpol_mapping = {1: 1e+3,  2: 1e+3,  3: 1e+3,  4: 1e+3,  5: 1e+3}
@@ -122,7 +122,7 @@ elif QA_or_QH == 'nfp3_QA':
     CS_WEIGHT           = 2.0e-2
     ARCLENGTH_WEIGHT    = (3.7e-4-0.00e-4)
     bootstrap_mismatch_weight = 1e2
-elif QA_or_QH == 'nfp3_QH':
+elif QA_or_QH == 'nfp3_QH': ## type 4
     sign_B_external_normal = -1
     max_mode_array                    = [1,2]*2 + [3] * 0 + [4] * 0 + [5] * 0 + [6] * 0
     quasisymmetry_weight_mpol_mapping = {1: 1e+3,  2: 1e+3,  3: 1e+3,  4: 1e+3,  5: 1e+3}
@@ -151,7 +151,7 @@ elif QA_or_QH == 'nfp3_QH':
     CS_WEIGHT           = 1.7e-2
     ARCLENGTH_WEIGHT    = 4.3e-9
     bootstrap_mismatch_weight = 1e2
-elif QA_or_QH == 'nfp1_QI':
+elif QA_or_QH == 'nfp1_QI': ## type 5
     optimize_DMerc = False
     sign_B_external_normal = -1
     max_mode_array                      = [1,2,3]*2 + [3]* 0+ [4]*0 + [5] * 0
@@ -180,7 +180,7 @@ elif QA_or_QH == 'nfp1_QI':
     CS_THRESHOLD        = 2.3
     CS_WEIGHT           = 9.3
     ARCLENGTH_WEIGHT    = 1.1e-9
-elif QA_or_QH == 'nfp2_QI':
+elif QA_or_QH == 'nfp2_QI': ## type 6
     optimize_DMerc = False
     sign_B_external_normal = -1
     maximum_elongation=5.6
@@ -211,21 +211,22 @@ elif QA_or_QH == 'nfp2_QI':
     CS_THRESHOLD        = 2.3
     CS_WEIGHT           = 9.3
     ARCLENGTH_WEIGHT    = 1.1e-9
-elif QA_or_QH == 'nfp3_QI':
-    optimize_DMerc = False
+elif QA_or_QH == 'nfp3_QI': ## type 7
+    optimize_DMerc = True
     sign_B_external_normal = -1
-    max_mode_array                      = [1,2,3]*2 + [3]* 0+ [4]*0 + [5] * 0
-    quasiisodynamic_weight_mpol_mapping = {1: 2.1e+5,  2: 2.1e+5,  3: 2.1e+5,  4: 2.1e+5,  5: 2.1e+5}
-    # DMerc_weight_mpol_mapping           = {1: 1e+16, 2: 1e+16, 3: 1e+16, 4: 1e+16, 5: 1e+16}
-    DMerc_weight_mpol_mapping           = {1: 1e+6, 2: 1e+6, 3: 1e+6, 4: 1e+6, 5: 1e+6}
-    DMerc_fraction_mpol_mapping         = {1: 0.03,  2: 0.03,  3: 0.03,  4: 0.03,  5: 0.03}
-    maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 7, 6: 7}
+    max_mode_array                      = [3,2,1]*2 #[1,2,3]*2 + [3]* 0+ [4]*0 + [5] * 0
+    quasiisodynamic_weight_mpol_mapping = {1: 8e+4,  2: 8e+4,  3: 8e+4,  4: 8e+4,  5: 8e+4}
+    # quasiisodynamic_weight_mpol_mapping = {1: 2.1e+5,  2: 2.1e+5,  3: 2.1e+5,  4: 2.1e+5,  5: 2.1e+5}
+    DMerc_weight_mpol_mapping           = {1: 1e+16, 2: 1e+16, 3: 1e+16, 4: 1e+16, 5: 1e+16}
+    # DMerc_weight_mpol_mapping           = {1: 1e+6, 2: 1e+6, 3: 1e+6, 4: 1e+6, 5: 1e+6}
+    DMerc_fraction_mpol_mapping         = {1: 0.06,  2: 0.06,  3: 0.06,  4: 0.06,  5: 0.06}
+    maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5, 5: 7, 6: 7}
     coils_objective_array    = [5e5, 6e5, 7e5, 8e5]
     JACOBIAN_THRESHOLD_array = [6e2, 5e2, 4e2, 3e2, 2e2]
     aspect_ratio_target = 6.0
     max_iota            = 1.95 ### THIS WAS LOWER
-    min_iota            = 1.04 ### THIS WAS LOWER
-    min_average_iota    = 1.06 ### THIS WAS LOWER
+    min_iota            = 0.67 ### THIS WAS LOWER
+    min_average_iota    = 0.67 ### THIS WAS LOWER
     ncoils              = 3
     nmodes_coils        = 6
     R0                  = 11.14
@@ -241,7 +242,7 @@ elif QA_or_QH == 'nfp3_QI':
     CS_THRESHOLD        = 1.5
     CS_WEIGHT           = 9.3
     ARCLENGTH_WEIGHT    = 1.1e-9
-elif QA_or_QH == 'nfp4_QI':
+elif QA_or_QH == 'nfp4_QI': ## type 8
     optimize_DMerc = False
     sign_B_external_normal = -1
     max_mode_array                      = [1,2,3]*2 + [3]* 0+ [4]*0 + [5] * 0
