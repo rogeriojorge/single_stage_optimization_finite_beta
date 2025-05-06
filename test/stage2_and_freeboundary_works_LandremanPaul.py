@@ -26,11 +26,11 @@ tmax_fl = 8000
 nphi = 64
 ntheta = 32
 #################################################
-# filename = os.path.join(this_path,"input.final")
+filename = os.path.join(this_path,"input.final")
 # filename = os.path.join(this_path,"input.rotating_ellipse")
 # filename = os.path.join(this_path,"input.LandremanPaul2021_QA_lowres")
 # filename = os.path.join(this_path,"input.LandremanPaul2021_QA_lowres_pressure")
-filename = os.path.join(this_path,"input.LandremanPaul2021_QA_lowres_pressure_current")
+# filename = os.path.join(this_path,"input.LandremanPaul2021_QA_lowres_pressure_current")
 #################################################
 ## CHOOSE TO EXPLICITLY RUN VMEC IN VACUUM OR NOT
 run_in_vacuum = False
@@ -60,7 +60,7 @@ s_array = s_array[indices_to_plot]
 if do_stage_2:
     ncoils = 4 if 'LandremanPaul2021' in filename else 3
     R0_coils = np.sum(vmec.wout.raxis_cc)
-    R1_coils = np.min((vmec.wout.Aminor_p*4,R0_coils/1.4))
+    R1_coils = 0.7#np.min((vmec.wout.Aminor_p*2.6,R0_coils/1.4))
     order = 12
     LENGTH_CON_WEIGHT = 0.1
     LENGTH_THRESHOLD = 26*R0_coils/5

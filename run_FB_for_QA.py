@@ -9,9 +9,9 @@ First cmd line arg: path to the VMEC wout file
 Second cmd line arg: path to the MAKEGRID coils file for this equilibrium
 Third cmd line arg : path to the VMEC input file (so DESC can get the pressure profile)
 """
-from desc import set_device
+# from desc import set_device
 
-set_device("gpu")
+# set_device("gpu")
 
 import os
 import pathlib
@@ -48,7 +48,7 @@ from desc.equilibrium.utils import parse_profile
 from desc.io import load
 optimizer = "proximal-lsq-exact"
 nn = 7
-maxiter = 100
+maxiter = 10
 wout_filename ="optimization_finitebeta_nfp2_QA_stage1/wout_final.nc"
 subfoldername = wout_filename.split("/")[0]
 name = wout_filename.split("/")[1]
