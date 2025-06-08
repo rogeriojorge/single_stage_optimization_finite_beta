@@ -1,0 +1,18 @@
+#!/bin/bash
+#SBATCH --job-name=DESC_FB_single_stage_beta            # create a short name for your job
+#SBATCH --nodes=1                # node count
+#SBATCH -n 16        # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --mem=64G         # memory per cpu-core (4G is default)
+#SBATCH --time=01:59:00          # total run time limit (HH:MM:SS)
+#SBATCH --mail-type=begin        # send mail when process begins
+#SBATCH --mail-type=end          # send email when job ends
+#SBATCH --mail-user=dpanici@princeton.edu
+#SBATCH --constraint=a100 
+#SBATCH --gres=gpu:1
+
+
+
+
+#SBATCH --output=/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp3_QI_stage1_save/coils/optimal_coils/ncoils_5_order_9_R1_6.4_length_target_4.3e+01_weight_0.018_max_curvature_0.23_weight_0.00079_msc_0.8_weight_0.00012_cc_1.8_weight_0.028_cs_1.7_weight_0.002_arclweight_1.5e-06_sign_B_external_normal-1.0/slurm-%j.out
+source setup_DESC_env
+python run_free_boundary_given_wout_and_coilset.py /projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp3_QI_stage1_save/wout_final.nc /projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp3_QI_stage1_save/coils/optimal_coils/ncoils_5_order_9_R1_6.4_length_target_4.3e+01_weight_0.018_max_curvature_0.23_weight_0.00079_msc_0.8_weight_0.00012_cc_1.8_weight_0.028_cs_1.7_weight_0.002_arclweight_1.5e-06_sign_B_external_normal-1.0/coilset_desc_ncoils_5_order_9_nfp_3_sym_True.h5

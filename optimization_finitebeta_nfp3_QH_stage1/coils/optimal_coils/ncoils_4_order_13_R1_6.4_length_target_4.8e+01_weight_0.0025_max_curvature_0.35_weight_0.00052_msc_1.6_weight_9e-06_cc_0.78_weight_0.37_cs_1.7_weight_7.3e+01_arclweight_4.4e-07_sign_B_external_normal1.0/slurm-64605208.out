@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/run_free_boundary_given_wout_and_coilset.py", line 11, in <module>
+    set_device("gpu")
+  File "/home/dpanici/DESC/desc/__init__.py", line 95, in set_device
+    devices = nvgpu.gpu_info()
+              ^^^^^^^^^^^^^^^^
+  File "/home/dpanici/.conda/envs/desc-env/lib/python3.12/site-packages/nvgpu/__init__.py", line 23, in gpu_info
+    selected_lines[line_distance * i + 1].split('|')[2].strip().split('/')]
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range

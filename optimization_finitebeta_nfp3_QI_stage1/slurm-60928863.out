@@ -1,0 +1,12 @@
+DESC version 0.12.3+346.gb7354b1ef,using JAX backend, jax version=0.4.31, jaxlib version=0.4.31, dtype=float64
+Using device: NVIDIA A100 80GB PCIe (id=0), with 80.00 GB available memory
+SAVING NO SHEET CURRENT SOLVE TO  ./desc_fb_no_sheet_current.h5
+SAVING  SHEET CURRENT SOLVE TO  ./desc_fb_with_sheet_current.h5
+Traceback (most recent call last):
+  File "/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp3_QI_stage1/run_FB_for_QI_nfp3.py", line 87, in <module>
+    ext_field = CoilSet.from_makegrid_coilfile(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dpanici/DESC/desc/coils.py", line 1825, in from_makegrid_coilfile
+    with open(coil_file) as f:
+         ^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './coils/biot_savart_opt_nfp3.txt'

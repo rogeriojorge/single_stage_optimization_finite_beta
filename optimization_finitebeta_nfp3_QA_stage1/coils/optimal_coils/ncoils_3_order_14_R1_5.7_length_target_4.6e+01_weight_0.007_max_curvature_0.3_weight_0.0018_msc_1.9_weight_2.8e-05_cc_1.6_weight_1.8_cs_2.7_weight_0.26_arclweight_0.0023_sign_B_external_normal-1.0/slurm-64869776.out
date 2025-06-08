@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp3_QA_stage1/coils/optimal_coils/ncoils_3_order_14_R1_5.7_length_target_4.6e+01_weight_0.007_max_curvature_0.3_weight_0.0018_msc_1.9_weight_2.8e-05_cc_1.6_weight_1.8_cs_2.7_weight_0.26_arclweight_0.0023_sign_B_external_normal-1.0/run_free_boundary_given_wout_and_coilset.py", line 24, in <module>
+    from desc.grid import LinearGrid
+  File "/home/dpanici/DESC/desc/grid.py", line 8, in <module>
+    from desc.backend import fori_loop, jnp, put, repeat, take
+  File "/home/dpanici/DESC/desc/backend.py", line 8, in <module>
+    import nvtx
+ModuleNotFoundError: No module named 'nvtx'

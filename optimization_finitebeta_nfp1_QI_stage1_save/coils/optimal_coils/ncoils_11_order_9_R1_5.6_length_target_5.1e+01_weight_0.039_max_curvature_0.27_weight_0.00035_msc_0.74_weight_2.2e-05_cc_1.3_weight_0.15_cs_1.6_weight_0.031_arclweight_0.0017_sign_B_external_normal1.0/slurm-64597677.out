@@ -1,0 +1,8 @@
+optimization_finitebeta_nfp1_QI_stage1_save
+Traceback (most recent call last):
+  File "/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_9_R1_5.6_length_target_5.1e+01_weight_0.039_max_curvature_0.27_weight_0.00035_msc_0.74_weight_2.2e-05_cc_1.3_weight_0.15_cs_1.6_weight_0.031_arclweight_0.0017_sign_B_external_normal1.0/run_free_boundary_given_wout_and_coilset.py", line 322, in <module>
+    run_free_boundary(wout_filepath, path_to_coilset)
+  File "/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_9_R1_5.6_length_target_5.1e+01_weight_0.039_max_curvature_0.27_weight_0.00035_msc_0.74_weight_2.2e-05_cc_1.3_weight_0.15_cs_1.6_weight_0.031_arclweight_0.0017_sign_B_external_normal1.0/run_free_boundary_given_wout_and_coilset.py", line 70, in run_free_boundary
+    print(subfolderpath)
+          ^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'subfolderpath' where it is not associated with a value

@@ -1,0 +1,6 @@
+SAVING NO SHEET CURRENT SOLVE TO  /projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_15_R1_6.0_length_target_5e+01_weight_0.0051_max_curvature_0.28_weight_0.00015_msc_1.4_weight_3.8e-06_cc_1.1_weight_1.8e+01_cs_0.77_weight_0.0011_arclweight_4.6e-06_sign_B_external_normal-1.0/desc_fb_no_sheet_current.h5
+SAVING  SHEET CURRENT SOLVE TO  /projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_15_R1_6.0_length_target_5e+01_weight_0.0051_max_curvature_0.28_weight_0.00015_msc_1.4_weight_3.8e-06_cc_1.1_weight_1.8e+01_cs_0.77_weight_0.0011_arclweight_4.6e-06_sign_B_external_normal-1.0/desc_fb_with_sheet_current.h5
+/home/dpanici/DESC/desc/input_reader.py:1267: UserWarning: Current is not a power series!
+  warnings.warn(colored("Current is not a power series!", "yellow"))
+eq psi = 95.44138033701564
+field psi = -96.22913349460245

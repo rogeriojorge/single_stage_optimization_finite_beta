@@ -1,0 +1,7 @@
+DESC version 0.12.1+296.g65a64fdc9,using JAX backend, jax version=0.4.14, jaxlib version=0.4.14, dtype=float64
+Using device: NVIDIA A100 80GB PCIe (id=0), with 80.00 GB available memory
+Traceback (most recent call last):
+  File "/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp2_QA_stage1/rerun_with_opt_coilset.py", line 65, in <module>
+    eval_grid=plasma_grid,
+              ^^^^^^^^^^^
+NameError: name 'plasma_grid' is not defined

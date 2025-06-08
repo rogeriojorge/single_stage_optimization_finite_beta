@@ -1,0 +1,167 @@
+SAVING NO SHEET CURRENT SOLVE TO  /projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_9_R1_5.6_length_target_5.1e+01_weight_0.039_max_curvature_0.27_weight_0.00035_msc_0.74_weight_2.2e-05_cc_1.3_weight_0.15_cs_1.6_weight_0.031_arclweight_0.0017_sign_B_external_normal1.0/desc_fb_no_sheet_current.h5
+SAVING  SHEET CURRENT SOLVE TO  /projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_9_R1_5.6_length_target_5.1e+01_weight_0.039_max_curvature_0.27_weight_0.00035_msc_0.74_weight_2.2e-05_cc_1.3_weight_0.15_cs_1.6_weight_0.031_arclweight_0.0017_sign_B_external_normal1.0/desc_fb_with_sheet_current.h5
+/home/dpanici/DESC/desc/input_reader.py:1267: UserWarning: Current is not a power series!
+  warnings.warn(colored("Current is not a power series!", "yellow"))
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 1635
+Number of objectives: 9922
+
+Starting optimization
+Using method: lsq-exact
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 7.122e-07
+         Total delta_x: 3.106e-01
+         Iterations: 100
+         Function evaluations: 121
+         Jacobian evaluations: 101
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.691e+00  -->   7.122e-07, 
+Maximum absolute Force error:                                5.853e+09  -->   2.363e+06 (N)
+Minimum absolute Force error:                                2.008e+03  -->   5.857e+01 (N)
+Average absolute Force error:                                1.218e+08  -->   7.803e+04 (N)
+Maximum absolute Force error:                                1.227e+00  -->   4.955e-04 (normalized)
+Minimum absolute Force error:                                4.210e-07  -->   1.228e-08 (normalized)
+Average absolute Force error:                                2.554e-02  -->   1.636e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   3.510e-16 (m)
+Z boundary error:                                            0.000e+00  -->   1.178e-16 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   1.164e-10 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+eq psi = 95.44138033701564
+field psi = -97.14026949761997
+
+==================================
+Optimizing boundary modes M,N <= 1
+====================================
+Building objective: Boundary error
+/home/dpanici/DESC/desc/utils.py:563: UserWarning: Boundary pressure is nonzero (max 72.0979485308053 Pa), a sheet current should be included.
+  warnings.warn(colored(msg, "yellow"), err)
+Precomputing transforms
+Timer: Precomputing transforms = 185 ms
+Timer: Objective build = 3.43 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 855 ms
+Timer: Objective build = 917 ms
+Timer: Objective build = 1.89 ms
+Timer: Eq Update LinearConstraintProjection build = 5.96 sec
+Timer: Proximal projection build = 13.4 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 637 ms
+Timer: LinearConstraintProjection build = 2.66 sec
+Number of parameters: 9
+Number of objectives: 3362
+Timer: Initializing the optimization = 16.8 sec
+
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          1.375e-01                                    2.395e-01   
+       1              2          8.599e-02      5.153e-02      2.514e-01      3.410e-02   
+       2              3          8.525e-02      7.352e-04      1.531e-02      3.819e-04   
+       3              4          8.525e-02      7.347e-06      5.590e-04      1.652e-05   
+Optimization terminated successfully.
+`ftol` condition satisfied. (ftol=1.00e-04)
+         Current function value: 8.525e-02
+         Total delta_x: 2.631e-01
+         Iterations: 3
+         Function evaluations: 4
+         Jacobian evaluations: 4
+Timer: Solution time = 1.56 min
+Timer: Avg time per step = 23.5 sec
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      1.375e-01  -->   8.525e-02, 
+Maximum absolute Boundary normal field error:                3.038e+01  -->   2.649e+01 (T*m^2)
+Minimum absolute Boundary normal field error:                1.279e-13  -->   1.179e-13 (T*m^2)
+Average absolute Boundary normal field error:                3.972e+00  -->   3.832e+00 (T*m^2)
+Maximum absolute Boundary normal field error:                2.140e-01  -->   1.866e-01 (normalized)
+Minimum absolute Boundary normal field error:                9.006e-16  -->   8.308e-16 (normalized)
+Average absolute Boundary normal field error:                2.798e-02  -->   2.699e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:           1.895e+02  -->   1.147e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:           3.413e-02  -->   1.658e-01 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:           2.973e+01  -->   2.130e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:           3.121e-01  -->   1.889e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:           5.620e-05  -->   2.730e-04 (normalized)
+Average absolute Boundary magnetic pressure error:           4.896e-02  -->   3.508e-02 (normalized)
+Maximum absolute Force error:                                2.363e+06  -->   2.196e+06 (N)
+Minimum absolute Force error:                                5.857e+01  -->   6.520e+00 (N)
+Average absolute Force error:                                7.803e+04  -->   7.124e+04 (N)
+Maximum absolute Force error:                                4.955e-04  -->   4.605e-04 (normalized)
+Minimum absolute Force error:                                1.228e-08  -->   1.367e-09 (normalized)
+Average absolute Force error:                                1.636e-05  -->   1.494e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   2.222e-16 (m)
+Z boundary error:                                            0.000e+00  -->   1.153e-16 (m)
+Fixed pressure profile error:                                0.000e+00  -->   0.000e+00 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+==============================================================================================================
+
+==================================
+Optimizing boundary modes M,N <= 2
+====================================
+Building objective: Boundary error
+/home/dpanici/DESC/desc/utils.py:563: UserWarning: Boundary pressure is nonzero (max 72.0979485308053 Pa), a sheet current should be included.
+  warnings.warn(colored(msg, "yellow"), err)
+Precomputing transforms
+Timer: Precomputing transforms = 185 ms
+Timer: Objective build = 2.59 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 870 ms
+Timer: Objective build = 934 ms
+Timer: Objective build = 1.94 ms
+Timer: Eq Update LinearConstraintProjection build = 5.88 sec
+Timer: Proximal projection build = 12.6 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 648 ms
+Timer: LinearConstraintProjection build = 2.70 sec
+Number of parameters: 25
+Number of objectives: 3362
+Timer: Initializing the optimization = 16.1 sec
+
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          8.156e-02                                    5.336e-02   
+       1              3          5.222e-02      2.934e-02      4.249e-01      2.814e-02   
+       2              4          5.099e-02      1.226e-03      3.984e-01      9.009e-02   
+       3              5          4.318e-02      7.813e-03      1.128e-01      2.100e-03   
+       4              6          4.237e-02      8.102e-04      1.839e-01      1.541e-02   
+       5              8          4.202e-02      3.547e-04      6.580e-02      2.697e-03   
+       6              9          4.181e-02      2.084e-04      1.199e-01      9.192e-03   
+       7             10          4.162e-02      1.845e-04      1.151e-01      1.074e-02   
+       8             11          4.152e-02      1.058e-04      1.131e-01      1.149e-02   
+       9             12          4.125e-02      2.657e-04      1.141e-01      1.164e-02   
+      10             13          4.104e-02      2.111e-04      1.158e-01      1.109e-02   
+      11             14          4.088e-02      1.582e-04      6.013e-02      3.228e-03   
+      12             15          4.086e-02      2.595e-05      3.904e-02      1.328e-03   
+      13             16          4.084e-02      1.109e-05      2.487e-02      6.822e-04   
+      14             17          4.084e-02      4.424e-06      1.583e-02      4.131e-04   
+      15             18          4.083e-02      1.462e-05      9.953e-03      2.469e-04   
+      16             19          4.082e-02      1.010e-05      5.778e-03      1.254e-04   
+      17             20          4.081e-02      4.347e-06      3.627e-03      8.927e-05   
+slurmstepd: error: *** JOB 64597751 ON della-l03g7 CANCELLED AT 2025-05-29T17:28:41 DUE TO TIME LIMIT ***

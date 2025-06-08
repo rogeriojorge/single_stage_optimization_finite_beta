@@ -1,0 +1,79 @@
+optimization_finitebeta_nfp1_QI_stage1_save
+/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save
+SAVING NO SHEET CURRENT SOLVE TO  /projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_9_R1_5.6_length_target_5.1e+01_weight_0.039_max_curvature_0.27_weight_0.00035_msc_0.74_weight_2.2e-05_cc_1.3_weight_0.15_cs_1.6_weight_0.031_arclweight_0.0017_sign_B_external_normal1.0/desc_fb_no_sheet_current.h5
+SAVING  SHEET CURRENT SOLVE TO  /projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_9_R1_5.6_length_target_5.1e+01_weight_0.039_max_curvature_0.27_weight_0.00035_msc_0.74_weight_2.2e-05_cc_1.3_weight_0.15_cs_1.6_weight_0.031_arclweight_0.0017_sign_B_external_normal1.0/desc_fb_with_sheet_current.h5
+/home/dpanici/DESC/desc/input_reader.py:1267: UserWarning: Current is not a power series!
+  warnings.warn(colored("Current is not a power series!", "yellow"))
+Building objective: force
+Precomputing transforms
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Number of parameters: 1635
+Number of objectives: 9922
+
+Starting optimization
+Using method: lsq-exact
+Warning: Maximum number of iterations has been exceeded.
+         Current function value: 7.122e-07
+         Total delta_x: 3.106e-01
+         Iterations: 100
+         Function evaluations: 121
+         Jacobian evaluations: 101
+==============================================================================================================
+                                                                 Start  -->   End
+Total (sum of squares):                                      2.691e+00  -->   7.122e-07, 
+Maximum absolute Force error:                                5.853e+09  -->   2.363e+06 (N)
+Minimum absolute Force error:                                2.008e+03  -->   5.857e+01 (N)
+Average absolute Force error:                                1.218e+08  -->   7.803e+04 (N)
+Maximum absolute Force error:                                1.227e+00  -->   4.955e-04 (normalized)
+Minimum absolute Force error:                                4.210e-07  -->   1.228e-08 (normalized)
+Average absolute Force error:                                2.554e-02  -->   1.636e-05 (normalized)
+R boundary error:                                            0.000e+00  -->   3.510e-16 (m)
+Z boundary error:                                            0.000e+00  -->   1.178e-16 (m)
+Fixed Psi error:                                             0.000e+00  -->   0.000e+00 (Wb)
+Fixed pressure profile error:                                0.000e+00  -->   1.164e-10 (Pa)
+Fixed current profile error:                                 0.000e+00  -->   0.000e+00 (A)
+Fixed sheet current error:                                   0.000e+00  -->   0.000e+00 (~)
+==============================================================================================================
+Traceback (most recent call last):
+  File "/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_9_R1_5.6_length_target_5.1e+01_weight_0.039_max_curvature_0.27_weight_0.00035_msc_0.74_weight_2.2e-05_cc_1.3_weight_0.15_cs_1.6_weight_0.031_arclweight_0.0017_sign_B_external_normal1.0/run_free_boundary_given_wout_and_coilset.py", line 322, in <module>
+    run_free_boundary(wout_filepath, path_to_coilset)
+  File "/projects/EKOLEMEN/DESC/single_stage_optimization_finite_beta/optimization_finitebeta_nfp1_QI_stage1_save/coils/optimal_coils/ncoils_11_order_9_R1_5.6_length_target_5.1e+01_weight_0.039_max_curvature_0.27_weight_0.00035_msc_0.74_weight_2.2e-05_cc_1.3_weight_0.15_cs_1.6_weight_0.031_arclweight_0.0017_sign_B_external_normal1.0/run_free_boundary_given_wout_and_coilset.py", line 156, in run_free_boundary
+    eq.save(path_init_fixed_solve)
+  File "/home/dpanici/DESC/desc/io/optimizable_io.py", line 264, in save
+    writer = writer_factory(file_name, file_format=file_format, file_mode=file_mode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dpanici/DESC/desc/io/optimizable_io.py", line 385, in writer_factory
+    writer = hdf5Writer(file_name, file_mode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dpanici/DESC/desc/io/hdf5_io.py", line 302, in __init__
+    super().__init__()
+  File "/home/dpanici/DESC/desc/io/hdf5_io.py", line 30, in __init__
+    super().__init__()
+  File "/home/dpanici/DESC/desc/io/core_io.py", line 11, in __init__
+    self.resolve_base()
+  File "/home/dpanici/DESC/desc/io/core_io.py", line 37, in resolve_base
+    self.base = self.open_file(self.target, self.file_mode)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dpanici/DESC/desc/io/hdf5_io.py", line 47, in open_file
+    return h5py.File(file_name, file_mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dpanici/.conda/envs/desc-env/lib/python3.12/site-packages/h5py/_hl/files.py", line 564, in __init__
+    fid = make_fid(name, mode, userblock_size, fapl, fcpl, swmr=swmr)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dpanici/.conda/envs/desc-env/lib/python3.12/site-packages/h5py/_hl/files.py", line 244, in make_fid
+    fid = h5f.create(name, h5f.ACC_TRUNC, fapl=fapl, fcpl=fcpl)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "h5py/_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py/h5f.pyx", line 122, in h5py.h5f.create
+FileNotFoundError: [Errno 2] Unable to synchronously create file (unable to open file: name = 'optimization_finitebeta_nfp1_QI_stage1_save/desc_initial_fixed_bdry_solve.h5', errno = 2, error message = 'No such file or directory', flags = 13, o_flags = 242)

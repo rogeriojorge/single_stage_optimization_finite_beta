@@ -1,0 +1,1175 @@
+DESC version 0.12.0+215.g7fdb093a1,using JAX backend, jax version=0.4.14, jaxlib version=0.4.14, dtype=float64
+Using device: NVIDIA A100 80GB PCIe (id=0), with 80.00 GB available memory
+
+==================================
+Optimizing boundary modes M,N <= 1
+====================================
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 1.24 sec
+Timer: Objective build = 4.29 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Timer: Objective build = 2.25 sec
+Timer: Linear constraint projection build = 8.44 sec
+Number of parameters: 1635
+Number of objectives: 9922
+Starting optimization
+Using method: lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          8.914e-08                                    2.209e-04   
+       1              5          8.856e-08      5.788e-10      2.832e-03      2.034e-04   
+Optimization terminated successfully.
+`ftol` condition satisfied.
+         Current function value: 8.856e-08
+         Total delta_x: 2.832e-03
+         Iterations: 1
+         Function evaluations: 5
+         Jacobian evaluations: 2
+Timer: Solution time = 14.5 sec
+Timer: Avg time per step = 7.28 sec
+Start of solver
+Total (sum of squares):  8.914e-08, 
+Maximum absolute Force error:  1.024e+06 (N)
+Minimum absolute Force error:  6.055e+00 (N)
+Average absolute Force error:  4.294e+04 (N)
+Maximum absolute Force error:  1.205e-04 (normalized)
+Minimum absolute Force error:  7.126e-10 (normalized)
+Average absolute Force error:  5.053e-06 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed sheet current error:  0.000e+00 (~)
+End of solver
+Total (sum of squares):  8.856e-08, 
+Maximum absolute Force error:  1.010e+06 (N)
+Minimum absolute Force error:  3.013e+00 (N)
+Average absolute Force error:  4.270e+04 (N)
+Maximum absolute Force error:  1.188e-04 (normalized)
+Minimum absolute Force error:  3.546e-10 (normalized)
+Average absolute Force error:  5.025e-06 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  5.206e-10 (A)
+Fixed sheet current error:  0.000e+00 (~)
+Building objective: Boundary error
+Precomputing transforms
+Timer: Precomputing transforms = 962 ms
+Timer: Objective build = 1.52 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 127 ms
+Timer: Objective build = 369 ms
+Timer: Proximal projection build = 14.6 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 1.37 sec
+Timer: Linear constraint projection build = 3.05 sec
+Number of parameters: 15
+Number of objectives: 5043
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          6.752e+01                                    1.770e+01   
+       1              2          4.496e+01      2.256e+01      5.431e+07      1.071e+01   
+       2              4          3.597e+01      8.987e+00      3.029e+07      9.756e+00   
+       3              5          2.152e+01      1.445e+01      6.202e+07      8.702e+00   
+       4              6          4.089e+00      1.744e+01      1.180e+08      4.912e+00   
+       5              7          6.669e-01      3.422e+00      4.564e+07      4.753e-01   
+       6              8          6.658e-01      1.030e-03      3.118e+07      8.194e-01   
+       7              9          3.094e-01      3.564e-01      1.880e+07      1.941e-01   
+       8             11          2.937e-01      1.573e-02      4.019e+06      1.658e-01   
+       9             12          2.933e-01      3.375e-04      6.589e+06      2.023e-01   
+      10             13          2.817e-01      1.159e-02      1.964e+06      1.237e-01   
+      11             14          2.807e-01      1.022e-03      3.287e+06      1.010e-01   
+      12             15          2.770e-01      3.715e-03      1.020e+06      6.300e-02   
+      13             16          2.751e-01      1.864e-03      1.866e+06      4.943e-02   
+      14             17          2.745e-01      6.151e-04      1.566e+06      4.834e-02   
+      15             18          2.725e-01      1.975e-03      4.852e+05      4.508e-02   
+      16             19          2.718e-01      7.583e-04      8.258e+05      2.969e-02   
+      17             20          2.708e-01      9.627e-04      5.852e+05      4.259e-02   
+      18             21          2.702e-01      6.428e-04      8.709e+05      4.060e-02   
+      19             23          2.695e-01      6.555e-04      4.578e+05      2.995e-02   
+      20             24          2.691e-01      4.641e-04      4.211e+05      3.876e-02   
+      21             25          2.689e-01      1.316e-04      6.578e+05      4.000e-02   
+      22             26          2.685e-01      3.921e-04      4.035e+05      3.234e-02   
+      23             27          2.680e-01      5.174e-04      7.270e+04      3.559e-02   
+      24             28          2.679e-01      1.013e-04      3.153e+04      3.567e-02   
+      25             29          2.678e-01      1.210e-04      1.834e+04      3.604e-02   
+      26             30          2.676e-01      2.384e-04      1.406e+04      3.757e-02   
+      27             32          2.675e-01      1.017e-04      1.677e+04      3.747e-02   
+      28             34          2.674e-01      1.600e-05      4.009e+03      3.784e-02   
+Optimization terminated successfully.
+`ftol` condition satisfied.
+         Current function value: 2.674e-01
+         Total delta_x: 3.105e+08
+         Iterations: 28
+         Function evaluations: 34
+         Jacobian evaluations: 29
+Timer: Solution time = 7.13 min
+Timer: Avg time per step = 14.7 sec
+Start of solver
+Total (sum of squares):  6.752e+01, 
+Maximum absolute Boundary normal field error:  2.042e+00 (T*m^2)
+Minimum absolute Boundary normal field error:  9.243e-04 (T*m^2)
+Average absolute Boundary normal field error:  6.029e-01 (T*m^2)
+Maximum absolute Boundary normal field error:  1.241e-02 (normalized)
+Minimum absolute Boundary normal field error:  5.617e-06 (normalized)
+Average absolute Boundary normal field error:  3.664e-03 (normalized)
+Maximum absolute Boundary magnetic pressure error:  3.230e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  9.638e-01 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  9.755e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  2.986e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  8.909e-04 (normalized)
+Average absolute Boundary magnetic pressure error:  9.017e-02 (normalized)
+Maximum absolute Boundary field jump error:  4.099e+02 (T*m^2)
+Minimum absolute Boundary field jump error:  1.415e+02 (T*m^2)
+Average absolute Boundary field jump error:  2.972e+02 (T*m^2)
+Maximum absolute Boundary field jump error:  2.491e+00 (normalized)
+Minimum absolute Boundary field jump error:  8.601e-01 (normalized)
+Average absolute Boundary field jump error:  1.806e+00 (normalized)
+Maximum absolute Force error:  1.010e+06 (N)
+Minimum absolute Force error:  3.013e+00 (N)
+Average absolute Force error:  4.270e+04 (N)
+Maximum absolute Force error:  1.188e-04 (normalized)
+Minimum absolute Force error:  3.546e-10 (normalized)
+Average absolute Force error:  5.025e-06 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+End of solver
+Total (sum of squares):  2.674e-01, 
+Maximum absolute Boundary normal field error:  3.686e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  8.190e-03 (T*m^2)
+Average absolute Boundary normal field error:  9.310e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  2.240e-01 (normalized)
+Minimum absolute Boundary normal field error:  4.977e-05 (normalized)
+Average absolute Boundary normal field error:  5.658e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.324e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  1.293e-02 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  3.019e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  2.148e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  1.195e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  2.790e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.293e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  1.399e-01 (T*m^2)
+Average absolute Boundary field jump error:  1.240e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.001e-01 (normalized)
+Minimum absolute Boundary field jump error:  8.499e-04 (normalized)
+Average absolute Boundary field jump error:  7.533e-02 (normalized)
+Maximum absolute Force error:  2.477e+06 (N)
+Minimum absolute Force error:  6.713e-01 (N)
+Average absolute Force error:  1.068e+05 (N)
+Maximum absolute Force error:  2.916e-04 (normalized)
+Minimum absolute Force error:  7.900e-11 (normalized)
+Average absolute Force error:  1.257e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+
+==================================
+Optimizing boundary modes M,N <= 2
+====================================
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 1.35 sec
+Timer: Objective build = 4.41 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Timer: Objective build = 2.39 sec
+Timer: Linear constraint projection build = 4.12 sec
+Number of parameters: 1635
+Number of objectives: 9922
+Starting optimization
+Using method: lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          5.124e-06                                    7.758e-03   
+       1              4          5.122e-06      1.948e-09      2.300e-03      1.171e-02   
+Optimization terminated successfully.
+`ftol` condition satisfied.
+         Current function value: 5.122e-06
+         Total delta_x: 2.300e-03
+         Iterations: 1
+         Function evaluations: 4
+         Jacobian evaluations: 2
+Timer: Solution time = 10.6 sec
+Timer: Avg time per step = 5.31 sec
+Start of solver
+Total (sum of squares):  5.124e-06, 
+Maximum absolute Force error:  2.477e+06 (N)
+Minimum absolute Force error:  6.713e-01 (N)
+Average absolute Force error:  1.068e+05 (N)
+Maximum absolute Force error:  9.752e-04 (normalized)
+Minimum absolute Force error:  2.643e-10 (normalized)
+Average absolute Force error:  4.204e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed sheet current error:  0.000e+00 (~)
+End of solver
+Total (sum of squares):  5.122e-06, 
+Maximum absolute Force error:  2.475e+06 (N)
+Minimum absolute Force error:  3.121e+01 (N)
+Average absolute Force error:  1.068e+05 (N)
+Maximum absolute Force error:  9.742e-04 (normalized)
+Minimum absolute Force error:  1.229e-08 (normalized)
+Average absolute Force error:  4.203e-05 (normalized)
+R boundary error:  9.861e-32 (m)
+Z boundary error:  2.776e-17 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  1.154e-09 (A)
+Fixed sheet current error:  0.000e+00 (~)
+Building objective: Boundary error
+Precomputing transforms
+Timer: Precomputing transforms = 995 ms
+Timer: Objective build = 1.62 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 137 ms
+Timer: Objective build = 398 ms
+Timer: Proximal projection build = 9.94 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 1.45 sec
+Timer: Linear constraint projection build = 2.48 sec
+Number of parameters: 31
+Number of objectives: 5043
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          7.863e-01                                    1.383e+00   
+       1              3          7.205e-01      6.582e-02      2.903e+06      3.421e-01   
+       2             42          7.205e-01      0.000e+00      0.000e+00      3.421e-01   
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 7.205e-01
+         Total delta_x: 2.903e+06
+         Iterations: 2
+         Function evaluations: 42
+         Jacobian evaluations: 2
+Timer: Solution time = 5.32 min
+Timer: Avg time per step = 1.77 min
+Start of solver
+Total (sum of squares):  7.863e-01, 
+Maximum absolute Boundary normal field error:  3.689e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  3.590e-03 (T*m^2)
+Average absolute Boundary normal field error:  9.301e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.305e-01 (normalized)
+Minimum absolute Boundary normal field error:  3.217e-05 (normalized)
+Average absolute Boundary normal field error:  8.334e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.324e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  1.718e-02 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  3.017e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  7.184e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  5.311e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  9.329e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.294e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  8.762e-02 (T*m^2)
+Average absolute Boundary field jump error:  1.239e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.951e-01 (normalized)
+Minimum absolute Boundary field jump error:  7.850e-04 (normalized)
+Average absolute Boundary field jump error:  1.110e-01 (normalized)
+Maximum absolute Force error:  2.475e+06 (N)
+Minimum absolute Force error:  3.121e+01 (N)
+Average absolute Force error:  1.068e+05 (N)
+Maximum absolute Force error:  9.742e-04 (normalized)
+Minimum absolute Force error:  1.229e-08 (normalized)
+Average absolute Force error:  4.203e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+End of solver
+Total (sum of squares):  7.205e-01, 
+Maximum absolute Boundary normal field error:  3.826e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  2.736e-02 (T*m^2)
+Average absolute Boundary normal field error:  9.936e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.428e-01 (normalized)
+Minimum absolute Boundary normal field error:  2.452e-04 (normalized)
+Average absolute Boundary normal field error:  8.902e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.019e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  1.634e-02 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.163e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.243e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  5.051e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.689e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.316e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  4.050e-01 (T*m^2)
+Average absolute Boundary field jump error:  1.306e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.971e-01 (normalized)
+Minimum absolute Boundary field jump error:  3.628e-03 (normalized)
+Average absolute Boundary field jump error:  1.170e-01 (normalized)
+Maximum absolute Force error:  4.484e+06 (N)
+Minimum absolute Force error:  1.521e-01 (N)
+Average absolute Force error:  1.281e+05 (N)
+Maximum absolute Force error:  1.765e-03 (normalized)
+Minimum absolute Force error:  5.989e-11 (normalized)
+Average absolute Force error:  5.042e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  1.002e-09 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+
+==================================
+Optimizing boundary modes M,N <= 4
+====================================
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 1.37 sec
+Timer: Objective build = 4.45 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Timer: Objective build = 2.40 sec
+Timer: Linear constraint projection build = 3.97 sec
+Number of parameters: 1635
+Number of objectives: 9922
+Starting optimization
+Using method: lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          7.935e-06                                    1.120e-01   
+       1              5          7.908e-06      2.736e-08      1.945e-03      9.801e-02   
+Optimization terminated successfully.
+`ftol` condition satisfied.
+         Current function value: 7.908e-06
+         Total delta_x: 1.945e-03
+         Iterations: 1
+         Function evaluations: 5
+         Jacobian evaluations: 2
+Timer: Solution time = 11.1 sec
+Timer: Avg time per step = 5.57 sec
+Start of solver
+Total (sum of squares):  7.935e-06, 
+Maximum absolute Force error:  4.484e+06 (N)
+Minimum absolute Force error:  1.521e-01 (N)
+Average absolute Force error:  1.281e+05 (N)
+Maximum absolute Force error:  1.835e-03 (normalized)
+Minimum absolute Force error:  6.227e-11 (normalized)
+Average absolute Force error:  5.242e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed sheet current error:  0.000e+00 (~)
+End of solver
+Total (sum of squares):  7.908e-06, 
+Maximum absolute Force error:  3.538e+06 (N)
+Minimum absolute Force error:  2.293e+00 (N)
+Average absolute Force error:  1.280e+05 (N)
+Maximum absolute Force error:  1.448e-03 (normalized)
+Minimum absolute Force error:  9.385e-10 (normalized)
+Average absolute Force error:  5.237e-05 (normalized)
+R boundary error:  1.130e-31 (m)
+Z boundary error:  3.925e-17 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  6.337e-10 (A)
+Fixed sheet current error:  0.000e+00 (~)
+Building objective: Boundary error
+Precomputing transforms
+Timer: Precomputing transforms = 1.00 sec
+Timer: Objective build = 1.58 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 138 ms
+Timer: Objective build = 397 ms
+Timer: Proximal projection build = 9.96 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 1.47 sec
+Timer: Linear constraint projection build = 2.50 sec
+Number of parameters: 87
+Number of objectives: 5043
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          7.471e-01                                    9.438e-01   
+       1              4          7.387e-01      8.419e-03      1.157e+06      8.464e-01   
+       2              5          7.310e-01      7.676e-03      1.248e+05      7.777e-01   
+       3              6          7.237e-01      7.303e-03      6.932e+04      7.476e-01   
+       4              7          7.199e-01      3.808e-03      3.570e+04      7.068e-01   
+       5              8          7.157e-01      4.205e-03      1.324e+04      7.454e-01   
+       6              9          7.130e-01      2.731e-03      1.597e+04      6.779e-01   
+       7             10          7.120e-01      9.932e-04      1.085e+04      5.616e-01   
+       8             11          7.112e-01      7.860e-04      4.281e+03      5.777e-01   
+       9             12          7.103e-01      9.326e-04      4.480e+03      5.810e-01   
+      10             13          7.102e-01      4.054e-05      4.183e+03      5.819e-01   
+      11             46          7.102e-01      0.000e+00      0.000e+00      5.819e-01   
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 7.102e-01
+         Total delta_x: 9.001e+05
+         Iterations: 11
+         Function evaluations: 46
+         Jacobian evaluations: 11
+Timer: Solution time = 6.84 min
+Timer: Avg time per step = 34.2 sec
+Start of solver
+Total (sum of squares):  7.471e-01, 
+Maximum absolute Boundary normal field error:  3.828e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  7.559e-03 (T*m^2)
+Average absolute Boundary normal field error:  1.002e+01 (T*m^2)
+Maximum absolute Boundary normal field error:  3.460e-01 (normalized)
+Minimum absolute Boundary normal field error:  6.832e-05 (normalized)
+Average absolute Boundary normal field error:  9.054e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.019e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  2.249e-02 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.154e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.490e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  7.231e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.924e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.316e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  4.731e-01 (T*m^2)
+Average absolute Boundary field jump error:  1.311e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.998e-01 (normalized)
+Minimum absolute Boundary field jump error:  4.276e-03 (normalized)
+Average absolute Boundary field jump error:  1.185e-01 (normalized)
+Maximum absolute Force error:  3.538e+06 (N)
+Minimum absolute Force error:  2.293e+00 (N)
+Average absolute Force error:  1.280e+05 (N)
+Maximum absolute Force error:  1.448e-03 (normalized)
+Minimum absolute Force error:  9.386e-10 (normalized)
+Average absolute Force error:  5.237e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+End of solver
+Total (sum of squares):  7.102e-01, 
+Maximum absolute Boundary normal field error:  3.820e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  2.490e-03 (T*m^2)
+Average absolute Boundary normal field error:  9.888e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.453e-01 (normalized)
+Minimum absolute Boundary normal field error:  2.251e-05 (normalized)
+Average absolute Boundary normal field error:  8.938e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  1.969e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  5.413e-03 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.120e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.331e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  1.740e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.816e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.302e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  3.662e-02 (T*m^2)
+Average absolute Boundary field jump error:  1.253e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.984e-01 (normalized)
+Minimum absolute Boundary field jump error:  3.310e-04 (normalized)
+Average absolute Boundary field jump error:  1.132e-01 (normalized)
+Maximum absolute Force error:  2.742e+06 (N)
+Minimum absolute Force error:  4.799e+00 (N)
+Average absolute Force error:  1.646e+05 (N)
+Maximum absolute Force error:  1.122e-03 (normalized)
+Minimum absolute Force error:  1.964e-09 (normalized)
+Average absolute Force error:  6.736e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  1.317e-09 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+
+==================================
+Optimizing boundary modes M,N <= 5
+====================================
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 1.39 sec
+Timer: Objective build = 4.50 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Timer: Objective build = 2.40 sec
+Timer: Linear constraint projection build = 4.01 sec
+Number of parameters: 1635
+Number of objectives: 9922
+Starting optimization
+Using method: lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          1.308e-05                                    4.446e-02   
+       1              5          1.307e-05      7.268e-09      1.446e-03      5.651e-02   
+       2              6          1.305e-05      1.707e-08      4.394e-04      3.215e-02   
+Optimization terminated successfully.
+`ftol` condition satisfied.
+         Current function value: 1.305e-05
+         Total delta_x: 1.695e-03
+         Iterations: 2
+         Function evaluations: 6
+         Jacobian evaluations: 3
+Timer: Solution time = 11.1 sec
+Timer: Avg time per step = 3.73 sec
+Start of solver
+Total (sum of squares):  1.308e-05, 
+Maximum absolute Force error:  2.742e+06 (N)
+Minimum absolute Force error:  4.799e+00 (N)
+Average absolute Force error:  1.646e+05 (N)
+Maximum absolute Force error:  1.116e-03 (normalized)
+Minimum absolute Force error:  1.952e-09 (normalized)
+Average absolute Force error:  6.696e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed sheet current error:  0.000e+00 (~)
+End of solver
+Total (sum of squares):  1.305e-05, 
+Maximum absolute Force error:  2.755e+06 (N)
+Minimum absolute Force error:  1.461e+01 (N)
+Average absolute Force error:  1.643e+05 (N)
+Maximum absolute Force error:  1.121e-03 (normalized)
+Minimum absolute Force error:  5.945e-09 (normalized)
+Average absolute Force error:  6.687e-05 (normalized)
+R boundary error:  5.557e-17 (m)
+Z boundary error:  1.865e-18 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  1.222e-09 (A)
+Fixed sheet current error:  0.000e+00 (~)
+Building objective: Boundary error
+Precomputing transforms
+Timer: Precomputing transforms = 1.01 sec
+Timer: Objective build = 1.59 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 139 ms
+Timer: Objective build = 399 ms
+Timer: Proximal projection build = 9.75 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 1.46 sec
+Timer: Linear constraint projection build = 2.50 sec
+Number of parameters: 127
+Number of objectives: 5043
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          7.036e-01                                    2.202e+00   
+       1              4          7.021e-01      1.527e-03      1.675e+05      6.883e-01   
+       2              5          6.922e-01      9.864e-03      2.097e+04      7.865e-01   
+       3              6          6.869e-01      5.323e-03      2.328e+04      6.213e-01   
+       4              7          6.859e-01      1.018e-03      2.841e+04      5.761e-01   
+       5              8          6.837e-01      2.163e-03      1.065e+04      6.244e-01   
+       6             42          6.837e-01      0.000e+00      0.000e+00      6.244e-01   
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 6.837e-01
+         Total delta_x: 1.986e+05
+         Iterations: 6
+         Function evaluations: 42
+         Jacobian evaluations: 6
+Timer: Solution time = 5.97 min
+Timer: Avg time per step = 51.1 sec
+Start of solver
+Total (sum of squares):  7.036e-01, 
+Maximum absolute Boundary normal field error:  3.817e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  8.744e-03 (T*m^2)
+Average absolute Boundary normal field error:  9.896e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.434e-01 (normalized)
+Minimum absolute Boundary normal field error:  7.867e-05 (normalized)
+Average absolute Boundary normal field error:  8.903e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  1.969e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  5.091e-03 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.119e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.293e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  1.627e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.773e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.302e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  1.903e-01 (T*m^2)
+Average absolute Boundary field jump error:  1.253e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.971e-01 (normalized)
+Minimum absolute Boundary field jump error:  1.712e-03 (normalized)
+Average absolute Boundary field jump error:  1.128e-01 (normalized)
+Maximum absolute Force error:  2.755e+06 (N)
+Minimum absolute Force error:  1.461e+01 (N)
+Average absolute Force error:  1.643e+05 (N)
+Maximum absolute Force error:  1.121e-03 (normalized)
+Minimum absolute Force error:  5.945e-09 (normalized)
+Average absolute Force error:  6.686e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+End of solver
+Total (sum of squares):  6.837e-01, 
+Maximum absolute Boundary normal field error:  3.734e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  7.122e-03 (T*m^2)
+Average absolute Boundary normal field error:  9.617e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.359e-01 (normalized)
+Minimum absolute Boundary normal field error:  6.408e-05 (normalized)
+Average absolute Boundary normal field error:  8.652e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.041e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  8.483e-03 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.161e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.522e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  2.711e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.906e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.218e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  2.745e-01 (T*m^2)
+Average absolute Boundary field jump error:  1.217e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.895e-01 (normalized)
+Minimum absolute Boundary field jump error:  2.469e-03 (normalized)
+Average absolute Boundary field jump error:  1.095e-01 (normalized)
+Maximum absolute Force error:  4.496e+06 (N)
+Minimum absolute Force error:  2.271e+01 (N)
+Average absolute Force error:  1.954e+05 (N)
+Maximum absolute Force error:  1.829e-03 (normalized)
+Minimum absolute Force error:  9.239e-09 (normalized)
+Average absolute Force error:  7.952e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  9.740e-10 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+
+==================================
+Optimizing boundary modes M,N <= 7
+====================================
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 1.39 sec
+Timer: Objective build = 4.55 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Timer: Objective build = 2.38 sec
+Timer: Linear constraint projection build = 3.96 sec
+Number of parameters: 1635
+Number of objectives: 9922
+Starting optimization
+Using method: lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          1.749e-05                                    1.977e-02   
+       1              4          1.738e-05      1.095e-07      1.211e-02      2.896e-02   
+Optimization terminated successfully.
+`ftol` condition satisfied.
+         Current function value: 1.738e-05
+         Total delta_x: 1.211e-02
+         Iterations: 1
+         Function evaluations: 4
+         Jacobian evaluations: 2
+Timer: Solution time = 10.5 sec
+Timer: Avg time per step = 5.28 sec
+Start of solver
+Total (sum of squares):  1.749e-05, 
+Maximum absolute Force error:  4.496e+06 (N)
+Minimum absolute Force error:  2.271e+01 (N)
+Average absolute Force error:  1.954e+05 (N)
+Maximum absolute Force error:  1.823e-03 (normalized)
+Minimum absolute Force error:  9.207e-09 (normalized)
+Average absolute Force error:  7.925e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed sheet current error:  0.000e+00 (~)
+End of solver
+Total (sum of squares):  1.738e-05, 
+Maximum absolute Force error:  4.472e+06 (N)
+Minimum absolute Force error:  1.629e+01 (N)
+Average absolute Force error:  1.950e+05 (N)
+Maximum absolute Force error:  1.813e-03 (normalized)
+Minimum absolute Force error:  6.607e-09 (normalized)
+Average absolute Force error:  7.908e-05 (normalized)
+R boundary error:  2.604e-18 (m)
+Z boundary error:  2.780e-17 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  9.458e-10 (A)
+Fixed sheet current error:  0.000e+00 (~)
+Building objective: Boundary error
+Precomputing transforms
+Timer: Precomputing transforms = 1.00 sec
+Timer: Objective build = 1.58 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 136 ms
+Timer: Objective build = 392 ms
+Timer: Proximal projection build = 9.74 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 1.47 sec
+Timer: Linear constraint projection build = 2.50 sec
+Number of parameters: 231
+Number of objectives: 5043
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          6.842e-01                                    7.762e+00   
+       1              5          6.695e-01      1.467e-02      2.118e+04      6.580e+00   
+       2              6          6.654e-01      4.048e-03      1.580e+04      4.514e+00   
+       3              7          6.612e-01      4.265e-03      5.118e+03      4.262e+00   
+       4              8          6.564e-01      4.790e-03      5.288e+03      3.289e+00   
+       5              9          6.528e-01      3.582e-03      4.969e+03      2.977e+00   
+       6             10          6.492e-01      3.574e-03      4.519e+03      2.508e+00   
+       7             11          6.456e-01      3.648e-03      3.928e+03      1.828e+00   
+       8             12          6.430e-01      2.613e-03      4.223e+03      1.628e+00   
+       9             13          6.406e-01      2.392e-03      4.961e+03      1.713e+00   
+      10             14          6.391e-01      1.490e-03      5.374e+03      1.486e+00   
+      11             15          6.374e-01      1.720e-03      5.997e+03      1.811e+00   
+      12             16          6.365e-01      8.303e-04      5.970e+03      1.535e+00   
+      13             17          6.356e-01      8.847e-04      1.155e+03      1.349e+00   
+      14             50          6.356e-01      0.000e+00      0.000e+00      1.349e+00   
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 6.356e-01
+         Total delta_x: 6.848e+04
+         Iterations: 14
+         Function evaluations: 50
+         Jacobian evaluations: 14
+Timer: Solution time = 8.21 min
+Timer: Avg time per step = 32.8 sec
+Start of solver
+Total (sum of squares):  6.842e-01, 
+Maximum absolute Boundary normal field error:  3.735e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  2.716e-03 (T*m^2)
+Average absolute Boundary normal field error:  9.670e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.354e-01 (normalized)
+Minimum absolute Boundary normal field error:  2.439e-05 (normalized)
+Average absolute Boundary normal field error:  8.684e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.041e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  1.338e-02 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.160e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.501e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  4.261e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.879e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.220e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  2.507e-01 (T*m^2)
+Average absolute Boundary field jump error:  1.220e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.892e-01 (normalized)
+Minimum absolute Boundary field jump error:  2.251e-03 (normalized)
+Average absolute Boundary field jump error:  1.096e-01 (normalized)
+Maximum absolute Force error:  4.472e+06 (N)
+Minimum absolute Force error:  1.629e+01 (N)
+Average absolute Force error:  1.950e+05 (N)
+Maximum absolute Force error:  1.813e-03 (normalized)
+Minimum absolute Force error:  6.608e-09 (normalized)
+Average absolute Force error:  7.910e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+End of solver
+Total (sum of squares):  6.356e-01, 
+Maximum absolute Boundary normal field error:  3.749e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  1.523e-02 (T*m^2)
+Average absolute Boundary normal field error:  9.020e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.366e-01 (normalized)
+Minimum absolute Boundary normal field error:  1.368e-04 (normalized)
+Average absolute Boundary normal field error:  8.100e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.012e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  2.879e-02 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.163e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.408e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  9.171e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.890e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.246e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  9.921e-02 (T*m^2)
+Average absolute Boundary field jump error:  1.172e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.915e-01 (normalized)
+Minimum absolute Boundary field jump error:  8.909e-04 (normalized)
+Average absolute Boundary field jump error:  1.053e-01 (normalized)
+Maximum absolute Force error:  4.982e+06 (N)
+Minimum absolute Force error:  2.291e+01 (N)
+Average absolute Force error:  2.268e+05 (N)
+Maximum absolute Force error:  2.020e-03 (normalized)
+Minimum absolute Force error:  9.290e-09 (normalized)
+Average absolute Force error:  9.196e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  1.154e-09 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+
+==================================
+Optimizing boundary modes M,N <= 8
+====================================
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 1.39 sec
+Timer: Objective build = 4.48 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Timer: Objective build = 2.40 sec
+Timer: Linear constraint projection build = 4.02 sec
+Number of parameters: 1635
+Number of objectives: 9922
+Starting optimization
+Using method: lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          2.335e-05                                    7.094e-02   
+       1              4          2.335e-05      2.569e-09      1.098e-02      1.122e-01   
+       2              5          2.328e-05      6.809e-08      3.130e-03      1.855e-01   
+Optimization terminated successfully.
+`ftol` condition satisfied.
+         Current function value: 2.328e-05
+         Total delta_x: 1.306e-02
+         Iterations: 2
+         Function evaluations: 5
+         Jacobian evaluations: 3
+Timer: Solution time = 11.3 sec
+Timer: Avg time per step = 3.77 sec
+Start of solver
+Total (sum of squares):  2.335e-05, 
+Maximum absolute Force error:  4.982e+06 (N)
+Minimum absolute Force error:  2.291e+01 (N)
+Average absolute Force error:  2.268e+05 (N)
+Maximum absolute Force error:  2.020e-03 (normalized)
+Minimum absolute Force error:  9.288e-09 (normalized)
+Average absolute Force error:  9.193e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed sheet current error:  0.000e+00 (~)
+End of solver
+Total (sum of squares):  2.328e-05, 
+Maximum absolute Force error:  4.915e+06 (N)
+Minimum absolute Force error:  9.522e+00 (N)
+Average absolute Force error:  2.267e+05 (N)
+Maximum absolute Force error:  1.993e-03 (normalized)
+Minimum absolute Force error:  3.861e-09 (normalized)
+Average absolute Force error:  9.191e-05 (normalized)
+R boundary error:  9.035e-19 (m)
+Z boundary error:  2.274e-18 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  9.776e-10 (A)
+Fixed sheet current error:  0.000e+00 (~)
+Building objective: Boundary error
+Precomputing transforms
+Timer: Precomputing transforms = 1.01 sec
+Timer: Objective build = 1.59 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 139 ms
+Timer: Objective build = 396 ms
+Timer: Proximal projection build = 9.73 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 1.88 sec
+Timer: Linear constraint projection build = 2.51 sec
+Number of parameters: 295
+Number of objectives: 5043
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          6.364e-01                                    6.878e+00   
+       1              6          6.304e-01      5.969e-03      3.289e+03      5.326e+00   
+       2              7          6.239e-01      6.507e-03      1.101e+04      2.423e+01   
+       3              9          6.217e-01      2.196e-03      1.947e+03      1.162e+01   
+       4             10          6.204e-01      1.346e-03      2.599e+03      4.496e+00   
+       5             11          6.203e-01      6.926e-05      2.805e+03      4.259e+00   
+       6             43          6.203e-01      0.000e+00      0.000e+00      4.259e+00   
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 6.203e-01
+         Total delta_x: 2.115e+04
+         Iterations: 6
+         Function evaluations: 43
+         Jacobian evaluations: 6
+Timer: Solution time = 6.77 min
+Timer: Avg time per step = 58.0 sec
+Start of solver
+Total (sum of squares):  6.364e-01, 
+Maximum absolute Boundary normal field error:  3.748e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  2.238e-02 (T*m^2)
+Average absolute Boundary normal field error:  9.009e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.365e-01 (normalized)
+Minimum absolute Boundary normal field error:  2.010e-04 (normalized)
+Average absolute Boundary normal field error:  8.089e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.012e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  1.274e-02 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.171e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.406e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  4.056e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.911e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.243e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  4.822e-02 (T*m^2)
+Average absolute Boundary field jump error:  1.174e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.912e-01 (normalized)
+Minimum absolute Boundary field jump error:  4.330e-04 (normalized)
+Average absolute Boundary field jump error:  1.054e-01 (normalized)
+Maximum absolute Force error:  4.915e+06 (N)
+Minimum absolute Force error:  9.522e+00 (N)
+Average absolute Force error:  2.267e+05 (N)
+Maximum absolute Force error:  1.992e-03 (normalized)
+Minimum absolute Force error:  3.860e-09 (normalized)
+Average absolute Force error:  9.190e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+End of solver
+Total (sum of squares):  6.203e-01, 
+Maximum absolute Boundary normal field error:  3.750e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  1.143e-02 (T*m^2)
+Average absolute Boundary normal field error:  8.658e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.367e-01 (normalized)
+Minimum absolute Boundary normal field error:  1.027e-04 (normalized)
+Average absolute Boundary normal field error:  7.773e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  2.000e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  3.729e-03 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.204e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.366e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  1.187e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  7.016e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.237e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  2.451e-02 (T*m^2)
+Average absolute Boundary field jump error:  1.156e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.906e-01 (normalized)
+Minimum absolute Boundary field jump error:  2.201e-04 (normalized)
+Average absolute Boundary field jump error:  1.038e-01 (normalized)
+Maximum absolute Force error:  5.134e+06 (N)
+Minimum absolute Force error:  4.902e+00 (N)
+Average absolute Force error:  2.336e+05 (N)
+Maximum absolute Force error:  2.081e-03 (normalized)
+Minimum absolute Force error:  1.987e-09 (normalized)
+Average absolute Force error:  9.468e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  1.049e-09 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+
+==================================
+Optimizing boundary modes M,N <= 10
+====================================
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 1.40 sec
+Timer: Objective build = 4.53 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed Psi
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed sheet current
+Building objective: self_consistency R
+Building objective: self_consistency Z
+Building objective: lambda gauge
+Building objective: axis R self consistency
+Building objective: axis Z self consistency
+Timer: Objective build = 2.40 sec
+Timer: Linear constraint projection build = 3.98 sec
+Number of parameters: 1635
+Number of objectives: 9922
+Starting optimization
+Using method: lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          2.440e-05                                    4.729e-02   
+       1              4          2.437e-05      3.036e-08      9.359e-03      9.675e-02   
+       2              5          2.426e-05      1.085e-07      2.533e-03      4.948e-02   
+Optimization terminated successfully.
+`ftol` condition satisfied.
+         Current function value: 2.426e-05
+         Total delta_x: 1.073e-02
+         Iterations: 2
+         Function evaluations: 5
+         Jacobian evaluations: 3
+Timer: Solution time = 10.9 sec
+Timer: Avg time per step = 3.65 sec
+Start of solver
+Total (sum of squares):  2.440e-05, 
+Maximum absolute Force error:  5.134e+06 (N)
+Minimum absolute Force error:  4.902e+00 (N)
+Average absolute Force error:  2.336e+05 (N)
+Maximum absolute Force error:  2.087e-03 (normalized)
+Minimum absolute Force error:  1.993e-09 (normalized)
+Average absolute Force error:  9.496e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed sheet current error:  0.000e+00 (~)
+End of solver
+Total (sum of squares):  2.426e-05, 
+Maximum absolute Force error:  5.061e+06 (N)
+Minimum absolute Force error:  1.411e+01 (N)
+Average absolute Force error:  2.327e+05 (N)
+Maximum absolute Force error:  2.058e-03 (normalized)
+Minimum absolute Force error:  5.735e-09 (normalized)
+Average absolute Force error:  9.463e-05 (normalized)
+R boundary error:  5.735e-17 (m)
+Z boundary error:  2.776e-17 (m)
+Fixed Psi error:  0.000e+00 (Wb)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  5.944e-10 (A)
+Fixed sheet current error:  0.000e+00 (~)
+Building objective: Boundary error
+Precomputing transforms
+Timer: Precomputing transforms = 1.01 sec
+Timer: Objective build = 1.59 sec
+Building objective: force
+Precomputing transforms
+Timer: Precomputing transforms = 137 ms
+Timer: Objective build = 396 ms
+Timer: Proximal projection build = 9.81 sec
+Building objective: lcfs R
+Building objective: lcfs Z
+Building objective: fixed pressure
+Building objective: fixed current
+Building objective: fixed Psi
+Timer: Objective build = 1.40 sec
+Timer: Linear constraint projection build = 2.34 sec
+Number of parameters: 447
+Number of objectives: 5043
+Starting optimization
+Using method: proximal-lsq-exact
+   Iteration     Total nfev        Cost      Cost reduction    Step norm     Optimality   
+       0              1          6.270e-01                                    3.166e+01   
+       1              6          6.212e-01      5.749e-03      2.709e+03      3.141e+01   
+       2              7          6.190e-01      2.271e-03      2.979e+03      4.551e+01   
+       3             39          6.190e-01      0.000e+00      0.000e+00      4.551e+01   
+Warning: A bad approximation caused failure to predict improvement.
+         Current function value: 6.190e-01
+         Total delta_x: 5.683e+03
+         Iterations: 3
+         Function evaluations: 39
+         Jacobian evaluations: 3
+Timer: Solution time = 5.79 min
+Timer: Avg time per step = 1.45 min
+Start of solver
+Total (sum of squares):  6.270e-01, 
+Maximum absolute Boundary normal field error:  3.737e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  8.131e-03 (T*m^2)
+Average absolute Boundary normal field error:  8.651e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.360e-01 (normalized)
+Minimum absolute Boundary normal field error:  7.311e-05 (normalized)
+Average absolute Boundary normal field error:  7.779e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  1.999e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  1.944e-03 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.217e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.382e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  6.209e-06 (normalized)
+Average absolute Boundary magnetic pressure error:  7.078e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.238e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  1.005e-01 (T*m^2)
+Average absolute Boundary field jump error:  1.163e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.911e-01 (normalized)
+Minimum absolute Boundary field jump error:  9.040e-04 (normalized)
+Average absolute Boundary field jump error:  1.045e-01 (normalized)
+Maximum absolute Force error:  5.061e+06 (N)
+Minimum absolute Force error:  1.411e+01 (N)
+Average absolute Force error:  2.327e+05 (N)
+Maximum absolute Force error:  2.057e-03 (normalized)
+Minimum absolute Force error:  5.735e-09 (normalized)
+Average absolute Force error:  9.462e-05 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  0.000e+00 (A)
+Fixed Psi error:  0.000e+00 (Wb)
+End of solver
+Total (sum of squares):  6.190e-01, 
+Maximum absolute Boundary normal field error:  3.724e+01 (T*m^2)
+Minimum absolute Boundary normal field error:  1.228e-03 (T*m^2)
+Average absolute Boundary normal field error:  8.580e+00 (T*m^2)
+Maximum absolute Boundary normal field error:  3.348e-01 (normalized)
+Minimum absolute Boundary normal field error:  1.104e-05 (normalized)
+Average absolute Boundary normal field error:  7.715e-02 (normalized)
+Maximum absolute Boundary magnetic pressure error:  1.976e+02 (T^2*m^2)
+Minimum absolute Boundary magnetic pressure error:  1.631e-02 (T^2*m^2)
+Average absolute Boundary magnetic pressure error:  2.178e+01 (T^2*m^2)
+Maximum absolute Boundary magnetic pressure error:  6.309e-01 (normalized)
+Minimum absolute Boundary magnetic pressure error:  5.207e-05 (normalized)
+Average absolute Boundary magnetic pressure error:  6.955e-02 (normalized)
+Maximum absolute Boundary field jump error:  3.228e+01 (T*m^2)
+Minimum absolute Boundary field jump error:  2.899e-01 (T*m^2)
+Average absolute Boundary field jump error:  1.156e+01 (T*m^2)
+Maximum absolute Boundary field jump error:  2.902e-01 (normalized)
+Minimum absolute Boundary field jump error:  2.607e-03 (normalized)
+Average absolute Boundary field jump error:  1.040e-01 (normalized)
+Maximum absolute Force error:  6.432e+06 (N)
+Minimum absolute Force error:  6.795e+00 (N)
+Average absolute Force error:  2.461e+05 (N)
+Maximum absolute Force error:  2.615e-03 (normalized)
+Minimum absolute Force error:  2.762e-09 (normalized)
+Average absolute Force error:  1.000e-04 (normalized)
+R boundary error:  0.000e+00 (m)
+Z boundary error:  0.000e+00 (m)
+Fixed pressure profile error:  0.000e+00 (Pa)
+Fixed current profile error:  1.173e-09 (A)
+Fixed Psi error:  0.000e+00 (Wb)
