@@ -6,9 +6,12 @@
 First cmd line arg: path to the VMEC wout file
 Second cmd line arg: path to the DESC coils .h5 for this equilibrium
 """
+import os
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.95"
 from desc import set_device
 
 set_device("gpu")
+
 
 import os
 import sys
